@@ -1,0 +1,163 @@
+
+import React from 'react';
+import { useCart } from '../contexts/CartContext';
+import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+const Cart: React.FC = () => {
+  const { items, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
+
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(price);
+  };
+
+  if (items.length === 0) {
+    return (
+      <div className="min-h-screen pt-16">
+        <div className="container mx-auto px-4 py-16">
+          <div className="text-center max-w-md mx-auto">
+            <ShoppingBag className="h-24 w-24 mx-auto text-muted-foreground mb-6" />
+            <h1 className="text-3xl font-elegant font-bold mb-4">Carrinho Vazio</h1>
+            <p className="text-muted-foreground mb-8">
+              Você ainda não adicionou nenhum produto ao seu carrinho.
+            </p>
+            <Link
+              to="/"
+              className="inline-block bg-atelie-gradient text-white px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
+            >
+              Continuar Comprando
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen pt-16">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-3xl font-elegant font-bold text-gradient mb-2">
+            Meu Carrinho
+          </h1>
+          <p className="text-muted-foreground">
+            {items.length} {items.length === 1 ? 'item' : 'itens'} no carrinho
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          {/* Cart Items */}
+          <div className="lg:col-span-2 space-y-4">
+            {items.map((item) => (
+              <div key={item.id} className="bg-card rounded-lg p-6 border border-border">
+                <div className="flex items-center space-x-4">
+                  {/* Product Image */}
+                  <div className="flex-shrink-0">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-20 h-20 object-cover rounded-lg"
+                    />
+                  </div>
+
+                  {/* Product Info */}
+                  <div className="flex-grow">
+                    <h3 className="font-semibold text-lg mb-1">{item.name}</h3>
+                    <p className="text-muted-foreground text-sm mb-2">
+                      {item.category}
+                    </p>
+                    <div className="text-lg font-bold text-gradient">
+                      {formatPrice(item.price)}
+                    </div>
+                  </div>
+
+                  {/* Quantity Controls */}
+                  <div className="flex items-center space-x-3">
+                    <button
+                      onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                      className="p-1 rounded-md hover:bg-accent transition-colors"
+                    >
+                      <Minus className="h-4 w-4" />
+                    </button>
+                    <span className="w-12 text-center font-medium">{item.quantity}</span>
+                    <button
+                      onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                      className="p-1 rounded-md hover:bg-accent transition-colors"
+                    >
+                      <Plus className="h-4 w-4" />
+                    </button>
+                  </div>
+
+                  {/* Remove Button */}
+                  <button
+                    onClick={() => removeFromCart(item.id)}
+                    className="p-2 text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+                  >
+                    <Trash2 className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {/* Clear Cart */}
+            <div className="flex justify-end">
+              <button
+                onClick={clearCart}
+                className="text-destructive hover:bg-destructive/10 px-4 py-2 rounded-lg transition-colors"
+              >
+                Limpar Carrinho
+              </button>
+            </div>
+          </div>
+
+          {/* Order Summary */}
+          <div className="lg:col-span-1">
+            <div className="bg-card rounded-lg p-6 border border-border sticky top-24">
+              <h2 className="text-xl font-semibold mb-6">Resumo do Pedido</h2>
+              
+              <div className="space-y-4 mb-6">
+                {items.map((item) => (
+                  <div key={item.id} className="flex justify-between text-sm">
+                    <span>{item.name} x{item.quantity}</span>
+                    <span>{formatPrice(item.price * item.quantity)}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="border-t border-border pt-4 mb-6">
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Total</span>
+                  <span className="text-gradient">{formatPrice(getTotalPrice())}</span>
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <button className="w-full bg-atelie-gradient text-white py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity">
+                  Finalizar Compra
+                </button>
+                
+                <Link
+                  to="/"
+                  className="block w-full text-center border border-border py-3 rounded-lg hover:bg-accent transition-colors"
+                >
+                  Continuar Comprando
+                </Link>
+              </div>
+
+              <div className="mt-6 text-sm text-muted-foreground">
+                <p>✓ Frete grátis para pedidos acima de R$ 500</p>
+                <p>✓ Parcelamento em até 12x sem juros</p>
+                <p>✓ Garantia de 2 anos</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Cart;
