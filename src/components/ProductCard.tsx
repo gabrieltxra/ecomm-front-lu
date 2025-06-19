@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { Heart, ShoppingCart } from 'lucide-react';
-import { Product } from '../contexts/CartContext';
 import { useCart } from '../contexts/CartContext';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
+import { Product } from '@/types/Product';
 
 interface ProductCardProps {
   product: Product;
@@ -33,7 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* Image Container */}
         <div className="relative aspect-square overflow-hidden">
           <img
-            src={product.image}
+            src={product.image_url}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />

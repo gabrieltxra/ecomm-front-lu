@@ -1,5 +1,12 @@
-
-import { Product } from '../contexts/CartContext';
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  description: string;
+  images: string[];
+  category: string;
+}
 
 export const products: Product[] = [
   {

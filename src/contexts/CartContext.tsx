@@ -1,15 +1,9 @@
-
+import { Product as ProductType } from '@/types/Product';
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-  description: string;
-  images: string[];
-  category: string;
+interface Product extends ProductType {
 }
+
 
 export interface CartItem extends Product {
   quantity: number;

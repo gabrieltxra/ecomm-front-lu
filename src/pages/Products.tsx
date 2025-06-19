@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { products } from '../data/products';
 import ProductCard from '../components/ProductCard';
-import { Filter, SortAsc, SortDesc, X } from 'lucide-react';
+import { Filter, X } from 'lucide-react';
+import { Product } from '@/types/Product';
+import { useProducts } from '@/services/productsService';
 
 // Interfaces para integração com banco de dados
 interface Category {
@@ -46,31 +47,62 @@ const Products: React.FC<ProductsPageProps> = ({
   categories = [],
   priceRange,
   sortOptions = [],
-  loading = false,
   onFiltersChange
 }) => {
-  // Estado dos filtros
-  const [filters, setFilters] = useState<FilterState>({
-    category: '',
-    minPrice: priceRange?.min || 0,
-    maxPrice: priceRange?.max || 1000,
-    sortBy: 'name'
-  });
 
   const [showFilters, setShowFilters] = useState(false);
+  const { products, loading, fetchProducts, fetchFiltersConfig } = useProducts();
+  const [filters, setFilters] = useState<FilterState>({
+    category: '',
+    minPrice: 0,
+    maxPrice: 0,
+    sortBy: 'name',
+    // brand, color, material, availability can be added here if needed
+  });
+
+  useEffect(() => {
+  if (products.length > 0 && filters.maxPrice === 0) {
+    const prices = products.map(p => Number(p.price));
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+
+    setFilters(prev => ({
+      ...prev,
+      minPrice: min,
+      maxPrice: max,
+    }));
+  }
+}, [products]);
+
+
+  useEffect(() => {
+    fetchFiltersConfig();
+  }, []);
+
+  useEffect(() => {
+    fetchProducts(filters);
+  }, [filters]);
+
+  const handleFiltersChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
+  };
+
+
 
   // Categorias padrão (fallback para dados mockados)
-  const defaultCategories: Category[] = useMemo(() => {
+ const defaultCategories: Category[] = useMemo(() => {
     if (categories.length > 0) return categories;
-    
-    // Fallback: extrair categorias dos produtos mockados
+
+    if (!products || products.length === 0) return [];
+
     const uniqueCategories = [...new Set(products.map(product => product.category))];
     return uniqueCategories.map((cat, index) => ({
       id: index + 1,
       name: cat,
       count: products.filter(p => p.category === cat).length
     }));
-  }, [categories]);
+  }, [categories, products]); 
+
 
   // Opções de ordenação padrão
   const defaultSortOptions: SortOption[] = useMemo(() => {
