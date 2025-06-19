@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ShoppingCart, LogIn, Menu, X, Sun, Moon } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
@@ -13,6 +12,7 @@ const Header: React.FC = () => {
 
   const navigation = [
     { name: 'Home', href: '/' },
+    { name: 'Produtos', href: '/produtos' },
     { name: 'Cortinas', href: '/cortinas' },
     { name: 'Persianas', href: '/persianas' },
     { name: 'Sob Medida', href: '/sob-medida' }
