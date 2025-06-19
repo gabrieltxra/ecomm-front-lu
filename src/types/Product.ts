@@ -9,5 +9,5 @@ export interface Product {
   created_at: Date;
   updated_at: Date;
   status: 'active' | 'inactive' | 'out_of_stock';
-  image_url?: string;
+  image_urls?: string[];
 }

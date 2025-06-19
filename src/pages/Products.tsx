@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import { Filter, X } from 'lucide-react';
-import { Product } from '@/types/Product';
 import { useProducts } from '@/services/productsService';
 
 // Interfaces para integração com banco de dados
@@ -83,12 +82,6 @@ const Products: React.FC<ProductsPageProps> = ({
     fetchProducts(filters);
   }, [filters]);
 
-  const handleFiltersChange = (newFilters: FilterState) => {
-    setFilters(newFilters);
-  };
-
-
-
   // Categorias padrão (fallback para dados mockados)
  const defaultCategories: Category[] = useMemo(() => {
     if (categories.length > 0) return categories;
@@ -121,10 +114,10 @@ const Products: React.FC<ProductsPageProps> = ({
   const defaultPriceRange: PriceRange = useMemo(() => {
     if (priceRange) return priceRange;
     
-    const prices = products.map(p => p.price);
+    const prices = products.map(p => Number(p.price));
     return {
-      min: Math.min(...prices),
-      max: Math.max(...prices)
+      min: prices.length > 0 ? Math.min(...prices) : 0,
+      max: prices.length > 0 ? Math.max(...prices) : 10000
     };
   }, [priceRange]);
 
