@@ -87,11 +87,11 @@ export const getProducts = async (
     });
 
     const response = await fetch(`${API_BASE_URL}/products?${queryParams}`);
+    console.log('Fetching products with URL:', `${API_BASE_URL}/products?${queryParams}`);
     if (!response.ok) throw new Error('Erro ao buscar produtos');
 
     const data = await response.json();
 
-    console.log('Resposta da API:', data);
 
     const products: Product[] = data.products.map((p: any) => ({
       ...p,

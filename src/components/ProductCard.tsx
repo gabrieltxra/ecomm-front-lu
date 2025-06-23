@@ -32,11 +32,18 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       <div className="bg-card rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover-scale animate-fade-in">
         {/* Image Container */}
         <div className="relative aspect-square overflow-hidden">
+         {product.image_urls?.length > 0 ? (
           <img
             src={product.image_urls[0]}
             alt={product.name}
             className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           />
+        ) : (
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-500">
+            Sem imagem
+          </div>
+        )}
+
           
           {/* Overlay Actions */}
           <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
