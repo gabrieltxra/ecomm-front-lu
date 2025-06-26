@@ -5,14 +5,40 @@ import { ArrowLeft, Heart, ShoppingCart, Star } from 'lucide-react';
 import { products } from '../data/products';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'sonner';
+import { getProductById } from '@/services/productsService';
+import { Product } from '@/types/Product';
+import { useEffect } from 'react';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
-  const product = products.find(p => p.id === Number(id));
+const [product, setProduct] = useState<Product | null>(null);
+const [loading, setLoading] = useState(true);
+
+useEffect(() => {
+  const fetchProduct = async () => {
+    if (!id) return;
+    try {
+      const data = await getProductById(id);
+      if (data) {
+        setProduct(data);
+      } else {
+        setProduct(null);
+      }
+    } catch (error) {
+      console.error(error);
+      setProduct(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchProduct();
+}, [id]);
 
   if (!product) {
     return (
@@ -60,7 +86,7 @@ const ProductDetail: React.FC = () => {
             {/* Main Image */}
             <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
               <img
-                src={product.images[selectedImageIndex]}
+                src={product.image_urls[selectedImageIndex]}
                 alt={product.name}
                 className="w-full h-full object-cover"
               />
@@ -68,7 +94,7 @@ const ProductDetail: React.FC = () => {
 
             {/* Thumbnail Images */}
             <div className="grid grid-cols-3 gap-4">
-              {product.images.map((image, index) => (
+              {product.image_urls.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImageIndex(index)}
