@@ -3,12 +3,14 @@ import { ShoppingCart, LogIn, Menu, X, Sun, Moon } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Link, useLocation } from 'react-router-dom';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Header: React.FC = () => {
   const { getTotalItems } = useCart();
   const { theme, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
+  const { user, isLoggedIn } = useAuth();
 
   const navigation = [
     { name: 'Home', href: '/' },
@@ -65,12 +67,6 @@ const Header: React.FC = () => {
                 <Sun className="h-5 w-5" />
               )}
             </button>
-
-            {/* Login */}
-            <button className="p-2 rounded-lg hover:bg-accent transition-colors">
-              <LogIn className="h-5 w-5" />
-            </button>
-
             {/* Cart */}
             <Link to="/cart" className="relative p-2 rounded-lg hover:bg-accent transition-colors">
               <ShoppingCart className="h-5 w-5" />
@@ -80,7 +76,29 @@ const Header: React.FC = () => {
                 </span>
               )}
             </Link>
-
+            {isLoggedIn ? (
+              <Link
+                to="/perfil" // <- ADAPTAR DEPOIS PARA PAGE DE PERFIL
+                className="w-8 h-8 rounded-full overflow-hidden border-2 border-primary hover:scale-105 transition-transform"
+              >
+             {user.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt="Avatar"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center bg-rose-400 text-white text-xl font-bold uppercase">
+                {user.name[0]
+                }
+              </div>
+            )}
+              </Link>
+            ) : (
+              <Link to="/login" className="p-2 rounded-lg hover:bg-accent transition-colors">
+                <LogIn className="h-5 w-5" />
+              </Link>
+            )}
             {/* Mobile Menu Button */}
             <button
               className="md:hidden p-2 rounded-lg hover:bg-accent transition-colors"

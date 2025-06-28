@@ -2,7 +2,7 @@
 // Este arquivo demonstra como integrar os filtros com dados do banco
 
 import { Product } from '@/types/Product';
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 // Interfaces para API
 export interface Category {
@@ -52,7 +52,6 @@ export interface FiltersConfig {
 
 // Configuração da API
 const API_BASE_URL = import.meta.env.VITE_REACT_APP_API_URL || 'http://localhost:3000/api';
-console.log('API_BASE_URL:', API_BASE_URL);
 
 // Função para buscar configurações dos filtros
 export const getFiltersConfig = async (): Promise<FiltersConfig> => {

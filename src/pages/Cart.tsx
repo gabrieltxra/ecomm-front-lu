@@ -57,7 +57,7 @@ const Cart: React.FC = () => {
                   {/* Product Image */}
                   <div className="flex-shrink-0">
                     <img
-                      src={item.image}
+                      src={item.image_urls[0]}
                       alt={item.name}
                       className="w-20 h-20 object-cover rounded-lg"
                     />

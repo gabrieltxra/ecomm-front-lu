@@ -12,6 +12,9 @@ import Cart from "./pages/Cart";
 import NotFound from "./pages/NotFound";
 import Products from "./pages/Products";
 import { FaWhatsapp } from 'react-icons/fa';
+import Login from "./pages/Login";
+import Cadastro from "./pages/Cadastro";
+import Perfil from "./pages/Perfil";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +32,9 @@ const App = () => (
                 <Route path="/" element={<Home />} />
                 <Route path="/produtos" element={<Products />} />
                 <Route path="/product/:id" element={<ProductDetail />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/cadastro" element={<Cadastro />} />
+                <Route path="/perfil" element={<Perfil />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/cortinas" element={<Home />} />
                 <Route path="/persianas" element={<Home />} />
