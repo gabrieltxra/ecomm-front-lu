@@ -2,9 +2,10 @@
 import React from 'react';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Product } from '@/types/Product';
+
 
 interface ProductCardProps {
   product: Product;
@@ -12,12 +13,19 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addToCart } = useCart();
+  const token = localStorage.getItem('token');
+  const navigate = useNavigate();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    addToCart(product);
-    toast.success(`${product.name} adicionado ao carrinho!`);
+    if (token) {
+      addToCart(product);
+      toast.success(`${product.name} adicionado ao carrinho!`);
+    } else {
+      toast.error('Você precisa estar logado para adicionar produtos ao carrinho.');
+      navigate('/login');
+    }
   };
 
   const formatPrice = (price: number) => {

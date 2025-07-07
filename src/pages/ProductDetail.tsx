@@ -2,7 +2,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Heart, ShoppingCart, Star } from 'lucide-react';
-import { products } from '../data/products';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'sonner';
 import { getProductById } from '@/services/productsService';
@@ -13,7 +12,7 @@ const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  
+  const token = localStorage.getItem('token');
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
 const [product, setProduct] = useState<Product | null>(null);
@@ -55,10 +54,15 @@ useEffect(() => {
       </div>
     );
   }
-
+  
   const handleAddToCart = () => {
-    addToCart(product);
-    toast.success(`${product.name} adicionado ao carrinho!`);
+    if (token) {
+      addToCart(product);
+      toast.success(`${product.name} adicionado ao carrinho!`);
+    } else {
+      toast.error('Você precisa estar logado para adicionar produtos ao carrinho.');
+      navigate('/login');
+    }
   };
 
   const formatPrice = (price: number) => {

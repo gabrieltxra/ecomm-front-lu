@@ -15,49 +15,53 @@ import { FaWhatsapp } from 'react-icons/fa';
 import Login from "./pages/Login";
 import Cadastro from "./pages/Cadastro";
 import Perfil from "./pages/Perfil";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <ThemeProvider>
-        <CartProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <div className="min-h-screen bg-background relative">
-              <Header />
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/produtos" element={<Products />} />
-                <Route path="/product/:id" element={<ProductDetail />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/cadastro" element={<Cadastro />} />
-                <Route path="/perfil" element={<Perfil />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/cortinas" element={<Home />} />
-                <Route path="/persianas" element={<Home />} />
-                <Route path="/sob-medida" element={<Home />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              {/* Botão flutuante do WhatsApp */}
-              <a
-                href="https://wa.me/5519991893513"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="fixed z-50 bottom-6 right-6 bg-rose-400 hover:bg-rose-500 text-white rounded-full shadow-lg p-4 flex items-center justify-center transition-all border-4 border-white"
-                aria-label="Fale conosco no WhatsApp"
-              >
-                <FaWhatsapp className="w-7 h-7 text-white drop-shadow" />
-              </a>
-            </div>
-          </BrowserRouter>
-        </CartProvider>
-      </ThemeProvider>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <ThemeProvider>
+          <CartProvider>
+            <AuthProvider>
+            <Toaster />
+            <Sonner />
+              <div className="min-h-screen bg-background relative">
+                <Header />
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/produtos" element={<Products />} />
+                  <Route path="/product/:id" element={<ProductDetail />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/cadastro" element={<Cadastro />} />
+                  <Route path="/perfil" element={<Perfil />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/cortinas" element={<Home />} />
+                  <Route path="/persianas" element={<Home />} />
+                  <Route path="/sob-medida" element={<Home />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                {/* Botão flutuante do WhatsApp */}
+                <a
+                  href="https://wa.me/5519991893513"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="fixed z-50 bottom-6 right-6 bg-rose-400 hover:bg-rose-500 text-white rounded-full shadow-lg p-4 flex items-center justify-center transition-all border-4 border-white"
+                  aria-label="Fale conosco no WhatsApp"
+                >
+                  <FaWhatsapp className="w-7 h-7 text-white drop-shadow" />
+                </a>
+              </div>
+            </AuthProvider>
+          </CartProvider>
+        </ThemeProvider>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </BrowserRouter>
+
 );
 
 export default App;

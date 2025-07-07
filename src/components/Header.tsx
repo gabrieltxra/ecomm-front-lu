@@ -36,7 +36,7 @@ const Header: React.FC = () => {
               <span className="text-gradient font-script text-xl ml-1">Lu</span>
               <span className="text-gradient font-elegant text-lg block text-xs">Cortinas</span>
             </div>
-          </Link>
+        </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">

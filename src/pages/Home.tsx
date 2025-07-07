@@ -1,12 +1,40 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Carousel from '../components/Carousel';
 import ProductGrid from '../components/ProductGrid';
 import { products, banners } from '../data/products';
 import { Link } from 'react-router-dom';
+import { FilterState, useProducts } from '@/services/productsService';
+
 
 const Home: React.FC = () => {
-  const featuredProducts = products.slice(0, 8);
-  const bestSellers = products.slice(0, 4); // Exemplo para seção de mais vendidos
+
+const { products, fetchProducts } = useProducts();
+
+  const [filters, setFilters] = useState<FilterState>({
+    category: '',
+    minPrice: 0,
+    maxPrice: 0,
+    sortBy: 'name',
+    // brand, color, material, availability can be added here if needed
+  });
+
+useEffect(() => {
+  if (products.length > 0 && filters.maxPrice === 0) {
+    const prices = products.map(p => Number(p.price));
+    const min = Math.min(...prices);
+    const max = Math.max(...prices);
+
+    setFilters(prev => ({
+      ...prev,
+      minPrice: min,
+      maxPrice: max,
+    }));
+  }
+}, [products]);
+
+  useEffect(() => {
+    fetchProducts(filters);
+  }, [filters]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -46,7 +74,7 @@ const Home: React.FC = () => {
           <h2 className="text-2xl md:text-3xl font-bold text-black">Produtos em Destaque</h2>
           <Link to="/produtos" className="text-rose-400 hover:underline font-semibold">Ver todos</Link>
         </div>
-        <ProductGrid products={featuredProducts} title="Produtos em Destaque" />
+        <ProductGrid products={products.slice(0, 3)} title="Produtos em Destaque" />
       </section>
 
       {/* Mais Vendidos */}
@@ -54,7 +82,7 @@ const Home: React.FC = () => {
         <div className="container mx-auto px-4 flex items-center justify-between mb-6">
           <h2 className="text-2xl md:text-3xl font-bold text-black">Mais Vendidos</h2>
         </div>
-        <ProductGrid products={bestSellers} title="Mais Vendidos" />
+        <ProductGrid products={products.slice(4, 10)} title="Mais Vendidos" />
       </section>
 
       {/* Sobre (rodapé visual) */}
