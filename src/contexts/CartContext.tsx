@@ -116,17 +116,31 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   };
 
-  const updateQuantity = (productId: number, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(productId);
-      return;
-    }
-    setItems(prevItems =>
-      prevItems.map(item =>
-        item.id === productId ? { ...item, quantity } : item
-      )
-    );
-  };
+ const updateQuantity = async (productId: number, quantity: number) => {
+  if (quantity <= 0) {
+    removeFromCart(productId);
+    return;
+  }
+
+  setItems(prevItems =>
+    prevItems.map(item =>
+      item.id === productId ? { ...item, quantity } : item
+    )
+  );
+
+  try {
+    await fetch(`${API}/cartItem/${productId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ quantity }),
+    });
+  } catch (err) {
+    console.error('Erro ao atualizar quantidade no backend:', err);
+  }
+};
 
   const getTotalItems = () => {
     return items.reduce((total, item) => total + item.quantity, 0);
