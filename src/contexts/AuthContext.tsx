@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { getProfile } from '@/services/authService';
+import { useCart } from './CartContext';
 
 interface User {
   id: number;
@@ -19,6 +20,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const { clearCart } = useCart();
 
   const login = (user: User, token: string) => {
     localStorage.setItem('token', token);
@@ -27,6 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const logout = () => {
     localStorage.removeItem('token');
+    clearCart();
     setUser(null);
   };
 

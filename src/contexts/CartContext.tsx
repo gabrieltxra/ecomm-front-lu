@@ -18,6 +18,7 @@ interface CartContextType {
   getTotalItems: () => number;
   getTotalPrice: () => number;
   clearCart: () => void;
+  loadCartFromServer: () => Promise<void>; 
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -41,31 +42,32 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 
 
   const loadCartFromServer = async () => {
-    if (!token) return;
+  const token = localStorage.getItem('token'); 
+  if (!token) return;
 
-    try {
-      const res = await fetch(`${API}/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+  try {
+    const res = await fetch(`${API}/me`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-      if (!res.ok) {
-        throw new Error('Falha ao carregar carrinho');
-      }
-
-      const data = await res.json();
-
-      if (Array.isArray(data.cart)) {
-        setItems(data.cart.map(item => ({
-          ...item,
-          quantity: item.quantity || 1 
-        })));
-      }
-    } catch (err) {
-      console.error('Erro ao carregar carrinho do backend:', err);
+    if (!res.ok) {
+      throw new Error('Falha ao carregar carrinho');
     }
-  };
+
+    const data = await res.json();
+
+    if (Array.isArray(data.cart)) {
+      setItems(data.cart.map(item => ({
+        ...item,
+        quantity: item.quantity || 1 
+      })));
+    }
+  } catch (err) {
+    console.error('Erro ao carregar carrinho do backend:', err);
+  }
+};
 
   const addToCart = async (product: Product) => {
     if (!token) {
@@ -168,6 +170,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         getTotalItems,
         getTotalPrice,
         clearCart,
+        loadCartFromServer 
       }}
     >
       {children}

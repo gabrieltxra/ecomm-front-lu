@@ -4,10 +4,13 @@ import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { login as loginApi } from '@/services/authService';
+import { useCart } from '@/contexts/CartContext';
+
 
 const Login: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
+  const { loadCartFromServer } = useCart();
 
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
@@ -18,10 +21,9 @@ const Login: React.FC = () => {
 
   try {
     const { user, token } = await loginApi(email, senha); 
-
     localStorage.setItem('token', token); 
     login(user, token);
-
+    await loadCartFromServer();
     navigate('/'); 
   } catch (err: any) {
     setErro(err.message || 'Erro ao fazer login.');
