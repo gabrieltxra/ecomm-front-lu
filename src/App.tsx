@@ -16,6 +16,7 @@ import Login from "./pages/Login";
 import Cadastro from "./pages/Cadastro";
 import Perfil from "./pages/Perfil";
 import { AuthProvider } from "./contexts/AuthContext";
+import CheckoutPage from "./pages/Checkout";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
                   <Route path="/cortinas" element={<Home />} />
                   <Route path="/persianas" element={<Home />} />
                   <Route path="/sob-medida" element={<Home />} />
+                  <Route path="/checkout" element={<CheckoutPage />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Routes>

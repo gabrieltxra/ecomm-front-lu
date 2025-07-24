@@ -135,12 +135,15 @@ const Cart: React.FC = () => {
               </div>
 
               <div className="space-y-3">
-                <button className="w-full bg-atelie-gradient text-white py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity">
+                <Link
+                  to="/checkout"
+                  className="w-full bg-atelie-gradient text-white py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity text-center block"
+                >
                   Finalizar Compra
-                </button>
+                </Link>
                 
                 <Link
-                  to="/"
+                  to="/produtos"
                   className="block w-full text-center border border-border py-3 rounded-lg hover:bg-accent transition-colors"
                 >
                   Continuar Comprando
