@@ -39,14 +39,15 @@ const Header: React.FC = () => {
         </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-8" role="navigation" aria-label="Menu principal">
             {navigation.map((item) => (
               <Link
                 key={item.name}
                 to={item.href}
-                className={`text-sm font-medium transition-colors hover:text-primary ${
-                  isActive(item.href) ? 'text-primary' : 'text-muted-foreground'
+                className={`text-sm font-medium transition-colors hover:text-rose-500 dark:hover:text-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-500 dark:focus:ring-rose-400 rounded px-2 py-1 ${
+                  isActive(item.href) ? 'text-rose-500 dark:text-rose-400 font-semibold' : 'text-muted-foreground'
                 }`}
+                aria-current={isActive(item.href) ? 'page' : undefined}
               >
                 {item.name}
               </Link>
@@ -58,8 +59,8 @@ const Header: React.FC = () => {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg hover:bg-accent transition-colors"
-              aria-label="Toggle theme"
+              className="p-2 rounded-lg hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-rose-500 dark:focus:ring-rose-400"
+              aria-label={theme === 'light' ? 'Ativar modo escuro' : 'Ativar modo claro'}
             >
               {theme === 'light' ? (
                 <Moon className="h-5 w-5" />
@@ -68,10 +69,14 @@ const Header: React.FC = () => {
               )}
             </button>
             {/* Cart */}
-            <Link to="/cart" className="relative p-2 rounded-lg hover:bg-accent transition-colors">
+            <Link 
+              to="/cart" 
+              className="relative p-2 rounded-lg hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-rose-500 dark:focus:ring-rose-400"
+              aria-label={`Carrinho de compras com ${getTotalItems()} itens`}
+            >
               <ShoppingCart className="h-5 w-5" />
               {getTotalItems() > 0 && (
-                <span className="absolute -top-1 -right-1 bg-atelie-gradient text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
+                <span className="absolute -top-1 -right-1 bg-rose-500 dark:bg-rose-400 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium animate-pulse">
                   {getTotalItems()}
                 </span>
               )}

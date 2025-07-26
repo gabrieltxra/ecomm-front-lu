@@ -62,7 +62,7 @@ export default {
 			},
 			backgroundImage: {
 				'atelie-gradient': 'linear-gradient(135deg, #F8B9B9 0%, #FAD0C4 100%)',
-				'atelie-gradient-dark': 'linear-gradient(135deg, #2d1b1b 0%, #3d2e2e 100%)',
+				'atelie-gradient-dark': 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
 			},
 			fontFamily: {
 				'script': ['Dancing Script', 'cursive'],

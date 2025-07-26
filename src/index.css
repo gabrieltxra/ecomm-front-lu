@@ -39,32 +39,32 @@
   }
 
   .dark {
-    --background: 0 0% 10%;
-    --foreground: 346 41% 90%;
+    --background: 222 84% 4%;
+    --foreground: 210 40% 98%;
 
-    --card: 0 0% 10%;
-    --card-foreground: 346 41% 90%;
+    --card: 222 84% 4%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 0 0% 10%;
-    --popover-foreground: 346 41% 90%;
+    --popover: 222 84% 4%;
+    --popover-foreground: 210 40% 98%;
 
     --primary: 346 41% 85%;
-    --primary-foreground: 0 0% 9%;
+    --primary-foreground: 222 84% 4%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 346 41% 90%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 346 41% 90%;
+    --accent: 217 33% 17%;
+    --accent-foreground: 210 40% 98%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 63% 31%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
+    --border: 217 33% 17%;
+    --input: 217 33% 17%;
     --ring: 346 41% 85%;
   }
 }
@@ -84,7 +84,224 @@
     @apply bg-atelie-gradient bg-clip-text text-transparent;
   }
   
+  .text-gradient-dark {
+    @apply bg-atelie-gradient-dark bg-clip-text text-transparent;
+  }
+  
   .hover-scale {
     @apply transition-transform duration-200 hover:scale-105;
   }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
+
+/* Classes específicas para modo escuro - Design Elegante */
+.dark .bg-white {
+  @apply bg-slate-900/80 backdrop-blur-sm;
+}
+
+.dark .text-gray-600 {
+  color: rgb(203 213 225);
+}
+
+.dark .text-gray-700 {
+  @apply text-slate-200;
+}
+
+.dark .text-gray-800 {
+  @apply text-slate-100;
+}
+
+.dark .border-gray-300 {
+  @apply border-slate-700/50;
+}
+
+.dark .bg-gray-50 {
+  @apply bg-slate-800/60 backdrop-blur-sm;
+}
+
+.dark .bg-gray-100 {
+  @apply bg-slate-700/80;
+}
+
+.dark .bg-rose-50 {
+  @apply bg-slate-800/60 backdrop-blur-sm;
+}
+
+.dark .bg-gradient-to-br {
+  background: linear-gradient(135deg, rgb(15 23 42) 0%, rgb(30 41 59) 100%);
+}
+
+/* Removendo a regra problemática de shadow-lg */
+
+.dark .border-rose-100 {
+  @apply border-slate-700/50;
+}
+
+/* Melhorias específicas para modo escuro - Design Premium */
+.dark .bg-card {
+  @apply bg-slate-900/40 backdrop-blur-md border border-slate-700/30;
+}
+
+.dark .bg-accent {
+  @apply bg-slate-800/40 backdrop-blur-sm;
+}
+
+.dark .hover\:bg-accent:hover {
+  @apply bg-slate-800/60 backdrop-blur-sm;
+}
+
+.dark .border-border {
+  @apply border-slate-700/50;
+}
+
+/* Gradientes já definidos no tailwind.config.ts - não redefinir aqui */
+
+/* Melhorias para cards de produtos - Design Premium */
+.dark .product-card {
+  @apply bg-slate-800/30 backdrop-blur-md border border-slate-700/40 shadow-lg;
+}
+
+.dark .product-card:hover {
+  @apply bg-slate-800/50 border-slate-600/60 shadow-xl transform scale-105 transition-all duration-300;
+}
+
+/* Melhorias para seções - Design Elegante */
+.dark .section-light {
+  @apply bg-slate-800/20 backdrop-blur-sm;
+}
+
+.dark .section-dark {
+  @apply bg-slate-900/30 backdrop-blur-sm;
+}
+
+/* Melhorias adicionais para modo escuro - Design Premium */
+.dark .text-gradient {
+  background: linear-gradient(135deg, #f8b9b9 0%, #fad0c4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 8px rgba(248, 185, 185, 0.3));
+}
+
+.dark .text-gradient-dark {
+  background: linear-gradient(135deg, #94a3b8 0%, #cbd5e1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 6px rgba(148, 163, 184, 0.2));
+}
+
+/* Melhorias para inputs no modo escuro - Design Premium */
+.dark input:focus {
+  @apply ring-2 ring-rose-400/60 border-rose-400/60 shadow-lg;
+}
+
+.dark select:focus {
+  @apply ring-2 ring-rose-400/60 border-rose-400/60 shadow-lg;
+}
+
+/* Melhorias para botões no modo escuro - Design Premium */
+.dark .btn-primary {
+  @apply bg-rose-400 hover:bg-rose-500 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105;
+}
+
+.dark .btn-secondary {
+  @apply bg-slate-700/80 hover:bg-slate-600/90 text-slate-100 border border-slate-600/50 hover:border-slate-500/70 transition-all duration-300 backdrop-blur-sm;
+}
+
+/* Efeitos de glassmorphism para modo escuro - Design Premium */
+.dark .glass {
+  @apply bg-slate-800/15 backdrop-blur-lg border border-slate-700/30 shadow-xl;
+}
+
+.dark .glass-hover:hover {
+  @apply bg-slate-800/25 border-slate-600/40 shadow-2xl transform scale-105 transition-all duration-300;
+}
+
+/* Sombra customizada para modo escuro - Design Premium */
+.dark .shadow-dark {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+/* Efeitos especiais para modo escuro */
+.dark .glow {
+  box-shadow: 0 0 20px rgba(248, 185, 185, 0.2);
+}
+
+.dark .glow-hover:hover {
+  box-shadow: 0 0 30px rgba(248, 185, 185, 0.3);
+}
+
+/* Melhorias de Performance e UX */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Melhorias de Acessibilidade */
+@media (prefers-contrast: high) {
+  .dark .text-slate-300 {
+    color: rgb(255 255 255) !important;
+  }
+  
+  .dark .text-slate-400 {
+    color: rgb(255 255 255) !important;
+  }
+  
+  .dark .text-slate-500 {
+    color: rgb(255 255 255) !important;
+  }
+}
+
+/* Melhorias de Foco para Acessibilidade */
+.focus-visible:focus {
+  outline: 2px solid rgb(244 63 94);
+  outline-offset: 2px;
+}
+
+/* Melhorias de Hover para Touch Devices */
+@media (hover: none) {
+  .hover\:scale-105:hover {
+    transform: none;
+  }
+  
+  .hover\:shadow-xl:hover {
+    box-shadow: inherit;
+  }
+}
+
+/* Loading States */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid transparent;
+  border-top: 2px solid rgb(244 63 94);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

@@ -14,10 +14,10 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products, title }) => {
       <div className="container mx-auto px-4">
         {/* Section Title */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-elegant font-bold text-gradient mb-4">
+          <h2 className="text-3xl md:text-4xl font-elegant font-bold text-rose-500 dark:text-rose-400 mb-4">
             {title}
           </h2>
-          <div className="w-24 h-1 bg-atelie-gradient mx-auto rounded-full"></div>
+          <div className="w-24 h-1 bg-rose-500 dark:bg-rose-400 mx-auto rounded-full shadow-lg"></div>
         </div>
 
         {/* Products Grid */}

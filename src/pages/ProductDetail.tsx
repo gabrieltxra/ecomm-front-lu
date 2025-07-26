@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { getProductById } from '@/services/productsService';
 import { Product } from '@/types/Product';
 import { useEffect } from 'react';
+import SimilarProducts from '@/components/SimilarProducts';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -192,6 +193,9 @@ useEffect(() => {
           </div>
         </div>
       </div>
+      
+      {/* Produtos Similares */}
+      {product && <SimilarProducts currentProduct={product} />}
     </div>
   );
 };

@@ -37,18 +37,18 @@ useEffect(() => {
   }, [filters]);
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white dark:bg-gray-900">
       {/* Banner Principal */}
-      <section className="pt-20 pb-8 bg-white">
+      <section className="pt-20 pb-8 bg-white dark:bg-gray-900">
         <div className="container mx-auto px-4 flex flex-col lg:flex-row items-center gap-8">
           <div className="flex-1">
             <Carousel items={banners} />
           </div>
           <div className="flex-1 flex flex-col items-center lg:items-start text-center lg:text-left">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-black leading-tight">
-              Transforme seu lar com <span className="text-rose-400">elegância</span> e <span className="text-black">personalidade</span>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-black dark:text-white leading-tight">
+              Transforme seu lar com <span className="text-rose-400">elegância</span> e <span className="text-black dark:text-white">personalidade</span>
             </h1>
-            <p className="text-lg text-gray-700 mb-6 max-w-md">
+            <p className="text-lg text-gray-700 dark:text-gray-300 mb-6 max-w-md">
               Cortinas e persianas sob medida, feitas para impressionar. Qualidade premium, atendimento exclusivo e entrega rápida para todo o Brasil.
             </p>
             <Link to="/produtos" className="bg-rose-400 hover:bg-rose-500 text-white font-semibold px-8 py-3 rounded-lg shadow transition-all">
@@ -59,40 +59,40 @@ useEffect(() => {
       </section>
 
       {/* Selo de Benefícios */}
-      <section className="py-4 bg-rose-50 border-y border-rose-100">
-        <div className="container mx-auto px-4 flex flex-wrap justify-center gap-6 text-black text-sm font-medium">
-          <div className="flex items-center gap-2"><span className="font-bold">✓</span> + de 10 anos deixando os Lares Aconchegantes</div>
-          <div className="flex items-center gap-2"><span className="font-bold">✓</span> 6x sem juros</div>
-          <div className="flex items-center gap-2"><span className="font-bold">✓</span> Entrega para todo Brasil</div>
-          <div className="flex items-center gap-2"><span className="font-bold">✓</span> Atendimento personalizado</div>
+      <section className="py-4 bg-rose-50 dark:bg-slate-800/50 section-light border-y border-rose-100 dark:border-slate-700/50">
+        <div className="container mx-auto px-4 flex flex-wrap justify-center gap-6 text-black dark:text-slate-100 text-sm font-medium">
+          <div className="flex items-center gap-2"><span className="font-bold text-green-500">✓</span> + de 10 anos deixando os Lares Aconchegantes</div>
+          <div className="flex items-center gap-2"><span className="font-bold text-green-500">✓</span> 6x sem juros</div>
+          <div className="flex items-center gap-2"><span className="font-bold text-green-500">✓</span> Entrega para todo Brasil</div>
+          <div className="flex items-center gap-2"><span className="font-bold text-green-500">✓</span> Atendimento personalizado</div>
         </div>
       </section>
 
       {/* Produtos em Destaque */}
-      <section className="py-12 bg-white">
+      <section className="py-12 bg-white dark:bg-slate-900 section-dark">
         <div className="container mx-auto px-4 flex items-center justify-between mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-black">Produtos em Destaque</h2>
-          <Link to="/produtos" className="text-rose-400 hover:underline font-semibold">Ver todos</Link>
+          <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white">Produtos em Destaque</h2>
+          <Link to="/produtos" className="text-rose-500 dark:text-rose-400 hover:text-rose-600 dark:hover:text-rose-300 hover:underline font-semibold transition-colors">Ver todos</Link>
         </div>
         <ProductGrid products={products.slice(0, 3)} title="Produtos em Destaque" />
       </section>
 
       {/* Mais Vendidos */}
-      <section className="py-12 bg-rose-50">
+      <section className="py-12 bg-rose-50 dark:bg-slate-800/50 section-light">
         <div className="container mx-auto px-4 flex items-center justify-between mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-black">Mais Vendidos</h2>
+          <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white">Mais Vendidos</h2>
         </div>
         <ProductGrid products={products.slice(4, 10)} title="Mais Vendidos" />
       </section>
 
       {/* Sobre (rodapé visual) */}
-      <section className="py-16 bg-gradient-to-br from-white to-rose-50 border-t border-rose-100 mt-8">
+      <section className="py-16 bg-gradient-to-br from-white to-rose-50 dark:from-slate-900 dark:to-slate-800 border-t border-rose-100 dark:border-slate-700/50 mt-8">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-elegant font-bold text-rose-400 mb-6">
+            <h2 className="text-3xl md:text-4xl font-elegant font-bold text-rose-400 mb-6 glow">
               Sobre o Ateliê Lu Cortinas
             </h2>
-            <p className="text-lg text-gray-700 leading-relaxed mb-8">
+            <p className="text-lg text-gray-700 dark:text-slate-300 leading-relaxed mb-8">
               Há mais de 10 anos transformando lares com cortinas e persianas sob medida. Nossa paixão pela decoração e atenção aos detalhes nos permite criar peças únicas que refletem o estilo e personalidade de cada cliente.
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
