@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { register } from '@/services/authService';
+import { searchCep } from '@/services/viaCepService';
 import { toast } from 'sonner';
 import { MapPin, Search } from 'lucide-react';
 
@@ -25,30 +26,35 @@ const Cadastro: React.FC = () => {
     complemento: '',
     bairro: '',
     cidade: '',
-    estado: ''
+    estado: '',
+    pais: 'Brasil'
   });
 
   const [erro, setErro] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isSearchingCep, setIsSearchingCep] = useState(false);
 
   const handleCepSearch = async (cep: string) => {
     if (cep.length === 8) {
+      setIsSearchingCep(true);
       try {
-        //BUSCA DO CEP NA API ESPERANDO FAZER PEDRAO
         toast.info('Buscando CEP...');
-        // Simular preenchimento automático
-        setTimeout(() => {
-          setAddressData({
-            ...addressData,
-            rua: 'Rua Exemplo',
-            bairro: 'Centro',
-            cidade: 'São Paulo',
-            estado: 'SP'
-          });
-          toast.success('CEP encontrado!');
-        }, 1000);
-      } catch (error) {
-        toast.error('Erro ao buscar CEP');
+        const cepData = await searchCep(cep);
+        
+        setAddressData({
+          ...addressData,
+          cep: cepData.cep,
+          rua: cepData.logradouro,
+          bairro: cepData.bairro,
+          cidade: cepData.localidade,
+          estado: cepData.uf
+        });
+        
+        toast.success('CEP encontrado!');
+      } catch (error: any) {
+        toast.error(error.message || 'Erro ao buscar CEP');
+      } finally {
+        setIsSearchingCep(false);
       }
     }
   };
@@ -71,7 +77,26 @@ const Cadastro: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const { user, token } = await register(formData.nome, formData.email, formData.senha);
+      // Preparar payload para o backend
+      const payload = {
+        name: formData.nome,
+        email: formData.email,
+        password: formData.senha,
+        telefone: formData.telefone || undefined,
+        cpf: formData.cpf || undefined,
+        endereco: addressData.cep ? {
+          cep: addressData.cep,
+          rua: addressData.rua,
+          numero: addressData.numero,
+          complemento: addressData.complemento,
+          bairro: addressData.bairro,
+          cidade: addressData.cidade,
+          estado: addressData.estado,
+          pais: addressData.pais
+        } : undefined
+      };
+
+      const { user, token } = await register(payload);
       localStorage.setItem('token', token);
       login(user, token);
       toast.success('Conta criada com sucesso!');
@@ -210,18 +235,20 @@ const Cadastro: React.FC = () => {
                       className="w-full px-4 py-2 pr-10 border border-gray-300 rounded-lg bg-gray-50 focus:ring-2 focus:ring-rose-400 focus:border-transparent"
                       value={addressData.cep}
                       onChange={(e) => {
-                        setAddressData({ ...addressData, cep: e.target.value });
-                        handleCepSearch(e.target.value);
+                        const value = e.target.value.replace(/\D/g, '');
+                        setAddressData({ ...addressData, cep: value });
+                        if (value.length === 8) {
+                          handleCepSearch(value);
+                        }
                       }}
-                      placeholder="00000-000"
+                      placeholder="00000000"
                       maxLength={8}
                     />
-                    <button
-                      type="button"
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-rose-400"
-                    >
-                      <Search className="h-4 w-4" />
-                    </button>
+                    {isSearchingCep && (
+                      <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-rose-400"></div>
+                      </div>
+                    )}
                   </div>
                 </div>
 

@@ -6,23 +6,38 @@ interface User {
   id: number;
   name: string;
   email: string;
+  created_at: string;
+  type: string;
   avatarUrl?: string;
-  phone?: string;
+  telefone?: string;
   cpf?: string;
-  address?: {
+  // (estrutura flattened)
+  cep?: string;
+  rua?: string;
+  numero?: string;
+  complemento?: string;
+  bairro?: string;
+  cidade?: string;
+  estado?: string;
+  pais?: string;
+  
+  // Estrutura aninhada 
+  endereco?: {
     cep: string;
-    street: string;
-    number: string;
-    complement: string;
-    neighborhood: string;
-    city: string;
-    state: string;
+    rua: string;
+    numero: string;
+    complemento?: string;
+    bairro: string;
+    cidade: string;
+    estado: string;
+    pais: string;
   };
 }
 
 interface AuthContextType {
   user: User | null;
   isLoggedIn: boolean;
+  isLoading: boolean;
   login: (user: User, token: string) => void;
   logout: () => void;
 }
@@ -31,6 +46,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { clearCart } = useCart();
 
   const login = (user: User, token: string) => {
@@ -47,14 +63,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
+      setIsLoading(true);
       getProfile()
-        .then(setUser)
-        .catch(() => logout()); // token inválido
+        .then((userData) => {
+          setUser(userData);
+          setIsLoading(false);
+        })
+        .catch(() => {
+          logout();
+          setIsLoading(false);
+        });
+    } else {
+      setIsLoading(false);
     }
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn: !!user, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoggedIn: !!user, isLoading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

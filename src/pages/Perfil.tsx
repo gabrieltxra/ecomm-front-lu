@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { updateProfile, updatePassword } from '@/services/authService';
+import { searchCep } from '../services/viaCepService';
 import { 
   User, 
   MapPin, 
@@ -17,31 +18,34 @@ import {
 import { toast } from 'sonner';
 
 const Perfil: React.FC = () => {
-  const { user, isLoggedIn, logout } = useAuth();
+  const { user, isLoggedIn, isLoading, logout } = useAuth();
   const navigate = useNavigate();
   
   const [activeTab, setActiveTab] = useState('perfil');
   const [isEditing, setIsEditing] = useState(false);
   const [isEditingAddress, setIsEditingAddress] = useState(false);
   const [isEditingPassword, setIsEditingPassword] = useState(false);
+  const [isSearchingCep, setIsSearchingCep] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Estados para dados pessoais
   const [formData, setFormData] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    cpf: user?.cpf || ''
+    name: '',
+    email: '',
+    telefone: '',
+    cpf: ''
   });
 
   // Estados para endereço
   const [addressData, setAddressData] = useState({
-    cep: user?.address?.cep || '',
-    street: user?.address?.street || '',
-    number: user?.address?.number || '',
-    complement: user?.address?.complement || '',
-    neighborhood: user?.address?.neighborhood || '',
-    city: user?.address?.city || '',
-    state: user?.address?.state || ''
+    cep: '',
+    rua: '',
+    numero: '',
+    complemento: '',
+    bairro: '',
+    cidade: '',
+    estado: '',
+    pais: 'Brasil'
   });
 
   // Estados para senha
@@ -51,29 +55,130 @@ const Perfil: React.FC = () => {
     confirmPassword: ''
   });
 
+  // Carregar dados do usuário quando o componente montar ou quando o user mudar
   useEffect(() => {
-    if (!isLoggedIn) navigate('/login');
-  }, [isLoggedIn, navigate]);
+    if (user) {
+      console.log('Dados do usuário carregados:', user);
+      
+      setFormData({
+        name: user.name || '',
+        email: user.email || '',
+        telefone: user.telefone || '',
+        cpf: user.cpf || ''
+      });
+
+      // Tentar carregar dados de endereço da estrutura flattened primeiro
+      // Se não encontrar, tentar da estrutura aninhada
+      const enderecoData = user.endereco;
+      
+      setAddressData({
+        cep: user.cep || enderecoData?.cep || '',
+        rua: user.rua || enderecoData?.rua || '',
+        numero: user.numero || enderecoData?.numero || '',
+        complemento: user.complemento || enderecoData?.complemento || '',
+        bairro: user.bairro || enderecoData?.bairro || '',
+        cidade: user.cidade || enderecoData?.cidade || '',
+        estado: user.estado || enderecoData?.estado || '',
+        pais: user.pais || enderecoData?.pais || 'Brasil'
+      });
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (!isLoading && !isLoggedIn) {
+      navigate('/login');
+    }
+  }, [isLoading, isLoggedIn, navigate]);
+
+  // Mostrar loading enquanto carrega
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-white to-rose-50 dark:from-slate-900 dark:to-slate-800 pt-24 pb-16">
+        <div className="container mx-auto px-4 py-8">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-rose-400 mx-auto"></div>
+            <p className="mt-4 text-gray-600">Carregando perfil...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) return null;
 
+  const handleCepSearch = async (cep: string) => {
+    if (cep.length === 8) {
+      setIsSearchingCep(true);
+      try {
+        toast.info('Buscando CEP...');
+        const cepData = await searchCep(cep);
+        
+        setAddressData({
+          ...addressData,
+          cep: cepData.cep,
+          rua: cepData.logradouro,
+          bairro: cepData.bairro,
+          cidade: cepData.localidade,
+          estado: cepData.uf
+        });
+        
+        toast.success('CEP encontrado!');
+      } catch (error: any) {
+        toast.error(error.message || 'Erro ao buscar CEP');
+      } finally {
+        setIsSearchingCep(false);
+      }
+    }
+  };
+
   const handlePersonalDataSave = async () => {
+    setIsSaving(true);
     try {
-      // Aqui você implementaria a chamada para a API
+      const payload = {
+        name: formData.name,
+        email: formData.email,
+        telefone: formData.telefone || undefined,
+        cpf: formData.cpf || undefined
+      } as any;
+
+      console.log('Enviando dados pessoais:', payload);
+      await updateProfile(payload);
       toast.success('Dados pessoais atualizados com sucesso!');
       setIsEditing(false);
-    } catch (error) {
-      toast.error('Erro ao atualizar dados pessoais');
+    } catch (error: any) {
+      console.error('Erro ao salvar dados pessoais:', error);
+      toast.error(error.message || 'Erro ao atualizar dados pessoais');
+    } finally {
+      setIsSaving(false);
     }
   };
 
   const handleAddressSave = async () => {
+    setIsSaving(true);
     try {
-      // Aqui você implementaria a chamada para a API
+      // Usando a mesma estrutura do register
+      const payload = {
+        endereco: {
+          cep: addressData.cep,
+          rua: addressData.rua,
+          numero: addressData.numero,
+          complemento: addressData.complemento,
+          bairro: addressData.bairro,
+          cidade: addressData.cidade,
+          estado: addressData.estado,
+          pais: addressData.pais
+        }
+      } as any;
+
+      console.log('Enviando endereço (mesma estrutura do register):', payload);
+      await updateProfile(payload);
       toast.success('Endereço atualizado com sucesso!');
       setIsEditingAddress(false);
-    } catch (error) {
-      toast.error('Erro ao atualizar endereço');
+    } catch (error: any) {
+      console.error('Erro ao salvar endereço:', error);
+      toast.error(error.message || 'Erro ao atualizar endereço');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -83,8 +188,9 @@ const Perfil: React.FC = () => {
       return;
     }
     
+    setIsSaving(true);
     try {
-      // Aqui você implementaria a chamada para a API
+      await updatePassword(passwordData.currentPassword, passwordData.newPassword);
       toast.success('Senha atualizada com sucesso!');
       setIsEditingPassword(false);
       setPasswordData({
@@ -92,20 +198,11 @@ const Perfil: React.FC = () => {
         newPassword: '',
         confirmPassword: ''
       });
-    } catch (error) {
-      toast.error('Erro ao atualizar senha');
-    }
-  };
-
-  const handleCepSearch = async (cep: string) => {
-    if (cep.length === 8) {
-      try {
-        // Aqui você implementaria a busca do CEP na API
-        // Por enquanto, vamos simular
-        toast.info('Buscando CEP...');
-      } catch (error) {
-        toast.error('Erro ao buscar CEP');
-      }
+    } catch (error: any) {
+      console.error('Erro ao alterar senha:', error);
+      toast.error(error.message || 'Erro ao atualizar senha');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -181,14 +278,20 @@ const Perfil: React.FC = () => {
                       <div className="flex space-x-2">
                         <button
                           onClick={handlePersonalDataSave}
-                          className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+                          disabled={isSaving}
+                          className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors disabled:bg-gray-400"
                         >
-                          <Save className="h-4 w-4" />
-                          <span>Salvar</span>
+                          {isSaving ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          ) : (
+                            <Save className="h-4 w-4" />
+                          )}
+                          <span>{isSaving ? 'Salvando...' : 'Salvar'}</span>
                         </button>
                         <button
                           onClick={() => setIsEditing(false)}
-                          className="flex items-center space-x-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                          disabled={isSaving}
+                          className="flex items-center space-x-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:bg-gray-400"
                         >
                           <X className="h-4 w-4" />
                           <span>Cancelar</span>
@@ -230,10 +333,11 @@ const Perfil: React.FC = () => {
                       </label>
                       <input
                         type="tel"
-                        value={formData.phone}
-                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        value={formData.telefone}
+                        onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
                         disabled={!isEditing}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
+                        placeholder="(11) 99999-9999"
                       />
                     </div>
 
@@ -247,6 +351,7 @@ const Perfil: React.FC = () => {
                         onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
                         disabled={!isEditing}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
+                        placeholder="000.000.000-00"
                       />
                     </div>
                   </div>
@@ -270,14 +375,20 @@ const Perfil: React.FC = () => {
                       <div className="flex space-x-2">
                         <button
                           onClick={handleAddressSave}
-                          className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+                          disabled={isSaving}
+                          className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors disabled:bg-gray-400"
                         >
-                          <Save className="h-4 w-4" />
-                          <span>Salvar</span>
+                          {isSaving ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          ) : (
+                            <Save className="h-4 w-4" />
+                          )}
+                          <span>{isSaving ? 'Salvando...' : 'Salvar'}</span>
                         </button>
                         <button
                           onClick={() => setIsEditingAddress(false)}
-                          className="flex items-center space-x-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                          disabled={isSaving}
+                          className="flex items-center space-x-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:bg-gray-400"
                         >
                           <X className="h-4 w-4" />
                           <span>Cancelar</span>
@@ -291,17 +402,28 @@ const Perfil: React.FC = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-2">
                         CEP
                       </label>
-                      <input
-                        type="text"
-                        value={addressData.cep}
-                        onChange={(e) => {
-                          setAddressData({ ...addressData, cep: e.target.value });
-                          handleCepSearch(e.target.value);
-                        }}
-                        disabled={!isEditingAddress}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
-                        placeholder="00000-000"
-                      />
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={addressData.cep}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, '');
+                            setAddressData({ ...addressData, cep: value });
+                            if (value.length === 8) {
+                              handleCepSearch(value);
+                            }
+                          }}
+                          disabled={!isEditingAddress}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
+                          placeholder="00000000"
+                          maxLength={8}
+                        />
+                        {isSearchingCep && (
+                          <div className="absolute right-2 top-1/2 transform -translate-y-1/2">
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-rose-400"></div>
+                          </div>
+                        )}
+                      </div>
                     </div>
 
                     <div>
@@ -310,8 +432,8 @@ const Perfil: React.FC = () => {
                       </label>
                       <input
                         type="text"
-                        value={addressData.street}
-                        onChange={(e) => setAddressData({ ...addressData, street: e.target.value })}
+                        value={addressData.rua}
+                        onChange={(e) => setAddressData({ ...addressData, rua: e.target.value })}
                         disabled={!isEditingAddress}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                       />
@@ -323,8 +445,8 @@ const Perfil: React.FC = () => {
                       </label>
                       <input
                         type="text"
-                        value={addressData.number}
-                        onChange={(e) => setAddressData({ ...addressData, number: e.target.value })}
+                        value={addressData.numero}
+                        onChange={(e) => setAddressData({ ...addressData, numero: e.target.value })}
                         disabled={!isEditingAddress}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                       />
@@ -336,8 +458,8 @@ const Perfil: React.FC = () => {
                       </label>
                       <input
                         type="text"
-                        value={addressData.complement}
-                        onChange={(e) => setAddressData({ ...addressData, complement: e.target.value })}
+                        value={addressData.complemento}
+                        onChange={(e) => setAddressData({ ...addressData, complemento: e.target.value })}
                         disabled={!isEditingAddress}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                         placeholder="Apartamento, bloco, etc."
@@ -350,8 +472,8 @@ const Perfil: React.FC = () => {
                       </label>
                       <input
                         type="text"
-                        value={addressData.neighborhood}
-                        onChange={(e) => setAddressData({ ...addressData, neighborhood: e.target.value })}
+                        value={addressData.bairro}
+                        onChange={(e) => setAddressData({ ...addressData, bairro: e.target.value })}
                         disabled={!isEditingAddress}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                       />
@@ -363,8 +485,8 @@ const Perfil: React.FC = () => {
                       </label>
                       <input
                         type="text"
-                        value={addressData.city}
-                        onChange={(e) => setAddressData({ ...addressData, city: e.target.value })}
+                        value={addressData.cidade}
+                        onChange={(e) => setAddressData({ ...addressData, cidade: e.target.value })}
                         disabled={!isEditingAddress}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                       />
@@ -375,8 +497,8 @@ const Perfil: React.FC = () => {
                         Estado
                       </label>
                       <select
-                        value={addressData.state}
-                        onChange={(e) => setAddressData({ ...addressData, state: e.target.value })}
+                        value={addressData.estado}
+                        onChange={(e) => setAddressData({ ...addressData, estado: e.target.value })}
                         disabled={!isEditingAddress}
                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                       >
@@ -431,10 +553,15 @@ const Perfil: React.FC = () => {
                       <div className="flex space-x-2">
                         <button
                           onClick={handlePasswordSave}
-                          className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors"
+                          disabled={isSaving}
+                          className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors disabled:bg-gray-400"
                         >
-                          <Save className="h-4 w-4" />
-                          <span>Salvar</span>
+                          {isSaving ? (
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          ) : (
+                            <Save className="h-4 w-4" />
+                          )}
+                          <span>{isSaving ? 'Salvando...' : 'Salvar'}</span>
                         </button>
                         <button
                           onClick={() => {
@@ -445,7 +572,8 @@ const Perfil: React.FC = () => {
                               confirmPassword: ''
                             });
                           }}
-                          className="flex items-center space-x-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors"
+                          disabled={isSaving}
+                          className="flex items-center space-x-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:bg-gray-400"
                         >
                           <X className="h-4 w-4" />
                           <span>Cancelar</span>
