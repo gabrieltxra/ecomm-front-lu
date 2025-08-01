@@ -1,10 +1,14 @@
+import { useAuth } from "@/contexts/AuthContext";
 import { useState, useEffect } from "react";
 
 export default function CheckoutStep1({ onNext, updateData }: any) {
-  const [cep, setCep] = useState("");
-  const [numero, setNumero] = useState("");
-  const [observacao, setObservacao] = useState("");
-  const [telefone, setTelefone] = useState("");
+  const { user } = useAuth();
+  
+  const [cep, setCep] = useState(user?.endereco?.cep || "");
+  const [rua, setRua] = useState(user?.endereco?.rua || "");
+  const [numero, setNumero] = useState(user?.endereco?.numero || "");
+  const [observacao, setObservacao] = useState(user?.endereco?.complemento || "");
+  const [telefone, setTelefone] = useState(user?.telefone || "");
   const [isValid, setIsValid] = useState(false);
 
   // Função para formatar o CEP ao digitar
@@ -22,10 +26,16 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
     setCep(formatted);
   };
 
+  const handleRuaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRua(e.target.value.replace(/[^a-zA-Z0-9\s\-]/g, ""));
+  };
+
   const handleNumeroChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formatted = e.target.value.replace(/[^a-zA-Z0-9\s\-]/g, "");
     setNumero(formatted);
   };
+
+
 
   // Validação (CEP com 9 caracteres formatado, número não vazio, telefone com 8+)
   useEffect(() => {
@@ -71,6 +81,12 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
             onChange={handleCepChange}
             placeholder="CEP (ex: 12345-678)"
             maxLength={9}
+            className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-rose-300"
+          />
+          <input
+            value={rua}
+            onChange={handleRuaChange}
+            placeholder="Rua"
             className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-rose-300"
           />
           <input
