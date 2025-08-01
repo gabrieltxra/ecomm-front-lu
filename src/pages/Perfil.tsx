@@ -58,7 +58,6 @@ const Perfil: React.FC = () => {
   // Carregar dados do usuário quando o componente montar ou quando o user mudar
   useEffect(() => {
     if (user) {
-      console.log('Dados do usuário carregados:', user);
       
       setFormData({
         name: user.name || '',
@@ -141,7 +140,6 @@ const Perfil: React.FC = () => {
         cpf: formData.cpf || undefined
       } as any;
 
-      console.log('Enviando dados pessoais:', payload);
       await updateProfile(payload);
       toast.success('Dados pessoais atualizados com sucesso!');
       setIsEditing(false);
@@ -170,7 +168,6 @@ const Perfil: React.FC = () => {
         }
       } as any;
 
-      console.log('Enviando endereço (mesma estrutura do register):', payload);
       await updateProfile(payload);
       toast.success('Endereço atualizado com sucesso!');
       setIsEditingAddress(false);

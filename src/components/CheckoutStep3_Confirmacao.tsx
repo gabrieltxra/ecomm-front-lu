@@ -1,7 +1,6 @@
 // CheckoutStep3_Confirmacao.tsx
 export default function CheckoutStep3({ formData, onBack }: any) {
     const handleFinalizar = () => {
-        console.log("Dados finais:", formData);
         alert("Compra confirmada!");
     };
 

@@ -23,7 +23,14 @@ export default function Checkout() {
   return (
     <div>
       {step === 1 && <CheckoutStep1 onNext={handleNext} updateData={updateFormData} />}
-      {step === 2 && <CheckoutStep2 onNext={handleNext} onBack={handleBack} updateData={updateFormData} />}
+      {step === 2 && (
+        <CheckoutStep2
+          onNext={handleNext}
+          onBack={handleBack}
+          updateData={updateFormData}
+          data={formData} 
+        />
+      )}
       {step === 3 && <CheckoutStep3 formData={formData} onBack={handleBack} />}
     </div>
   );

@@ -85,7 +85,6 @@ export async function updateProfile(payload: UpdateProfilePayload) {
   const token = localStorage.getItem('token');
   if (!token) throw new Error('Token não encontrado');
 
-  console.log('Enviando payload para updateProfile:', payload);
 
   const res = await fetch(`${API}/me`, {
     method: 'PUT',
@@ -96,7 +95,6 @@ export async function updateProfile(payload: UpdateProfilePayload) {
     body: JSON.stringify(payload)
   });
 
-  console.log('Status da resposta PUT /me:', res.status);
 
   if (!res.ok) {
     const errorText = await res.text();
@@ -105,7 +103,6 @@ export async function updateProfile(payload: UpdateProfilePayload) {
   }
   
   const responseData = await res.json();
-  console.log('Resposta de sucesso:', responseData);
   return responseData;
 }
 
