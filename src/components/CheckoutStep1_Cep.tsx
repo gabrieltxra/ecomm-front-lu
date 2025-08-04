@@ -152,7 +152,7 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
                 onChange={() => setFreteSelecionado(op)}
               />
               <span>
-                <strong>{op.name}</strong> ({op.company?.name}) - R$ {op.price} - entrega em {op.delivery_time?.days} dias
+                <strong>Frete</strong> R$ {op.price} - entrega estimada em {op.delivery_time} dias
               </span>
             </label>
           ))}

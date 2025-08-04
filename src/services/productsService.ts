@@ -136,7 +136,7 @@ export const getRelatedProducts = async (productId: string | number, category: s
 
 // Hook personalizado para gerenciar produtos (exemplo de uso)
 export const useProducts = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [productsData, setProductsData] = useState<ProductsResponse | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filtersConfig, setFiltersConfig] = useState<FiltersConfig | null>(null);
@@ -144,10 +144,10 @@ export const useProducts = () => {
   const fetchProducts = async (filters: FilterState, page: number = 1) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const response = await getProducts(filters, page);
-      setProducts(response.products);
+      setProductsData(response);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro desconhecido');
     } finally {
@@ -165,7 +165,8 @@ export const useProducts = () => {
   };
 
   return {
-    products,
+    products: productsData?.products || [],
+    productsData,
     loading,
     error,
     filtersConfig,

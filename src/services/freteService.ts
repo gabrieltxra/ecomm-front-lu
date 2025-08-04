@@ -17,10 +17,12 @@ export interface FreteOption {
 
 export const getFreteData = async (params: FreteParams): Promise<FreteOption[]> => {
   try {
+    const token = localStorage.getItem('token');
     const response = await fetch(`${API_BASE_URL}/frete`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`
       },
       body: JSON.stringify(params)
     });

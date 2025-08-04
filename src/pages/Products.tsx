@@ -3,170 +3,57 @@ import ProductCard from '../components/ProductCard';
 import { Filter, X } from 'lucide-react';
 import { useProducts } from '@/services/productsService';
 
-// Interfaces para integração com banco de dados
-interface Category {
-  id: string | number;
-  name: string;
-  slug?: string;
-  count?: number; // Quantidade de produtos na categoria
-}
-
-interface PriceRange {
-  min: number;
-  max: number;
-}
-
-interface SortOption {
-  value: string;
-  label: string;
-}
-
-interface FilterState {
-  category: string;
-  minPrice: number;
-  maxPrice: number;
-  sortBy: string;
-  // Campos adicionais para futuras expansões
-  brand?: string;
-  color?: string;
-  material?: string;
-  availability?: 'in_stock' | 'out_of_stock' | 'all';
-}
-
-interface ProductsPageProps {
-  // Props para integração futura com API
-  categories?: Category[];
-  priceRange?: PriceRange;
-  sortOptions?: SortOption[];
-  loading?: boolean;
-  onFiltersChange?: (filters: FilterState) => void;
-}
-
-const Products: React.FC<ProductsPageProps> = ({
-  categories = [],
-  priceRange,
-  sortOptions = [],
-  onFiltersChange
-}) => {
-
+const Products: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
-  const { products, loading, fetchProducts, fetchFiltersConfig } = useProducts();
-  const [filters, setFilters] = useState<FilterState>({
+  const [currentPage, setCurrentPage] = useState(1);
+  const { productsData, loading, fetchProducts, fetchFiltersConfig, filtersConfig } = useProducts();
+
+  const [filters, setFilters] = useState({
     category: '',
     minPrice: 0,
     maxPrice: 0,
     sortBy: 'name',
-    // brand, color, material, availability can be added here if needed
   });
-
-  useEffect(() => {
-  if (products.length > 0 && filters.maxPrice === 0) {
-    const prices = products.map(p => Number(p.price));
-    const min = Math.min(...prices);
-    const max = Math.max(...prices);
-
-    setFilters(prev => ({
-      ...prev,
-      minPrice: min,
-      maxPrice: max,
-    }));
-  }
-}, [products]);
-
 
   useEffect(() => {
     fetchFiltersConfig();
   }, []);
 
   useEffect(() => {
-    fetchProducts(filters);
-  }, [filters]);
+    fetchProducts(filters, currentPage);
+  }, [filters, currentPage]);
 
-  // Categorias padrão (fallback para dados mockados)
- const defaultCategories: Category[] = useMemo(() => {
-    if (categories.length > 0) return categories;
-
-    if (!products || products.length === 0) return [];
-
-    const uniqueCategories = [...new Set(products.map(product => product.category))];
-    return uniqueCategories.map((cat, index) => ({
-      id: index + 1,
-      name: cat,
-      count: products.filter(p => p.category === cat).length
-    }));
-  }, [categories, products]); 
-
-
-  // Opções de ordenação padrão
-  const defaultSortOptions: SortOption[] = useMemo(() => {
-    if (sortOptions.length > 0) return sortOptions;
-    
-    return [
-      { value: 'name', label: 'Nome A-Z' },
-      { value: 'price', label: 'Menor preço' },
-      { value: 'price-desc', label: 'Maior preço' },
-      { value: 'newest', label: 'Mais recentes' },
-      { value: 'popular', label: 'Mais populares' }
-    ];
-  }, [sortOptions]);
-
-  // Faixa de preço padrão
-  const defaultPriceRange: PriceRange = useMemo(() => {
-    if (priceRange) return priceRange;
-    
-    const prices = products.map(p => Number(p.price));
+  const defaultPriceRange = useMemo(() => {
+    if (!productsData || productsData.products.length === 0) return { min: 0, max: 10000 };
+    const prices = productsData?.products?.map(p => Number(p.price));
     return {
-      min: prices.length > 0 ? Math.min(...prices) : 0,
-      max: prices.length > 0 ? Math.max(...prices) : 10000
+      min: Math.min(...prices),
+      max: Math.max(...prices)
     };
-  }, [priceRange]);
+  }, [productsData]);
 
-  // Filtrar e ordenar produtos
-  const filteredProducts = useMemo(() => {
-    let filtered = products.filter(product => {
-      const matchesCategory = !filters.category || product.category === filters.category;
-      const matchesPrice = product.price >= filters.minPrice && product.price <= filters.maxPrice;
-      
-      // Filtros adicionais para futuras expansões
-      const matchesBrand = !filters.brand || product.category === filters.brand; // Placeholder
-      const matchesColor = !filters.color || true; // Placeholder
-      const matchesMaterial = !filters.material || true; // Placeholder
-      
-      return matchesCategory && matchesPrice && matchesBrand && matchesColor && matchesMaterial;
-    });
-
-    // Ordenar produtos
-    switch (filters.sortBy) {
-      case 'price':
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case 'price-desc':
-        filtered.sort((a, b) => b.price - a.price);
-        break;
-      case 'name':
-      default:
-        filtered.sort((a, b) => a.name.localeCompare(b.name));
-        break;
-    }
-
-    return filtered;
-  }, [filters]);
-
-  // Notificar mudanças nos filtros (para integração com API)
   useEffect(() => {
-    if (onFiltersChange) {
-      onFiltersChange(filters);
+    if (productsData && productsData.products.length > 0 && filters.maxPrice === 0) {
+      const prices = productsData?.products?.map(p => Number(p.price));
+      const min = Math.min(...prices);
+      const max = Math.max(...prices);
+
+      setFilters(prev => ({
+        ...prev,
+        minPrice: min,
+        maxPrice: max,
+      }));
     }
-  }, [filters, onFiltersChange]);
+  }, [productsData]);
 
   const clearFilters = () => {
-    const resetFilters = {
+    setFilters({
       category: '',
       minPrice: defaultPriceRange.min,
       maxPrice: defaultPriceRange.max,
       sortBy: 'name'
-    };
-    setFilters(resetFilters);
+    });
+    setCurrentPage(1);
   };
 
   const formatPrice = (price: number) => {
@@ -176,19 +63,24 @@ const Products: React.FC<ProductsPageProps> = ({
     }).format(price);
   };
 
-  // Loading state
+  const defaultCategories = useMemo(() => {
+    if (!productsData) return [];
+    const unique = [...new Set(productsData?.products?.map(p => p.category))];
+    return unique.map((cat, i) => ({
+      id: i + 1,
+      name: cat,
+      count: productsData.products.filter(p => p.category === cat).length
+    }));
+  }, [productsData]);
+
   if (loading) {
     return (
       <div className="min-h-screen pt-20 bg-white">
         <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-4"></div>
-            <div className="h-4 bg-gray-200 rounded w-1/4 mb-8"></div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-gray-200 rounded-lg h-80"></div>
-              ))}
-            </div>
+          <div className="animate-pulse grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
+              <div key={i} className="bg-gray-200 rounded-lg h-80"></div>
+            ))}
           </div>
         </div>
       </div>
@@ -198,18 +90,16 @@ const Products: React.FC<ProductsPageProps> = ({
   return (
     <div className="min-h-screen pt-20 bg-white">
       <div className="container mx-auto px-4 py-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-black mb-2">Nossos Produtos</h1>
           <p className="text-gray-600">
-            {filteredProducts.length} produto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
+            {productsData?.total || 0} produto{productsData?.total !== 1 ? 's' : ''} encontrado{productsData?.total !== 1 ? 's' : ''}
           </p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Filtros Laterais */}
+          {/* Filtros */}
           <div className="lg:w-64">
-            {/* Botão para mobile */}
             <button
               onClick={() => setShowFilters(!showFilters)}
               className="lg:hidden w-full bg-rose-400 text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 mb-4"
@@ -219,16 +109,10 @@ const Products: React.FC<ProductsPageProps> = ({
               {showFilters && <X className="w-5 h-5" />}
             </button>
 
-            {/* Filtros Desktop */}
             <div className={`lg:block ${showFilters ? 'block' : 'hidden'} bg-white border border-gray-200 rounded-lg p-6 sticky top-24`}>
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-lg font-semibold text-black">Filtros</h3>
-                <button
-                  onClick={clearFilters}
-                  className="text-rose-400 hover:text-rose-500 text-sm font-medium"
-                >
-                  Limpar
-                </button>
+                <button onClick={clearFilters} className="text-rose-400 hover:text-rose-500 text-sm font-medium">Limpar</button>
               </div>
 
               {/* Categoria */}
@@ -247,120 +131,99 @@ const Products: React.FC<ProductsPageProps> = ({
                       />
                       <span className="text-gray-700">Todas</span>
                     </div>
-                    <span className="text-xs text-gray-500">
-                      {products.length}
-                    </span>
                   </label>
-                  {defaultCategories.map((category) => (
-                    <label key={category.id} className="flex items-center justify-between">
+                  {defaultCategories.map((cat) => (
+                    <label key={cat.id} className="flex items-center justify-between">
                       <div className="flex items-center">
                         <input
                           type="radio"
                           name="category"
-                          value={category.name}
-                          checked={filters.category === category.name}
+                          value={cat.name}
+                          checked={filters.category === cat.name}
                           onChange={(e) => setFilters({ ...filters, category: e.target.value })}
                           className="mr-2 text-rose-400"
                         />
-                        <span className="text-gray-700">{category.name}</span>
+                        <span className="text-gray-700">{cat.name}</span>
                       </div>
-                      {category.count && (
-                        <span className="text-xs text-gray-500">
-                          {category.count}
-                        </span>
-                      )}
+                      <span className="text-xs text-gray-500">{cat.count}</span>
                     </label>
                   ))}
                 </div>
               </div>
 
-              {/* Faixa de Preço */}
+              {/* Preço */}
               <div className="mb-6">
                 <h4 className="font-medium text-black mb-3">Faixa de Preço</h4>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">Preço mínimo</label>
+                    <label className="block text-sm text-gray-600 mb-1">Mínimo</label>
                     <input
                       type="number"
                       value={filters.minPrice}
                       onChange={(e) => setFilters({ ...filters, minPrice: Number(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent"
-                      placeholder={defaultPriceRange.min.toString()}
-                      min={defaultPriceRange.min}
-                      max={defaultPriceRange.max}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">Preço máximo</label>
+                    <label className="block text-sm text-gray-600 mb-1">Máximo</label>
                     <input
                       type="number"
                       value={filters.maxPrice}
                       onChange={(e) => setFilters({ ...filters, maxPrice: Number(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent"
-                      placeholder={defaultPriceRange.max.toString()}
-                      min={defaultPriceRange.min}
-                      max={defaultPriceRange.max}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Ordenação */}
+              {/* Ordenar */}
               <div>
                 <h4 className="font-medium text-black mb-3">Ordenar por</h4>
                 <select
                   value={filters.sortBy}
                   onChange={(e) => setFilters({ ...filters, sortBy: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                 >
-                  {defaultSortOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
+                  <option value="name">Nome A-Z</option>
+                  <option value="price">Menor preço</option>
+                  <option value="price-desc">Maior preço</option>
                 </select>
               </div>
-
-              {/* Filtros adicionais para futuras expansões */}
-              {/* 
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <h4 className="font-medium text-black mb-3">Marca</h4>
-                <select
-                  value={filters.brand || ''}
-                  onChange={(e) => setFilters({ ...filters, brand: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent"
-                >
-                  <option value="">Todas as marcas</option>
-                  {/* Aqui virão as marcas do banco de dados */}
-                {/* </select>
-              </div>
-              */}
             </div>
           </div>
 
-          {/* Grid de Produtos */}
+          {/* Lista de produtos */}
           <div className="flex-1">
-            {filteredProducts.length === 0 ? (
-              <div className="text-center py-12">
-                <div className="text-gray-400 mb-4">
-                  <Filter className="w-16 h-16 mx-auto" />
-                </div>
-                <h3 className="text-xl font-semibold text-black mb-2">Nenhum produto encontrado</h3>
-                <p className="text-gray-600 mb-4">
-                  Tente ajustar os filtros para encontrar o que procura.
-                </p>
-                <button
-                  onClick={clearFilters}
-                  className="bg-rose-400 hover:bg-rose-500 text-white px-6 py-2 rounded-lg transition-colors"
-                >
-                  Limpar Filtros
-                </button>
-              </div>
+            {productsData?.products.length === 0 ? (
+              <p className="text-gray-500">Nenhum produto encontrado.</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredProducts.map((product) => (
+                {productsData?.products?.map(product => (
                   <ProductCard key={product.id} product={product} />
                 ))}
+              </div>
+            )}
+
+            {/* Paginação */}
+            {productsData?.totalPages > 1 && (
+              <div className="flex justify-center mt-10 gap-4">
+                <button
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(prev => prev - 1)}
+                  className="px-4 py-2 border rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+                >
+                  Anterior
+                </button>
+                <span className="text-gray-700 font-medium">
+                  Página {productsData.page} de {productsData.totalPages}
+                </span>
+                <button
+                  disabled={currentPage === productsData.totalPages}
+                  onClick={() => setCurrentPage(prev => prev + 1)}
+                  className="px-4 py-2 border rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+                >
+                  Próxima
+                </button>
               </div>
             )}
           </div>
@@ -370,4 +233,4 @@ const Products: React.FC<ProductsPageProps> = ({
   );
 };
 
-export default Products; 
+export default Products;
