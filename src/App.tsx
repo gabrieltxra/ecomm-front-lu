@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { HelmetProvider, Helmet } from "react-helmet-async";
 import { CartProvider } from "./contexts/CartContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Header from "./components/Header";
+
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import ProductDetail from "./pages/ProductDetail";
@@ -19,6 +19,7 @@ import Cadastro from "./pages/Cadastro";
 import Perfil from "./pages/Perfil";
 import { AuthProvider } from "./contexts/AuthContext";
 import CheckoutPage from "./pages/Checkout";
+import Header from "./components/Header";
 
 const queryClient = new QueryClient();
 
