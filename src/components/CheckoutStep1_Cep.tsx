@@ -7,6 +7,8 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
   const { user } = useAuth();
   const { items: cart } = useCart();
 
+  const [modoEntrega, setModoEntrega] = useState<"retirar" | "entregar">("entregar");
+
   const [cep, setCep] = useState(user?.endereco?.cep || "");
   const [rua, setRua] = useState(user?.endereco?.rua || "");
   const [numero, setNumero] = useState(user?.endereco?.numero || "");
@@ -24,71 +26,59 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
   };
 
   const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatCep(e.target.value);
-    setCep(formatted);
-  };
-
-  const handleRuaChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRua(e.target.value.replace(/[^a-zA-Z0-9\s\-]/g, ""));
-  };
-
-  const handleNumeroChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setNumero(e.target.value.replace(/[^a-zA-Z0-9\s\-]/g, ""));
+    setCep(formatCep(e.target.value));
   };
 
   useEffect(() => {
-    const valid = cep.trim().length === 9 && numero.trim().length > 0 && telefone.trim().length >= 8;
+    const valid =
+      modoEntrega === "retirar" ||
+      (cep.trim().length === 9 && numero.trim().length > 0 && telefone.trim().length >= 8);
     setIsValid(valid);
-  }, [cep, numero, telefone]);
+  }, [cep, numero, telefone, modoEntrega]);
 
-  // 📦 Consulta o frete automaticamente quando o cep for válido
   useEffect(() => {
-  const fetchFrete = async () => {
-    if (cep.trim().length === 9 && cart.length > 0) {
-      setLoadingFrete(true);
-      try {
-        const products_Ids = cart.map(item => item.id);
-        const result = await getFreteData({ cep, products_Ids });
+    const fetchFrete = async () => {
+      if (modoEntrega === "entregar" && cep.trim().length === 9 && cart.length > 0) {
+        setLoadingFrete(true);
+        try {
+          const products_Ids = cart.map(item => item.id);
+          const result = await getFreteData({ cep, products_Ids });
 
-        // 🧠 Filtro das opções válidas (sem erro)
-        const opcoesValidas = result.filter((op: any) => !op.error);
+          let opcoesValidas = result
+            .filter((op: any) => !op.error)
+            .map((op: any) => ({
+              id: String(op.id),
+              name: op.name || "Frete",
+              price: typeof op.price === "number" ? op.price : parseFloat(op.price || "0"),
+              delivery_time: op.delivery_time || 0
+            }));
 
-        setFreteOptions(opcoesValidas);
+          opcoesValidas = opcoesValidas.sort((a, b) => a.price - b.price);
 
-        // ✅ (Opcional) selecionar automaticamente a primeira opção válida
-        if (opcoesValidas.length > 0) {
-          setFreteSelecionado(opcoesValidas[0]);
+          setFreteOptions(opcoesValidas);
+          setFreteSelecionado(opcoesValidas[0] || null);
+        } catch (err) {
+          console.error("Erro ao calcular frete:", err);
+        } finally {
+          setLoadingFrete(false);
         }
-
-      } catch (err) {
-        console.error('Erro ao calcular frete:', err);
-      } finally {
-        setLoadingFrete(false);
       }
-    }
-  };
-  fetchFrete();
-}, [cep, cart]);
-
+    };
+    fetchFrete();
+  }, [cep, cart, modoEntrega]);
 
   const handleNext = () => {
-  updateData({
-    cart, 
-    endereco: {
-      cep,
-      rua,
-      numero,
-      observacao,
-      telefone,
-    },
-    frete: freteSelecionado,
-  });
-
-  onNext();
-};
+    updateData({
+      cart,
+      endereco: { cep, rua, numero, observacao, telefone },
+      frete: modoEntrega === "retirar" ? { id: "retirar", name: "Retirada no local", price: 0, delivery_time: 0 } : freteSelecionado,
+    });
+    onNext();
+  };
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      {/* Barra de progresso */}
       <div className="flex items-center justify-center mb-6 w-full max-w-2xl">
         <div className="flex items-center w-full">
           <div className="w-8 h-8 bg-rose-500 text-white rounded-full flex items-center justify-center font-bold">1</div>
@@ -100,75 +90,96 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
       </div>
 
       <div className="w-full max-w-2xl p-6 bg-white shadow-lg rounded-xl">
-        <h2 className="text-2xl font-semibold text-rose-300 mb-4">Endereço para entrega</h2>
+        <h2 className="text-2xl font-semibold text-rose-300 mb-4">Opções de entrega</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input
-            value={cep}
-            onChange={handleCepChange}
-            placeholder="CEP (ex: 12345-678)"
-            maxLength={9}
-            className="border border-gray-300 rounded-md px-4 py-2"
-          />
-          <input
-            value={rua}
-            onChange={handleRuaChange}
-            placeholder="Rua"
-            className="border border-gray-300 rounded-md px-4 py-2"
-          />
-          <input
-            value={numero}
-            onChange={handleNumeroChange}
-            placeholder="Número"
-            className="border border-gray-300 rounded-md px-4 py-2"
-          />
-          <input
-            value={observacao}
-            onChange={(e) => setObservacao(e.target.value)}
-            placeholder="Observação (opcional)"
-            className="border border-gray-300 rounded-md px-4 py-2 col-span-full"
-          />
-          <input
-            value={telefone}
-            onChange={(e) => setTelefone(e.target.value)}
-            placeholder="Telefone com DDD"
-            className="border border-gray-300 rounded-md px-4 py-2 col-span-full"
-          />
+        {/* Botões de modo de entrega */}
+        <div className="flex gap-4 mb-6">
+          <button
+            className={`flex-1 py-2 rounded-md border transition ${
+              modoEntrega === "retirar" ? "bg-rose-300 text-white border-rose-400" : "border-gray-300"
+            }`}
+            onClick={() => setModoEntrega("retirar")}
+          >
+            Retirar no local
+          </button>
+          <button
+            className={`flex-1 py-2 rounded-md border transition ${
+              modoEntrega === "entregar" ? "bg-rose-300 text-white border-rose-400" : "border-gray-300"
+            }`}
+            onClick={() => setModoEntrega("entregar")}
+          >
+            Entregar
+          </button>
         </div>
 
-        {/* Opções de frete */}
-        <div className="mt-6">
-          <h3 className="text-lg font-semibold mb-2">Opções de frete:</h3>
-          {loadingFrete && <p>Carregando...</p>}
-          {!loadingFrete && freteOptions.length === 0 && <p>Nenhuma opção disponível.</p>}
+        {/* Área dinâmica */}
+        {modoEntrega === "retirar" ? (
+          <div className="mb-6">
+            <h4 className="font-semibold mb-2">Endereço para retirada:</h4>
+            <iframe
+              src="https://www.google.com/maps?q=13457038&output=embed"
+              width="100%"
+              height="300"
+              style={{ border: 0 }}
+              loading="lazy"
+              className="rounded-lg shadow"
+            ></iframe>
+          </div>
+        ) : (
+          <div className="mb-6">
+            {/* Formulário */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <input value={cep} onChange={handleCepChange} placeholder="CEP" className="border rounded-md px-4 py-2" />
+              <input value={rua} onChange={(e) => setRua(e.target.value)} placeholder="Rua" className="border rounded-md px-4 py-2" />
+              <input value={numero} onChange={(e) => setNumero(e.target.value)} placeholder="Número" className="border rounded-md px-4 py-2" />
+              <input value={observacao} onChange={(e) => setObservacao(e.target.value)} placeholder="Complemento" className="border rounded-md px-4 py-2 col-span-full" />
+              <input value={telefone} onChange={(e) => setTelefone(e.target.value)} placeholder="Telefone com DDD" className="border rounded-md px-4 py-2 col-span-full" />
+            </div>
 
-          {!loadingFrete && freteOptions.map((op) => (
-            <label key={op.id} className="flex items-center gap-3 border p-2 rounded-md my-1 cursor-pointer">
-              <input
-                type="radio"
-                name="frete"
-                value={op.id}
-                checked={freteSelecionado?.id === op.id}
-                onChange={() => setFreteSelecionado(op)}
-              />
-              <span>
-                <strong>Frete</strong> R$ {op.price} - entrega estimada em {op.delivery_time} dias
-              </span>
-            </label>
-          ))}
+            {/* Lista de opções de frete */}
+            {loadingFrete && <p>Carregando opções...</p>}
+            {!loadingFrete && freteOptions.length > 0 && (
+              <div className="space-y-2">
+                {freteOptions.map((op) => (
+                  <label key={op.id} className={`flex items-center gap-3 border p-3 rounded-lg cursor-pointer ${
+                    freteSelecionado?.id === op.id ? "border-rose-400 bg-rose-50" : "border-gray-200"
+                  }`}>
+                    <input
+                      type="radio"
+                      name="frete"
+                      value={op.id}
+                      checked={freteSelecionado?.id === op.id}
+                      onChange={() => setFreteSelecionado(op)}
+                    />
+                    <span>
+                      R$ {op.price.toFixed(2)} - entrega estimada em {op.delivery_time} dias
+                    </span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Preço e botão */}
+        <div className="mt-4 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="text-lg font-semibold">
+            {modoEntrega === "retirar"
+              ? "R$ 0,00 - Retirada no local"
+              : freteSelecionado
+              ? `R$ ${freteSelecionado.price.toFixed(2)} - entrega em ${freteSelecionado.delivery_time} dias`
+              : "Selecione uma opção"}
+          </div>
+          <button
+            onClick={handleNext}
+            disabled={!isValid}
+            className={`px-6 py-2 rounded-md font-semibold transition ${
+              isValid ? "bg-rose-300 hover:bg-rose-600 text-white" : "bg-gray-300 text-gray-500 cursor-not-allowed"
+            }`}
+          >
+            Próximo
+          </button>
         </div>
-
-        <button
-          onClick={handleNext}
-          disabled={!isValid || !freteSelecionado}
-          className={`w-full mt-6 py-2 rounded-md font-semibold transition ${
-            isValid && freteSelecionado
-              ? "bg-rose-300 hover:bg-rose-600 text-white"
-              : "bg-gray-300 text-gray-500 cursor-not-allowed"
-          }`}
-        >
-          Próximo
-        </button>
       </div>
     </div>
   );
