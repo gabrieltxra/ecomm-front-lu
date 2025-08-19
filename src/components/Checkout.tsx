@@ -1,7 +1,6 @@
 
 import CheckoutStep1 from "../components/CheckoutStep1_Cep";
 import CheckoutStep2 from "../components/CheckoutStep2_Pagamento";
-import CheckoutStep3 from "../components/CheckoutStep3_Confirmacao";
 import { useState } from "react";
 
 
@@ -31,7 +30,6 @@ export default function Checkout() {
           data={formData} 
         />
       )}
-      {step === 3 && <CheckoutStep3 formData={formData} onBack={handleBack} />}
     </div>
   );
 }
