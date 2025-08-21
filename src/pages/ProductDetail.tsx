@@ -19,6 +19,8 @@ const ProductDetail: React.FC = () => {
 const [product, setProduct] = useState<Product | null>(null);
 const [loading, setLoading] = useState(true);
 
+console.log(product)
+
 useEffect(() => {
   const fetchProduct = async () => {
     if (!id) return;
@@ -164,21 +166,36 @@ useEffect(() => {
               </ul>
             </div>
 
-            {/* Actions */}
+           {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={handleAddToCart}
-                className="flex-1 bg-atelie-gradient text-white py-3 px-6 rounded-lg font-semibold hover:opacity-90 transition-opacity flex items-center justify-center space-x-2"
+                disabled={product.stock === 0}
+                className={`flex-1 py-3 px-6 rounded-lg font-semibold flex items-center justify-center space-x-2
+                  ${product.stock === 0 
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
+                    : "bg-atelie-gradient text-white hover:opacity-90 transition-opacity"
+                  }`}
               >
                 <ShoppingCart className="h-5 w-5" />
-                <span>Adicionar ao Carrinho</span>
+                <span>
+                  {product.stock === 0 ? "Indisponível" : "Adicionar ao Carrinho"}
+                </span>
               </button>
-              
-              <button className="flex items-center justify-center space-x-2 border border-border py-3 px-6 rounded-lg hover:bg-accent transition-colors">
+
+              <button
+                disabled={product.stock === 0}
+                className={`flex items-center justify-center space-x-2 border py-3 px-6 rounded-lg transition-colors
+                  ${product.stock === 0 
+                    ? "border-gray-300 text-gray-400 cursor-not-allowed" 
+                    : "border-border hover:bg-accent"
+                  }`}
+              >
                 <Heart className="h-5 w-5" />
                 <span>Favoritar</span>
               </button>
             </div>
+
 
             {/* Contact Info */}
             <div className="bg-accent/50 rounded-lg p-6 space-y-3">
