@@ -19,8 +19,6 @@ const ProductDetail: React.FC = () => {
 const [product, setProduct] = useState<Product | null>(null);
 const [loading, setLoading] = useState(true);
 
-console.log(product)
-
 useEffect(() => {
   const fetchProduct = async () => {
     if (!id) return;

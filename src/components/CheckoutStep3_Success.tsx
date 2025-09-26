@@ -66,9 +66,6 @@ export default function CheckoutStep3() {
 
             <div className="bg-gray-50 p-4 rounded-md mb-6 text-sm text-gray-700">
               <p><strong>Pedido:</strong> #{order.id}</p>
-              <p><strong>Status:</strong> {order.status}</p>
-              <p><strong>Pagamento:</strong> {order.payment_status}</p>
-              <p><strong>Total pago:</strong> {BRL(order.amount_paid / 100)} {order.currency?.toUpperCase()}</p>
               <p><strong>Atualizado em:</strong> {new Date(order.updated_at).toLocaleString("pt-BR")}</p>
             </div>
 
@@ -80,7 +77,7 @@ export default function CheckoutStep3() {
                 Voltar à loja
               </Link>
               <Link
-                to={`/orders/${order.id}`}
+                to={`/order/${order.id}`}
                 className="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 rounded-md text-center"
               >
                 Ver pedido

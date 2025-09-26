@@ -4,29 +4,27 @@ import { useNavigate } from 'react-router-dom';
 import { updateProfile, updatePassword } from '@/services/authService';
 import { searchCep } from '../services/viaCepService';
 import { 
-  User, 
-  MapPin, 
-  Lock, 
-  Mail, 
-  Phone, 
-  Edit, 
-  Save, 
-  X, 
-  LogOut,
-  Camera
+  User, MapPin, Lock, Edit, Save, X, LogOut, Camera,
+  Package, Truck, Calendar, CreditCard
 } from 'lucide-react';
+import { getUserOrders, Order } from '@/services/ordersService';
+import { Link } from "react-router-dom";
+
 import { toast } from 'sonner';
 
 const Perfil: React.FC = () => {
-  const { user, isLoggedIn, isLoading, logout } = useAuth();
-  const navigate = useNavigate();
-  
-  const [activeTab, setActiveTab] = useState('perfil');
-  const [isEditing, setIsEditing] = useState(false);
-  const [isEditingAddress, setIsEditingAddress] = useState(false);
-  const [isEditingPassword, setIsEditingPassword] = useState(false);
-  const [isSearchingCep, setIsSearchingCep] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const { user, isLoggedIn, isLoading, logout } = useAuth();
+  const navigate = useNavigate();
+  
+  const [activeTab, setActiveTab] = useState('perfil');
+  const [isEditing, setIsEditing] = useState(false);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [isEditingPassword, setIsEditingPassword] = useState(false);
+  const [isSearchingCep, setIsSearchingCep] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loadingOrders, setLoadingOrders] = useState(false);
+  const [ordersLoaded, setOrdersLoaded] = useState(false); 
 
   // Estados para dados pessoais
   const [formData, setFormData] = useState({
@@ -82,6 +80,23 @@ const Perfil: React.FC = () => {
       });
     }
   }, [user]);
+
+   useEffect(() => {
+    const load = async () => {
+      if (activeTab !== 'pedidos' || ordersLoaded || loadingOrders) return;
+      try {
+        setLoadingOrders(true);
+        const list = await getUserOrders();
+        setOrders(list);
+        setOrdersLoaded(true);
+      } catch (e: any) {
+        toast.error(e?.message || 'Erro ao carregar pedidos');
+      } finally {
+        setLoadingOrders(false);
+      }
+    };
+    load();
+  }, [activeTab]);
 
   useEffect(() => {
     if (!isLoading && !isLoggedIn) {
@@ -154,7 +169,6 @@ const Perfil: React.FC = () => {
   const handleAddressSave = async () => {
     setIsSaving(true);
     try {
-      // Usando a mesma estrutura do register
       const payload = {
         endereco: {
           cep: addressData.cep,
@@ -206,8 +220,40 @@ const Perfil: React.FC = () => {
   const tabs = [
     { id: 'perfil', label: 'Dados Pessoais', icon: User },
     { id: 'endereco', label: 'Endereço', icon: MapPin },
-    { id: 'senha', label: 'Alterar Senha', icon: Lock }
+    { id: 'senha', label: 'Alterar Senha', icon: Lock },
+    { id: 'pedidos', label: 'Meus Pedidos', icon: Package },
   ];
+
+  const formatMoney = (n: number) =>
+    (n ?? 0).toFixed(2).replace('.', ',');
+
+  const statusPill = (s) => {
+    const base = 'px-2 py-1 text-xs rounded-full font-medium';
+    switch (s) {
+      case 'Pago': return `${base} bg-green-100 text-green-700`;
+      case 'preparing_shipment': return `${base} bg-amber-100 text-amber-700`;
+      case 'shipped': return `${base} bg-sky-100 text-sky-700`;
+      case 'delivered': return `${base} bg-emerald-100 text-emerald-700`;
+      case 'Pendente': return `${base} bg-orange-100 text-orange-700`;
+      case 'cancelled': return `${base} bg-red-100 text-red-700`;
+      case 'returned': return `${base} bg-zinc-200 text-zinc-700`;
+      default: return `${base} bg-gray-100 text-gray-700`;
+    }
+  };
+
+  const reloadOrders = async () => {
+    try {
+      setLoadingOrders(true);
+      const list = await getUserOrders();
+      setOrders(list);
+      setOrdersLoaded(true);
+    } catch (e: any) {
+      toast.error(e?.message || 'Erro ao recarregar');
+    } finally {
+      setLoadingOrders(false);
+    }
+  };
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-rose-50 dark:from-slate-900 dark:to-slate-800 pt-24 pb-16">
@@ -578,6 +624,7 @@ const Perfil: React.FC = () => {
                       </div>
                     )}
                   </div>
+                  
 
                   {isEditingPassword && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -618,6 +665,89 @@ const Perfil: React.FC = () => {
                       </div>
                     </div>
                   )}
+                </div>
+              )}
+              {activeTab === 'pedidos' && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Meus Pedidos</h2>
+                  </div>
+
+                  {!loadingOrders && orders.length === 0 && (
+                    <div className="text-center p-8 border border-dashed rounded-lg dark:border-slate-700">
+                      <Package className="w-10 h-10 mx-auto opacity-70 mb-2" />
+                      <p className="text-gray-600 dark:text-gray-300">
+                        Você ainda não possui pedidos.
+                      </p>
+                    </div>
+                  )}
+
+                  <div className="space-y-4">
+                    {orders.map((o) => (
+                      <Link
+                        to={`/order/${o.id}`}
+                        key={o.id}
+                        className="block bg-white dark:bg-slate-800/50 border border-gray-200 
+                                  dark:border-slate-700/50 rounded-lg p-4 shadow-sm 
+                                  hover:shadow-md hover:border-rose-300 transition"
+                      >
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <Package className="w-5 h-5 text-rose-400" />
+                            <div>
+                              <div className="font-semibold">Pedido #{o.id}</div>
+                              <div className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                                <Calendar className="w-4 h-4" />
+                                {new Date(o.created_at).toLocaleString("pt-BR")}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <span className={statusPill(o.status)}>
+                              {o.status.replace("_", " ")}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
+                          <div className="flex items-center gap-2">
+                            <CreditCard className="w-4 h-4" />
+                            <span>
+                              Pagamento: {o.payment_method} ({o.payment_status})
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Truck className="w-4 h-4" />
+                            <span>Entrega: {o.shipping_method}</span>
+                          </div>
+                          <div className="text-right md:text-left font-semibold">
+                            Total: R$ {formatMoney(o.total + o.shipping_cost)}
+                          </div>
+                        </div>
+
+                        {o.items?.length ? (
+                          <div className="mt-3 border-t border-gray-200 dark:border-slate-700 pt-3">
+                            <ul className="space-y-1 text-sm">
+                              {o.items.map((it) => (
+                                <li
+                                  key={it.id ?? `${it.product_id}-${it.price}`}
+                                  className="flex justify-between"
+                                >
+                                  <span className="text-gray-700 dark:text-gray-200">
+                                    {it.product_name} × {it.quantity}
+                                  </span>
+                                  <span className="text-gray-600">
+                                    R$ {formatMoney(it.price * it.quantity)}
+                                  </span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ) : null}
+                      </Link>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

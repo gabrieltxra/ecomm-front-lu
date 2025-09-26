@@ -9,12 +9,14 @@ export default function CheckoutStep2({ onNext, onBack, updateData, data }: any)
           cep: data.endereco.cep,
           street: data.endereco.rua,
           number: data.endereco.numero,
-          city: data.endereco.cidade || "São Paulo", // futuro: viaCep
+          city: data.endereco.cidade || "São Paulo", 
           state: data.endereco.estado || "SP",
           phone: data.endereco.telefone,
         },
         shipping: {
-          method: data.frete.name,
+          method: data.frete.name === 'Retirada no local' 
+          ? 'Retirada no local' 
+          : 'Envio padrão',
           cost: data.frete.price,
           estimated_delivery: `${data.frete.delivery_time.days} dias`,
         },
@@ -73,7 +75,7 @@ export default function CheckoutStep2({ onNext, onBack, updateData, data }: any)
           </ul>
 
           <div className="flex justify-between mt-2">
-            <span>Frete ({data.frete?.name || "—"})</span>
+            <span>Frete</span>
             <span>{formatBRL(frete)}</span>
           </div>
 

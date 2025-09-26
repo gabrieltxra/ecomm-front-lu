@@ -21,6 +21,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import CheckoutPage from "./pages/Checkout";
 import Header from "./components/Header";
 import CheckoutStep3 from "./components/CheckoutStep3_Success";
+import OrderDetail from "./pages/OrderDetail";
 
 const queryClient = new QueryClient();
 
@@ -76,6 +77,7 @@ const App = () => (
                     <Route path="/sob-medida" element={<Home />} />
                     <Route path="/checkout" element={<CheckoutPage />} />
                     <Route path="/success" element={<CheckoutStep3 />} />
+                    <Route path="/order/:id" element={<OrderDetail />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
