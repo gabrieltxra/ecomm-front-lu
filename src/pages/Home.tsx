@@ -77,14 +77,6 @@ useEffect(() => {
         <ProductGrid products={products.slice(0, 3)} title="Produtos em Destaque" />
       </section>
 
-      {/* Mais Vendidos */}
-      <section className="py-12 bg-rose-50 dark:bg-slate-800/50 section-light">
-        <div className="container mx-auto px-4 flex items-center justify-between mb-6">
-          <h2 className="text-2xl md:text-3xl font-bold text-black dark:text-white">Mais Vendidos</h2>
-        </div>
-        <ProductGrid products={products.slice(4, 10)} title="Mais Vendidos" />
-      </section>
-
       {/* Sobre (rodapé visual) */}
       <section className="py-16 bg-gradient-to-br from-white to-rose-50 dark:from-slate-900 dark:to-slate-800 border-t border-rose-100 dark:border-slate-700/50 mt-8">
         <div className="container mx-auto px-4">

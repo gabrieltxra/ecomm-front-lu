@@ -22,6 +22,9 @@ import CheckoutPage from "./pages/Checkout";
 import Header from "./components/Header";
 import CheckoutStep3 from "./components/CheckoutStep3_Success";
 import OrderDetail from "./pages/OrderDetail";
+import ResetPasswordPage from "./pages/ResetPasswordPage";
+import ForgotPasswordPage from "./pages/ForgotPasswordPage";
+import OrderSupport from "./pages/OrderSupport";
 
 const queryClient = new QueryClient();
 
@@ -72,12 +75,15 @@ const App = () => (
                     <Route path="/cadastro" element={<Cadastro />} />
                     <Route path="/perfil" element={<Perfil />} />
                     <Route path="/cart" element={<Cart />} />
-                    <Route path="/cortinas" element={<Home />} />
+                    <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+                    <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+                    {/* <Route path="/cortinas" element={<Home />} />
                     <Route path="/persianas" element={<Home />} />
-                    <Route path="/sob-medida" element={<Home />} />
+                    <Route path="/sob-medida" element={<Home />} /> */}
                     <Route path="/checkout" element={<CheckoutPage />} />
                     <Route path="/success" element={<CheckoutStep3 />} />
                     <Route path="/order/:id" element={<OrderDetail />} />
+                    <Route path="/order/:id/support" element={<OrderSupport />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>

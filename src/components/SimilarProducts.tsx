@@ -88,7 +88,7 @@ const SimilarProducts: React.FC<SimilarProductsProps> = ({
 
         <div className="text-center mt-8">
           <button
-            onClick={() => navigate('/products')}
+            onClick={() => navigate('/produtos')}
             className="bg-rose-500 dark:bg-rose-400 hover:bg-rose-600 dark:hover:bg-rose-500 text-white px-8 py-3 rounded-lg font-semibold transition-colors shadow-lg hover:shadow-xl"
           >
             Ver Todos os Produtos

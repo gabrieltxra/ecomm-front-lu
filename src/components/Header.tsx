@@ -15,9 +15,9 @@ const Header: React.FC = () => {
   const navigation = [
     { name: 'Home', href: '/' },
     { name: 'Produtos', href: '/produtos' },
-    { name: 'Cortinas', href: '/cortinas' },
-    { name: 'Persianas', href: '/persianas' },
-    { name: 'Sob Medida', href: '/sob-medida' }
+    // { name: 'Cortinas', href: '/cortinas' },
+    // { name: 'Persianas', href: '/persianas' },
+    // { name: 'Sob Medida', href: '/sob-medida' }
   ];
 
   const isActive = (href: string) => location.pathname === href;

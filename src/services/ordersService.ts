@@ -6,6 +6,7 @@ export interface OrderItem {
   product_image: string;
   quantity: number;
   price: number;
+  image_url?: string;
 }
 
 export interface Order {
@@ -14,7 +15,7 @@ export interface Order {
   status:
     | 'created'
     | 'pending_payment'
-    | 'payment_confirmed'
+    | 'paid'
     | 'preparing_shipment'
     | 'shipped'
     | 'delivered'
@@ -24,9 +25,12 @@ export interface Order {
   shipping_method: string;
   shipping_cost: number;
   payment_method: string;
-  payment_status: 'pending' | 'paid' | 'failed';
+  payment_status: 'pending' | 'succeeded' | 'failed';
   stripe_session_id?: string;
   stripe_payment_intent?: string;
+
+  nfe_pdf_url?: string | null;
+
   address: {
     cep: string;
     street: string;
@@ -40,20 +44,19 @@ export interface Order {
   items?: OrderItem[];
 }
 
-const paymentMethodMap = {
-  'card': 'Cartão de Crédito',
-  'pix': 'Pix',
-  'boleto': 'Boleto',
+const paymentMethodMap: Record<string, string> = {
+  card: 'Cartão de Crédito',
+  pix: 'Pix',
+  boleto: 'Boleto',
 };
 
-const paymentStatusMap = {
-  'pending': 'Pendente',
-  'pending_payment': 'Pendente',
-  'paid': 'Pago',
-  'failed': 'Falhou',
-  'succeeded': 'Concluído',
+const paymentStatusMap: Record<string, string> = {
+  pending: 'Pendente',
+  pending_payment: 'Pendente',
+  paid: 'Pago',
+  failed: 'Falhou',
+  succeeded: 'Concluído',
 };
-
 const API_BASE_URL =
   import.meta.env.VITE_REACT_APP_API_URL || 'http://localhost:3000';
 
@@ -64,9 +67,9 @@ function normalizeOrder(raw: any): Order {
         order_id: String(it.order_id),
         product_id: String(it.product_id),
         product_name: String(it.product_name ?? ''),
-        product_image: String(it.product_image ?? ''),
         quantity: Number(it.quantity ?? 0),
         price: Number(it.price ?? 0),
+        image_url: it.image_url ? String(it.image_url) : undefined,
       }))
     : [];
 
@@ -85,6 +88,7 @@ function normalizeOrder(raw: any): Order {
     id: raw.id?.toString(),
     user_id: Number(raw.user_id),
     status: paymentStatusMap[raw.status] || raw.status,
+    nfe_pdf_url: raw.nfe_pdf_url ?? null,
     total: Number(raw.total ?? 0),
     shipping_method: String(raw.shipping_method ?? ''),
     shipping_cost: Number(raw.shipping_cost ?? 0),

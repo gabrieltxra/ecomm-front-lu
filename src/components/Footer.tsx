@@ -32,9 +32,9 @@ const Footer: React.FC = () => {
             <ul className="space-y-3 text-slate-600 dark:text-slate-300">
               <li><a href="/" className="hover:text-rose-500 dark:hover:text-rose-400 transition-colors font-medium">Home</a></li>
               <li><a href="/produtos" className="hover:text-rose-500 dark:hover:text-rose-400 transition-colors font-medium">Produtos</a></li>
-              <li><a href="/cortinas" className="hover:text-rose-500 dark:hover:text-rose-400 transition-colors font-medium">Cortinas</a></li>
+              {/* <li><a href="/cortinas" className="hover:text-rose-500 dark:hover:text-rose-400 transition-colors font-medium">Cortinas</a></li>
               <li><a href="/persianas" className="hover:text-rose-500 dark:hover:text-rose-400 transition-colors font-medium">Persianas</a></li>
-              <li><a href="/sob-medida" className="hover:text-rose-500 dark:hover:text-rose-400 transition-colors font-medium">Sob Medida</a></li>
+              <li><a href="/sob-medida" className="hover:text-rose-500 dark:hover:text-rose-400 transition-colors font-medium">Sob Medida</a></li> */}
             </ul>
           </div>
 
