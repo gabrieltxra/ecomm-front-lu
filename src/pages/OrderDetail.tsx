@@ -104,7 +104,7 @@ const OrderDetails: React.FC = () => {
           "bg-amber-50 text-amber-800 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-200 dark:ring-amber-500/20",
       };
     }
-    if (key.includes("canceled") || key.includes("cancelado")) {
+    if (key.includes("cancelled") || key.includes("cancelado")) {
       return {
         label: "Cancelado",
         className:
