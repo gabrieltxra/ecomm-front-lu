@@ -12,6 +12,13 @@ import { Link } from "react-router-dom";
 
 import { toast } from 'sonner';
 
+function getPickupStatusLabel(status?: string | null) {
+  const normalized = String(status || '').toLowerCase();
+  if (normalized === 'pronto_para_retirada') return 'Pronto para retirada';
+  if (normalized === 'retirado') return 'Retirado';
+  return 'Aguardando retirada';
+}
+
 const Perfil: React.FC = () => {
   const { user, isLoggedIn, isLoading, logout } = useAuth();
   const navigate = useNavigate();
@@ -683,7 +690,11 @@ const Perfil: React.FC = () => {
                   )}
 
                   <div className="space-y-4">
-                    {orders.map((o) => (
+                    {orders.map((o) => {
+                      const isPickup = String(o.shipping_method || '').toLowerCase().includes('retirada');
+                      const pickupStatus = getPickupStatusLabel(o.shipping?.status);
+
+                      return (
                       <Link
                         to={`/order/${o.id}`}
                         key={o.id}
@@ -719,12 +730,18 @@ const Perfil: React.FC = () => {
                           </div>
                           <div className="flex items-center gap-2">
                             <Truck className="w-4 h-4" />
-                            <span>Entrega: {o.shipping_method}</span>
+                            <span>{isPickup ? 'Retirada' : 'Entrega'}: {o.shipping_method}</span>
                           </div>
                           <div className="text-right md:text-left font-semibold">
                             Total: R$ {formatMoney(o.total + o.shipping_cost)}
                           </div>
                         </div>
+
+                        {isPickup && (
+                          <div className="mt-2 text-sm text-amber-700 dark:text-amber-300">
+                            Retirada: {pickupStatus}
+                          </div>
+                        )}
 
                         {o.items?.length ? (
                           <div className="mt-3 border-t border-gray-200 dark:border-slate-700 pt-3">
@@ -746,7 +763,8 @@ const Perfil: React.FC = () => {
                           </div>
                         ) : null}
                       </Link>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               )}

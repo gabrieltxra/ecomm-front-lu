@@ -27,6 +27,35 @@ const PICKUP_ADDRESS = {
 const PICKUP_FULL =
   "R. Jurunas, 398 - São Francisco, Santa Bárbara d'Oeste - SP, 13457-038";
 
+function getPickupStatusMeta(status?: string | null) {
+  const normalized = String(status || "").toLowerCase();
+
+  if (normalized === "pronto_para_retirada") {
+    return {
+      label: "Pronto para retirada",
+      message: "Seu pedido esta pronto para retirada em nossa loja.",
+      className:
+        "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200",
+    };
+  }
+
+  if (normalized === "retirado") {
+    return {
+      label: "Retirado",
+      message: "Este pedido ja foi retirado.",
+      className:
+        "border-slate-200 bg-slate-50 text-slate-800 dark:border-white/10 dark:bg-white/5 dark:text-slate-200",
+    };
+  }
+
+  return {
+    label: "Aguardando retirada",
+    message: "Entraremos em contato quando seu pedido estiver disponivel para retirada.",
+    className:
+      "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-100",
+  };
+}
+
 const OrderDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -127,6 +156,11 @@ const OrderDetails: React.FC = () => {
     const sm = (order?.shipping_method ?? "").toLowerCase();
     return sm.includes("retirada");
   }, [order?.shipping_method]);
+
+  const pickupStatus = useMemo(
+    () => getPickupStatusMeta(order?.shipping?.status),
+    [order?.shipping?.status]
+  );
 
   const address = useMemo(() => {
     if (isPickup) return PICKUP_ADDRESS;
@@ -311,9 +345,10 @@ const OrderDetails: React.FC = () => {
                 </p>
 
                 {isPickup && (
-                  <p className="text-xs text-slate-500 dark:text-slate-400 pt-1">
-                    Retire no endereço acima.
-                  </p>
+                  <div className={`mt-3 rounded-xl border px-3 py-3 ${pickupStatus.className}`}>
+                    <p className="text-xs font-semibold uppercase tracking-wide">{pickupStatus.label}</p>
+                    <p className="mt-1 text-sm">{pickupStatus.message}</p>
+                  </div>
                 )}
 
                 <div className="pt-3">

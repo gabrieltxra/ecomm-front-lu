@@ -1,7 +1,8 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import { getFreteData } from "@/services/freteService";
+import { searchCep } from "@/services/viaCepService";
 
 export default function CheckoutStep1({ onNext, updateData }: any) {
   const { user } = useAuth();
@@ -13,8 +14,14 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
   const [rua, setRua] = useState(user?.endereco?.rua || "");
   const [numero, setNumero] = useState(user?.endereco?.numero || "");
   const [observacao, setObservacao] = useState(user?.endereco?.complemento || "");
+  const [bairro, setBairro] = useState(user?.endereco?.bairro || "");
+  const [cidade, setCidade] = useState(user?.endereco?.cidade || "");
+  const [estado, setEstado] = useState(user?.endereco?.estado || "");
+  const [pais, setPais] = useState(user?.endereco?.pais || "Brasil");
   const [telefone, setTelefone] = useState(user?.telefone || "");
   const [isValid, setIsValid] = useState(false);
+  const didHydrateFromProfileRef = useRef(false);
+  const lastCepLookupRef = useRef<string>("");
 
   const [freteOptions, setFreteOptions] = useState<any[]>([]);
   const [freteSelecionado, setFreteSelecionado] = useState<any>(null);
@@ -28,6 +35,55 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
   const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCep(formatCep(e.target.value));
   };
+
+  useEffect(() => {
+    if (!user || didHydrateFromProfileRef.current) return;
+
+    const profileAddress = user.endereco;
+
+    setCep((prev) => prev || formatCep(profileAddress?.cep || user.cep || ""));
+    setRua((prev) => prev || profileAddress?.rua || user.rua || "");
+    setNumero((prev) => prev || profileAddress?.numero || user.numero || "");
+    setObservacao((prev) => prev || profileAddress?.complemento || user.complemento || "");
+    setBairro((prev) => prev || profileAddress?.bairro || user.bairro || "");
+    setCidade((prev) => prev || profileAddress?.cidade || user.cidade || "");
+    setEstado((prev) => prev || profileAddress?.estado || user.estado || "");
+    setPais((prev) => prev || profileAddress?.pais || user.pais || "Brasil");
+    setTelefone((prev) => prev || user.telefone || "");
+
+    didHydrateFromProfileRef.current = true;
+  }, [user]);
+
+  useEffect(() => {
+    const cleanCep = cep.replace(/\D/g, "");
+    if (cleanCep.length !== 8) return;
+    if (lastCepLookupRef.current === cleanCep) return;
+
+    let cancelled = false;
+
+    const hydrateFromCep = async () => {
+      try {
+        const cepData = await searchCep(cleanCep);
+        if (cancelled) return;
+
+        lastCepLookupRef.current = cleanCep;
+        setRua((prev) => prev || cepData.logradouro || "");
+        setBairro((prev) => prev || cepData.bairro || "");
+        setCidade((prev) => prev || cepData.localidade || "");
+        setEstado((prev) => prev || cepData.uf || "");
+      } catch {
+        if (!cancelled) {
+          lastCepLookupRef.current = cleanCep;
+        }
+      }
+    };
+
+    hydrateFromCep();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [cep]);
 
   // ===== Totais =====
   const subtotal = useMemo(() => {
@@ -126,7 +182,8 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
 
     updateData({
       cart,
-      endereco: { cep, rua, numero, observacao, telefone },
+      endereco: { cep, rua, numero, observacao, bairro, cidade, estado, pais, telefone },
+      method: modoEntrega,
       frete: freteFinal,
       subtotal,
       total,
@@ -181,6 +238,12 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
         {modoEntrega === "retirar" ? (
           <div className="mb-6">
             <h4 className="font-semibold mb-2">Endereço para retirada:</h4>
+            <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 shadow-sm">
+              <div className="mb-1 font-semibold uppercase tracking-wide text-amber-700">Importante</div>
+              <p>
+                Entraremos em contato para avisar quando seu pedido estiver disponível para retirada.
+              </p>
+            </div>
             <iframe
               src="https://www.google.com/maps?q=13457038&output=embed"
               width="100%"

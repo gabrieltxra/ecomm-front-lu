@@ -9,6 +9,15 @@ export interface OrderItem {
   image_url?: string;
 }
 
+export interface OrderShipping {
+  status?: string | null;
+  method?: string | null;
+  tracking_code?: string | null;
+  estimated_delivery?: string | null;
+  cost?: number | null;
+  updated_at?: string | null;
+}
+
 export interface Order {
   id?: string;
   user_id: number;
@@ -20,12 +29,14 @@ export interface Order {
     | 'shipped'
     | 'delivered'
     | 'cancelled'
-    | 'returned';
+    | 'returned'
+    | 'expired';
   total: number;
   shipping_method: string;
   shipping_cost: number;
   payment_method: string;
-  payment_status: 'pending' | 'succeeded' | 'failed';
+  mp_payment_method_id?: string | null;
+  payment_status: 'pending' | 'succeeded' | 'failed' | 'expired';
   stripe_session_id?: string;
   stripe_payment_intent?: string;
 
@@ -42,10 +53,12 @@ export interface Order {
   created_at: string;
   updated_at?: string;
   items?: OrderItem[];
+  shipping?: OrderShipping;
 }
 
 const paymentMethodMap: Record<string, string> = {
-  card: 'Cartão de Crédito',
+  card: 'Cartão de Crédito à vista',
+  card_installments: 'Cartão de Crédito parcelado',
   pix: 'Pix',
   boleto: 'Boleto',
 };
@@ -56,9 +69,44 @@ const paymentStatusMap: Record<string, string> = {
   paid: 'Pago',
   failed: 'Falhou',
   succeeded: 'Concluído',
+  expired: 'Expirado',
 };
 const API_BASE_URL =
   import.meta.env.VITE_REACT_APP_API_URL || 'http://localhost:3000';
+
+const legacyMercadoPagoCardMethods = new Set([
+  'visa',
+  'master',
+  'mastercard',
+  'elo',
+  'amex',
+  'hipercard',
+  'diners',
+  'discover',
+  'jcb',
+  'aura',
+  'mercadopago',
+]);
+
+function formatMercadoPagoMethodDetail(value: string | null | undefined) {
+  const normalized = String(value ?? '').trim().toLowerCase();
+  if (!normalized) return null;
+
+  const labels: Record<string, string> = {
+    visa: 'Visa',
+    master: 'Mastercard',
+    mastercard: 'Mastercard',
+    elo: 'Elo',
+    amex: 'Amex',
+    hipercard: 'Hipercard',
+    diners: 'Diners',
+    discover: 'Discover',
+    jcb: 'JCB',
+    aura: 'Aura',
+  };
+
+  return labels[normalized] || normalized.toUpperCase();
+}
 
 function normalizeOrder(raw: any): Order {
   const items: OrderItem[] = Array.isArray(raw.items)
@@ -84,6 +132,19 @@ function normalizeOrder(raw: any): Order {
     updated_at = updatedAtDate.toISOString();
   }
 
+  const rawPaymentMethod = String(raw.payment_method ?? '').toLowerCase();
+  const paymentMethodDetail = formatMercadoPagoMethodDetail(raw.mp_payment_method_id);
+  const legacyPaymentMethodDetail = legacyMercadoPagoCardMethods.has(rawPaymentMethod)
+    ? formatMercadoPagoMethodDetail(raw.payment_method)
+    : null;
+  const normalizedPaymentMethod = rawPaymentMethod === 'card_installments' || legacyMercadoPagoCardMethods.has(rawPaymentMethod)
+    ? paymentMethodDetail
+      ? `Cartão de Crédito parcelado (${paymentMethodDetail})`
+      : legacyPaymentMethodDetail
+      ? `Cartão de Crédito parcelado (${legacyPaymentMethodDetail})`
+      : 'Cartão de Crédito parcelado'
+    : paymentMethodMap[rawPaymentMethod] || raw.payment_method;
+
   return {
     id: raw.id?.toString(),
     user_id: Number(raw.user_id),
@@ -92,7 +153,8 @@ function normalizeOrder(raw: any): Order {
     total: Number(raw.total ?? 0),
     shipping_method: String(raw.shipping_method ?? ''),
     shipping_cost: Number(raw.shipping_cost ?? 0),
-    payment_method: paymentMethodMap[raw.payment_method] || raw.payment_method,
+    payment_method: normalizedPaymentMethod,
+    mp_payment_method_id: raw.mp_payment_method_id ? String(raw.mp_payment_method_id) : null,
     payment_status: paymentStatusMap[raw.payment_status] || raw.payment_status,
     stripe_session_id: raw.stripe_session_id,
     stripe_payment_intent: raw.stripe_payment_intent,
@@ -107,6 +169,16 @@ function normalizeOrder(raw: any): Order {
     created_at,
     updated_at,
     items,
+    shipping: raw.shipping
+      ? {
+          status: raw.shipping.status ? String(raw.shipping.status) : null,
+          method: raw.shipping.method ? String(raw.shipping.method) : null,
+          tracking_code: raw.shipping.tracking_code ? String(raw.shipping.tracking_code) : null,
+          estimated_delivery: raw.shipping.estimated_delivery ? String(raw.shipping.estimated_delivery) : null,
+          cost: raw.shipping.cost != null ? Number(raw.shipping.cost) : null,
+          updated_at: raw.shipping.updated_at ? String(raw.shipping.updated_at) : null,
+        }
+      : undefined,
   };
 }
 

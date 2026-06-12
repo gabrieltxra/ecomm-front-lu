@@ -3,9 +3,19 @@ import React from 'react';
 import { useCart } from '../contexts/CartContext';
 import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Cart: React.FC = () => {
-  const { items, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
+  const { items, removeFromCart, updateQuantity, getTotalPrice, clearCartFromServer } = useCart();
+
+  const handleClearCart = async () => {
+    try {
+      await clearCartFromServer();
+      toast.success('Carrinho limpo com sucesso.');
+    } catch {
+      toast.error('Não foi possível limpar o carrinho.');
+    }
+  };
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -105,7 +115,7 @@ const Cart: React.FC = () => {
             {/* Clear Cart */}
             <div className="flex justify-end">
               <button
-                onClick={clearCart}
+                onClick={() => void handleClearCart()}
                 className="text-destructive hover:bg-destructive/10 px-4 py-2 rounded-lg transition-colors"
               >
                 Limpar Carrinho

@@ -2,14 +2,17 @@ import React, { useState, useMemo, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
 import { Filter, X } from 'lucide-react';
 import { useProducts } from '@/services/productsService';
+import { useSearchParams } from 'react-router-dom';
 
 const Products: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showFilters, setShowFilters] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const { productsData, loading, fetchProducts, fetchFiltersConfig, filtersConfig } = useProducts();
+  const categoryFromUrl = searchParams.get('category') || '';
 
   const [filters, setFilters] = useState({
-    category: '',
+    category: categoryFromUrl,
     minPrice: 0,
     maxPrice: 0,
     sortBy: 'name',
@@ -22,6 +25,14 @@ const Products: React.FC = () => {
   useEffect(() => {
     fetchProducts(filters, currentPage);
   }, [filters, currentPage]);
+
+  useEffect(() => {
+    setFilters((prev) => {
+      if (prev.category === categoryFromUrl) return prev;
+      return { ...prev, category: categoryFromUrl };
+    });
+    setCurrentPage(1);
+  }, [categoryFromUrl]);
 
   const defaultPriceRange = useMemo(() => {
     if (!productsData || productsData.products.length === 0) return { min: 0, max: 10000 };
@@ -47,6 +58,7 @@ const Products: React.FC = () => {
   }, [productsData]);
 
   const clearFilters = () => {
+    setSearchParams({});
     setFilters({
       category: '',
       minPrice: defaultPriceRange.min,
@@ -54,6 +66,17 @@ const Products: React.FC = () => {
       sortBy: 'name'
     });
     setCurrentPage(1);
+  };
+
+  const handleCategoryChange = (value: string) => {
+    setFilters({ ...filters, category: value });
+    setCurrentPage(1);
+    if (value) {
+      setSearchParams({ category: value });
+      return;
+    }
+
+    setSearchParams({});
   };
 
   const formatPrice = (price: number) => {
@@ -126,7 +149,7 @@ const Products: React.FC = () => {
                         name="category"
                         value=""
                         checked={filters.category === ''}
-                        onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+                        onChange={(e) => handleCategoryChange(e.target.value)}
                         className="mr-2 text-rose-400"
                       />
                       <span className="text-gray-700">Todas</span>
@@ -140,7 +163,7 @@ const Products: React.FC = () => {
                           name="category"
                           value={cat.name}
                           checked={filters.category === cat.name}
-                          onChange={(e) => setFilters({ ...filters, category: e.target.value })}
+                          onChange={(e) => handleCategoryChange(e.target.value)}
                           className="mr-2 text-rose-400"
                         />
                         <span className="text-gray-700">{cat.name}</span>

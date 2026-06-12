@@ -18,6 +18,7 @@ interface CartContextType {
   getTotalItems: () => number;
   getTotalPrice: () => number;
   clearCart: () => void;
+  clearCartFromServer: () => Promise<void>;
   loadCartFromServer: () => Promise<void>; 
 }
 
@@ -156,6 +157,32 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setItems([]);
   };
 
+  const clearCartFromServer = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      setItems([]);
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API}/cart`, {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!res.ok) {
+        throw new Error('Erro ao limpar carrinho no backend');
+      }
+
+      setItems([]);
+    } catch (err) {
+      console.error('Erro ao limpar carrinho:', err);
+      throw err;
+    }
+  };
+
   useEffect(() => {
     loadCartFromServer();
   }, []);
@@ -170,6 +197,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         getTotalItems,
         getTotalPrice,
         clearCart,
+        clearCartFromServer,
         loadCartFromServer 
       }}
     >

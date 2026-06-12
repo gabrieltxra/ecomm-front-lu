@@ -21,6 +21,8 @@ import { AuthProvider } from "./contexts/AuthContext";
 import CheckoutPage from "./pages/Checkout";
 import Header from "./components/Header";
 import CheckoutStep3 from "./components/CheckoutStep3_Success";
+import CheckoutStepPending from "./components/CheckoutStepPending";
+import CheckoutStepError from "./components/CheckoutStepError";
 import OrderDetail from "./pages/OrderDetail";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
@@ -82,6 +84,8 @@ const App = () => (
                     <Route path="/sob-medida" element={<Home />} /> */}
                     <Route path="/checkout" element={<CheckoutPage />} />
                     <Route path="/success" element={<CheckoutStep3 />} />
+                    <Route path="/checkout/pending" element={<CheckoutStepPending />} />
+                    <Route path="/checkout/error" element={<CheckoutStepError />} />
                     <Route path="/order/:id" element={<OrderDetail />} />
                     <Route path="/order/:id/support" element={<OrderSupport />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
