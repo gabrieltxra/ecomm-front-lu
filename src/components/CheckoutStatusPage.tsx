@@ -20,7 +20,9 @@ function norm(v: any) {
 function isPaidLike(order: any) {
   const ps = norm(order?.payment_status);
   const st = norm(order?.status);
-  return ps === "succeeded" || ps === "paid" || st === "paid" || st === "aprovado" || Boolean(order?.paid_at || order?.paidAt);
+  return ["succeeded", "paid", "pago", "concluido", "aprovado"].includes(ps)
+    || ["succeeded", "paid", "pago", "concluido", "aprovado"].includes(st)
+    || Boolean(order?.paid_at || order?.paidAt);
 }
 
 function isFailedLike(order: any) {
