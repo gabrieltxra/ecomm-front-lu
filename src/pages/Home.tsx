@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
-import { ArrowRight, ChevronRight, Phone, Search, ShoppingBag, Truck } from 'lucide-react';
+import { ArrowRight, ChevronRight, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 import ProductGrid from '../components/ProductGrid';
@@ -92,41 +92,6 @@ const Home: React.FC = () => {
                 Em breve, novos produtos em destaque.
               </div>
             )}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-10 md:py-12">
-        <div className="container mx-auto px-4">
-          <div className="mb-6 max-w-2xl">
-            <h2 className="text-3xl font-bold">Comprar aqui e simples</h2>
-            <p className="mt-2 text-lg text-slate-600 dark:text-slate-300">
-              Fizemos a loja para voce encontrar o produto sem complicacao.
-            </p>
-          </div>
-
-          <div className="grid gap-4 md:grid-cols-3">
-            <div className="rounded-lg border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-              <Search className="mb-4 h-8 w-8 text-rose-500" />
-              <h3 className="text-xl font-semibold">1. Escolha o produto</h3>
-              <p className="mt-2 text-base leading-7 text-slate-600 dark:text-slate-300">
-                Abra o catalogo e veja as fotos, nomes e precos.
-              </p>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-              <ShoppingBag className="mb-4 h-8 w-8 text-rose-500" />
-              <h3 className="text-xl font-semibold">2. Coloque no carrinho</h3>
-              <p className="mt-2 text-base leading-7 text-slate-600 dark:text-slate-300">
-                Toque em comprar e confira seu pedido antes de pagar.
-              </p>
-            </div>
-            <div className="rounded-lg border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-              <Truck className="mb-4 h-8 w-8 text-rose-500" />
-              <h3 className="text-xl font-semibold">3. Receba em casa</h3>
-              <p className="mt-2 text-base leading-7 text-slate-600 dark:text-slate-300">
-                Depois do pagamento, acompanhamos o pedido ate a entrega.
-              </p>
-            </div>
           </div>
         </div>
       </section>
