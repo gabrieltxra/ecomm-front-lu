@@ -9,9 +9,10 @@ import { Product } from '@/types/Product';
 
 interface ProductCardProps {
   product: Product;
+  compact?: boolean;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) => {
   const { addToCart } = useCart();
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
@@ -46,7 +47,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     <Link to={`/product/${product.id}`} className="group">
       <div className="bg-card product-card rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover-scale animate-fade-in">
         {/* Image Container */}
-        <div className="relative aspect-square overflow-hidden">
+        <div className={`relative overflow-hidden ${compact ? 'aspect-[4/3]' : 'aspect-square'}`}>
          {product.image_urls?.length > 0 ? (
           <img
             src={product.image_urls[0]}
@@ -90,17 +91,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         </div>
 
                 {/* Product Info */}
-        <div className="p-4">
-          <h3 className="font-elegant text-lg font-semibold text-foreground mb-2 line-clamp-2">
+        <div className={compact ? 'p-3' : 'p-4'}>
+          <h3 className={`font-elegant font-semibold text-foreground mb-2 line-clamp-2 ${compact ? 'text-base' : 'text-lg'}`}>
             {product.name}
           </h3>
           
-          <p className="text-muted-foreground text-sm mb-3 line-clamp-2">
+          <p className={`text-muted-foreground text-sm mb-3 ${compact ? 'line-clamp-1' : 'line-clamp-2'}`}>
             {product.description}
           </p>
           
-          <div className="flex items-center justify-between">
-            <span className="text-2xl font-bold text-rose-500 dark:text-rose-400">
+          <div className="flex items-center justify-between gap-2">
+            <span className={`font-bold text-rose-500 dark:text-rose-400 ${compact ? 'text-xl' : 'text-2xl'}`}>
               {formatPrice(product.price)}
             </span>
             

@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
-import { ShoppingCart, LogIn, Menu, X, Sun, Moon } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { ShoppingCart, LogIn, Menu, X, Sun, Moon, Search } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Header: React.FC = () => {
   const { getTotalItems } = useCart();
   const { theme, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const location = useLocation();
+  const navigate = useNavigate();
   const { user, isLoggedIn } = useAuth();
 
   const navigation = [
@@ -21,6 +24,19 @@ const Header: React.FC = () => {
   ];
 
   const isActive = (href: string) => location.pathname === href;
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setSearchTerm(location.pathname === '/produtos' ? params.get('search') || '' : '');
+  }, [location.pathname, location.search]);
+
+  const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const value = searchTerm.trim();
+    navigate(value ? `/produtos?search=${encodeURIComponent(value)}` : '/produtos');
+    setIsMenuOpen(false);
+    setIsSearchOpen(false);
+  };
 
   return (
     <header className="fixed top-0 w-full bg-background/95 backdrop-blur-sm border-b border-border z-50">
@@ -54,8 +70,33 @@ const Header: React.FC = () => {
             ))}
           </nav>
 
+          <form
+            onSubmit={handleSearchSubmit}
+            className="hidden min-w-0 flex-1 max-w-sm items-center rounded-full border border-border bg-background px-3 py-2 md:flex"
+            role="search"
+          >
+            <Search className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="Buscar produtos"
+              className="min-w-0 flex-1 bg-transparent px-2 text-sm outline-none placeholder:text-muted-foreground"
+              aria-label="Buscar produtos"
+            />
+          </form>
+
           {/* Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3 sm:space-x-4">
+            <button
+              type="button"
+              onClick={() => setIsSearchOpen((open) => !open)}
+              className="p-2 rounded-lg hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-rose-500 dark:focus:ring-rose-400 md:hidden"
+              aria-label="Buscar produtos"
+            >
+              <Search className="h-5 w-5" />
+            </button>
+
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
@@ -113,6 +154,25 @@ const Header: React.FC = () => {
             </button>
           </div>
         </div>
+
+        {isSearchOpen && (
+          <form
+            onSubmit={handleSearchSubmit}
+            className="mb-3 flex items-center rounded-full border border-border bg-background px-3 py-2 shadow-sm md:hidden"
+            role="search"
+          >
+            <Search className="h-4 w-4 flex-shrink-0 text-muted-foreground" />
+            <input
+              type="search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              placeholder="Buscar produtos"
+              className="min-w-0 flex-1 bg-transparent px-2 text-sm outline-none placeholder:text-muted-foreground"
+              aria-label="Buscar produtos"
+              autoFocus
+            />
+          </form>
+        )}
 
         {/* Mobile Navigation */}
         {isMenuOpen && (

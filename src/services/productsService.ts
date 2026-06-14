@@ -141,12 +141,12 @@ export const useProducts = () => {
   const [error, setError] = useState<string | null>(null);
   const [filtersConfig, setFiltersConfig] = useState<FiltersConfig | null>(null);
 
-  const fetchProducts = async (filters: FilterState, page: number = 1) => {
+  const fetchProducts = async (filters: FilterState, page: number = 1, limit: number = 12) => {
     setLoading(true);
     setError(null);
 
     try {
-      const response = await getProducts(filters, page);
+      const response = await getProducts(filters, page, limit);
       setProductsData(response);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erro desconhecido');

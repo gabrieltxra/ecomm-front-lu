@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import ProductCard from '../components/ProductCard';
-import { Filter, X } from 'lucide-react';
+import { Filter, Search, X } from 'lucide-react';
 import { useProducts } from '@/services/productsService';
 import { useSearchParams } from 'react-router-dom';
 
@@ -10,6 +10,7 @@ const Products: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const { productsData, loading, fetchProducts, fetchFiltersConfig, filtersConfig } = useProducts();
   const categoryFromUrl = searchParams.get('category') || '';
+  const searchFromUrl = searchParams.get('search') || '';
 
   const [filters, setFilters] = useState({
     category: categoryFromUrl,
@@ -23,8 +24,8 @@ const Products: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    fetchProducts(filters, currentPage);
-  }, [filters, currentPage]);
+    fetchProducts(filters, searchFromUrl ? 1 : currentPage, searchFromUrl ? 200 : 12);
+  }, [filters, currentPage, searchFromUrl]);
 
   useEffect(() => {
     setFilters((prev) => {
@@ -71,8 +72,16 @@ const Products: React.FC = () => {
   const handleCategoryChange = (value: string) => {
     setFilters({ ...filters, category: value });
     setCurrentPage(1);
+    const nextParams: Record<string, string> = {};
     if (value) {
-      setSearchParams({ category: value });
+      nextParams.category = value;
+    }
+    if (searchFromUrl) {
+      nextParams.search = searchFromUrl;
+    }
+
+    if (Object.keys(nextParams).length > 0) {
+      setSearchParams(nextParams);
       return;
     }
 
@@ -96,6 +105,22 @@ const Products: React.FC = () => {
     }));
   }, [productsData]);
 
+  const displayedProducts = useMemo(() => {
+    const products = productsData?.products || [];
+    const term = searchFromUrl.trim().toLowerCase();
+    if (!term) return products;
+
+    return products.filter((product) => {
+      const searchable = [
+        product.name,
+        product.description,
+        product.category,
+      ].join(' ').toLowerCase();
+
+      return searchable.includes(term);
+    });
+  }, [productsData, searchFromUrl]);
+
   if (loading) {
     return (
       <div className="min-h-screen pt-20 bg-white">
@@ -116,8 +141,14 @@ const Products: React.FC = () => {
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-black mb-2">Nossos Produtos</h1>
           <p className="text-gray-600">
-            {productsData?.total || 0} produto{productsData?.total !== 1 ? 's' : ''} encontrado{productsData?.total !== 1 ? 's' : ''}
+            {displayedProducts.length} produto{displayedProducts.length !== 1 ? 's' : ''} encontrado{displayedProducts.length !== 1 ? 's' : ''}
           </p>
+          {searchFromUrl && (
+            <p className="mt-2 inline-flex items-center gap-2 rounded-full bg-rose-50 px-3 py-1 text-sm text-rose-600">
+              <Search className="h-4 w-4" />
+              Busca: {searchFromUrl}
+            </p>
+          )}
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8">
@@ -217,18 +248,18 @@ const Products: React.FC = () => {
 
           {/* Lista de produtos */}
           <div className="flex-1">
-            {productsData?.products.length === 0 ? (
+            {displayedProducts.length === 0 ? (
               <p className="text-gray-500">Nenhum produto encontrado.</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {productsData?.products?.map(product => (
-                  <ProductCard key={product.id} product={product} />
+                {displayedProducts.map(product => (
+                  <ProductCard key={product.id} product={product} compact />
                 ))}
               </div>
             )}
 
             {/* Paginação */}
-            {productsData?.totalPages > 1 && (
+            {!searchFromUrl && productsData?.totalPages > 1 && (
               <div className="flex justify-center mt-10 gap-4">
                 <button
                   disabled={currentPage === 1}
