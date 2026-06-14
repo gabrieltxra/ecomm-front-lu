@@ -16,13 +16,13 @@ const Home: React.FC = () => {
   const { products, fetchProducts, loading } = useProducts();
 
   useEffect(() => {
-    void fetchProducts(defaultFilters, 1);
+    void fetchProducts(defaultFilters, 1, 200);
   }, []);
 
   const featuredProducts = useMemo(() => products.slice(0, 8), [products]);
 
   const categories = useMemo(() => {
-    const seen = new Map<string, { name: string; image: string; count: number }>();
+    const seen = new Map<string, { name: string; image: string; productIds: Set<string> }>();
 
     for (const product of products) {
       const categoryName = String(product.category || '').trim();
@@ -30,18 +30,24 @@ const Home: React.FC = () => {
 
       const current = seen.get(categoryName);
       if (current) {
-        current.count += 1;
+        current.productIds.add(String(product.id));
         continue;
       }
 
       seen.set(categoryName, {
         name: categoryName,
         image: product.image_urls?.[0] || '',
-        count: 1,
+        productIds: new Set([String(product.id)]),
       });
     }
 
-    return Array.from(seen.values()).slice(0, 4);
+    return Array.from(seen.values())
+      .map((category) => ({
+        name: category.name,
+        image: category.image,
+        count: category.productIds.size,
+      }))
+      .slice(0, 4);
   }, [products]);
 
   const heroImage = featuredProducts[0]?.image_urls?.[0] || categories[0]?.image || '';
