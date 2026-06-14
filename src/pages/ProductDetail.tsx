@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, ShoppingCart, Star } from 'lucide-react';
+import { ArrowLeft, Phone, ShoppingCart } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'sonner';
 import { getProductById } from '@/services/productsService';
@@ -56,7 +56,14 @@ useEffect(() => {
     );
   }
   
+  const isAvailable = Number(product.stock) > 0;
+
   const handleAddToCart = () => {
+    if (!isAvailable) {
+      toast.error('Produto indisponível no momento.');
+      return;
+    }
+
     if (token) {
       addToCart(product);
       toast.success(`${product.name} adicionado ao carrinho!`);
@@ -131,16 +138,6 @@ useEffect(() => {
               {product.name}
             </h1>
 
-            {/* Rating */}
-            <div className="flex items-center space-x-2">
-              <div className="flex space-x-1">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
-                ))}
-              </div>
-              <span className="text-muted-foreground">(48 avaliações)</span>
-            </div>
-
             {/* Price */}
             <div className="text-4xl font-bold text-gradient">
               {formatPrice(product.price)}
@@ -153,44 +150,22 @@ useEffect(() => {
               </p>
             </div>
 
-            {/* Features */}
-            <div className="space-y-3">
-              <h3 className="font-semibold text-lg">Características:</h3>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>• Tecido de alta qualidade</li>
-                <li>• Medidas personalizadas</li>
-                <li>• Instalação incluída</li>
-                <li>• Garantia de 2 anos</li>
-              </ul>
-            </div>
 
            {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={handleAddToCart}
-                disabled={product.stock === 0}
+                disabled={!isAvailable}
                 className={`flex-1 py-3 px-6 rounded-lg font-semibold flex items-center justify-center space-x-2
-                  ${product.stock === 0 
+                  ${!isAvailable 
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
                     : "bg-atelie-gradient text-white hover:opacity-90 transition-opacity"
                   }`}
               >
                 <ShoppingCart className="h-5 w-5" />
                 <span>
-                  {product.stock === 0 ? "Indisponível" : "Adicionar ao Carrinho"}
+                  {!isAvailable ? "Indisponível" : "Adicionar ao Carrinho"}
                 </span>
-              </button>
-
-              <button
-                disabled={product.stock === 0}
-                className={`flex items-center justify-center space-x-2 border py-3 px-6 rounded-lg transition-colors
-                  ${product.stock === 0 
-                    ? "border-gray-300 text-gray-400 cursor-not-allowed" 
-                    : "border-border hover:bg-accent"
-                  }`}
-              >
-                <Heart className="h-5 w-5" />
-                <span>Favoritar</span>
               </button>
             </div>
 
@@ -201,9 +176,15 @@ useEffect(() => {
               <p className="text-muted-foreground">
                 Entre em contato conosco para esclarecimentos ou orçamento personalizado.
               </p>
-              <button className="bg-background border border-border py-2 px-4 rounded-lg hover:bg-accent transition-colors">
-                Falar com Consultor
-              </button>
+              <a
+                href="https://wa.me/5519991893513"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-rose-500 px-5 text-base font-semibold text-white shadow-sm transition hover:bg-rose-600"
+              >
+                Chamar no WhatsApp
+                <Phone className="h-5 w-5" />
+              </a>
             </div>
           </div>
         </div>

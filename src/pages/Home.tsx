@@ -48,8 +48,8 @@ const Home: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-white">
-      <section className="border-b border-rose-100 bg-rose-50/70 pt-24 dark:border-slate-800 dark:bg-slate-900">
-        <div className="container mx-auto grid gap-8 px-4 pb-10 md:pb-14 lg:grid-cols-[1fr_0.9fr] lg:items-center">
+      <section className="border-b border-rose-100 bg-rose-50/70 pt-20 md:pt-24 dark:border-slate-800 dark:bg-slate-900">
+        <div className="container mx-auto grid gap-6 px-4 pb-8 md:gap-8 md:pb-14 lg:grid-cols-[1fr_0.9fr] lg:items-center">
           <div className="max-w-2xl">
             <p className="text-lg font-semibold text-rose-600 dark:text-rose-300">Atelie Lu Cortinas</p>
             <h1 className="mt-3 text-4xl font-bold leading-tight md:text-5xl">
@@ -85,10 +85,10 @@ const Home: React.FC = () => {
               <img
                 src={heroImage}
                 alt="Produto do Atelie Lu Cortinas"
-                className="h-[300px] w-full object-cover md:h-[420px]"
+                className="h-[210px] w-full object-cover sm:h-[260px] md:h-[420px]"
               />
             ) : (
-              <div className="flex h-[300px] items-center justify-center px-6 text-center text-slate-500 md:h-[420px] dark:text-slate-400">
+              <div className="flex h-[210px] items-center justify-center px-6 text-center text-slate-500 sm:h-[260px] md:h-[420px] dark:text-slate-400">
                 Em breve, novos produtos em destaque.
               </div>
             )}

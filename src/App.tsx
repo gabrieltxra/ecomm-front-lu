@@ -20,6 +20,7 @@ import Perfil from "./pages/Perfil";
 import { AuthProvider } from "./contexts/AuthContext";
 import CheckoutPage from "./pages/Checkout";
 import Header from "./components/Header";
+import ScrollToTop from "./components/ScrollToTop";
 import CheckoutStep3 from "./components/CheckoutStep3_Success";
 import CheckoutStepPending from "./components/CheckoutStepPending";
 import CheckoutStepError from "./components/CheckoutStepError";
@@ -67,6 +68,7 @@ const App = () => (
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
               </Helmet>
               <div className="min-h-screen bg-background relative flex flex-col">
+                <ScrollToTop />
                 <Header />
                 <main className="flex-1">
                   <Routes>

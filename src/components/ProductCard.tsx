@@ -15,10 +15,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addToCart } = useCart();
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
+  const isAvailable = Number(product.stock) > 0;
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    if (!isAvailable) {
+      toast.error('Produto indisponível no momento.');
+      return;
+    }
+
     if (token) {
       addToCart(product);
       toast.success(`${product.name} adicionado ao carrinho!`);
@@ -61,9 +68,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               </button>
               <button
                 onClick={handleAddToCart}
-                className="p-2 bg-atelie-gradient hover:opacity-90 rounded-full transition-all transform hover:scale-105"
+                disabled={!isAvailable}
+                className={`p-2 rounded-full transition-all ${
+                  isAvailable
+                    ? 'bg-atelie-gradient hover:scale-105 hover:opacity-90'
+                    : 'cursor-not-allowed bg-gray-300'
+                }`}
+                aria-label={isAvailable ? 'Adicionar ao carrinho' : 'Produto indisponível'}
               >
-                <ShoppingCart className="h-5 w-5 text-white" />
+                <ShoppingCart className={`h-5 w-5 ${isAvailable ? 'text-white' : 'text-gray-500'}`} />
               </button>
             </div>
           </div>
@@ -93,9 +106,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             
             <button
               onClick={handleAddToCart}
-              className="bg-rose-500 dark:bg-rose-400 hover:bg-rose-600 dark:hover:bg-rose-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-lg hover:shadow-xl"
+              disabled={!isAvailable}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-lg ${
+                isAvailable
+                  ? 'bg-rose-500 text-white hover:bg-rose-600 hover:shadow-xl dark:bg-rose-400 dark:hover:bg-rose-500'
+                  : 'cursor-not-allowed bg-gray-300 text-gray-500 shadow-none dark:bg-gray-700 dark:text-gray-400'
+              }`}
             >
-              Comprar
+              {isAvailable ? 'Comprar' : 'Indisponível'}
             </button>
           </div>
         </div>
