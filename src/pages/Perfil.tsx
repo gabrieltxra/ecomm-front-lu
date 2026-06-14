@@ -263,14 +263,14 @@ const Perfil: React.FC = () => {
 
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-rose-50 dark:from-slate-900 dark:to-slate-800 pt-24 pb-16">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen overflow-x-hidden bg-gradient-to-br from-white to-rose-50 dark:from-slate-900 dark:to-slate-800 pt-20 sm:pt-24 pb-16">
+      <div className="container mx-auto px-3 py-6 sm:px-4 sm:py-8">
+        <div className="mx-auto w-full max-w-4xl">
           {/* Header */}
-          <div className="bg-white dark:bg-slate-800/50 backdrop-blur-sm rounded-lg shadow-lg dark:shadow-dark p-6 mb-8 border border-gray-200 dark:border-slate-700/50">
-            <div className="flex items-center space-x-6">
-              <div className="relative">
-                <div className="w-24 h-24 rounded-full overflow-hidden border-4 border-rose-100 dark:border-gray-600">
+          <div className="bg-white dark:bg-slate-800/50 backdrop-blur-sm rounded-lg shadow-lg dark:shadow-dark p-4 sm:p-6 mb-6 sm:mb-8 border border-gray-200 dark:border-slate-700/50">
+            <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-center sm:gap-6 sm:text-left">
+              <div className="relative flex-shrink-0">
+                <div className="h-20 w-20 overflow-hidden rounded-full border-4 border-rose-100 dark:border-gray-600 sm:h-24 sm:w-24">
                   <img
                     src={user.avatarUrl || '/placeholder.svg'}
                     alt="Avatar"
@@ -281,55 +281,55 @@ const Perfil: React.FC = () => {
                   <Camera className="h-4 w-4" />
                 </button>
               </div>
-              <div>
+              <div className="min-w-0">
                 <h1 className="text-2xl font-bold text-rose-400 mb-2">Meu Perfil</h1>
-                <p className="text-gray-600 dark:text-gray-300">{user.email}</p>
+                <p className="max-w-full break-all text-gray-600 dark:text-gray-300">{user.email}</p>
               </div>
             </div>
           </div>
 
           {/* Tabs */}
           <div className="bg-white dark:bg-slate-800/50 backdrop-blur-sm rounded-lg shadow-lg dark:shadow-dark overflow-hidden border border-gray-200 dark:border-slate-700/50">
-            <div className="flex border-b border-gray-200 dark:border-slate-700/50">
+            <div className="grid grid-cols-2 border-b border-gray-200 dark:border-slate-700/50 sm:grid-cols-4">
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 return (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`flex items-center space-x-2 px-6 py-4 font-medium transition-colors ${
+                    className={`flex min-w-0 items-center justify-center gap-2 px-2 py-3 text-center text-sm font-medium transition-colors sm:px-4 sm:py-4 sm:text-base ${
                       activeTab === tab.id
                         ? 'text-rose-400 border-b-2 border-rose-400 bg-rose-50 dark:bg-slate-700/50'
                         : 'text-gray-600 dark:text-slate-300 hover:text-rose-400 hover:bg-gray-50 dark:hover:bg-slate-700/50'
                     }`}
                   >
-                    <Icon className="h-5 w-5" />
-                    <span>{tab.label}</span>
+                    <Icon className="h-5 w-5 flex-shrink-0" />
+                    <span className="leading-tight">{tab.label}</span>
                   </button>
                 );
               })}
             </div>
 
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {/* Dados Pessoais */}
               {activeTab === 'perfil' && (
                 <div className="space-y-6">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">Informações Pessoais</h2>
                     {!isEditing ? (
                       <button
                         onClick={() => setIsEditing(true)}
-                        className="flex items-center space-x-2 bg-rose-400 text-white px-4 py-2 rounded-lg hover:bg-rose-500 transition-colors"
+                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-rose-400 px-4 py-2 text-white transition-colors hover:bg-rose-500 sm:w-auto"
                       >
                         <Edit className="h-4 w-4" />
                         <span>Editar</span>
                       </button>
                     ) : (
-                      <div className="flex space-x-2">
+                      <div className="grid grid-cols-2 gap-2 sm:flex">
                         <button
                           onClick={handlePersonalDataSave}
                           disabled={isSaving}
-                          className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors disabled:bg-gray-400"
+                          className="flex items-center justify-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600 disabled:bg-gray-400"
                         >
                           {isSaving ? (
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -341,7 +341,7 @@ const Perfil: React.FC = () => {
                         <button
                           onClick={() => setIsEditing(false)}
                           disabled={isSaving}
-                          className="flex items-center space-x-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:bg-gray-400"
+                          className="flex items-center justify-center gap-2 rounded-lg bg-gray-500 px-4 py-2 text-white transition-colors hover:bg-gray-600 disabled:bg-gray-400"
                         >
                           <X className="h-4 w-4" />
                           <span>Cancelar</span>
@@ -360,7 +360,7 @@ const Perfil: React.FC = () => {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         disabled={!isEditing}
-                        className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
+                        className="min-w-0 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100 dark:disabled:bg-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100"
                       />
                     </div>
 
@@ -373,7 +373,7 @@ const Perfil: React.FC = () => {
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         disabled={!isEditing}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
+                        className="min-w-0 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                       />
                     </div>
 
@@ -386,7 +386,7 @@ const Perfil: React.FC = () => {
                         value={formData.telefone}
                         onChange={(e) => setFormData({ ...formData, telefone: e.target.value })}
                         disabled={!isEditing}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
+                        className="min-w-0 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                         placeholder="(11) 99999-9999"
                       />
                     </div>
@@ -400,7 +400,7 @@ const Perfil: React.FC = () => {
                         value={formData.cpf}
                         onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
                         disabled={!isEditing}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
+                        className="min-w-0 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                         placeholder="000.000.000-00"
                       />
                     </div>
@@ -411,22 +411,22 @@ const Perfil: React.FC = () => {
               {/* Endereço */}
               {activeTab === 'endereco' && (
                 <div className="space-y-6">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <h2 className="text-xl font-semibold text-gray-800">Endereço de Entrega</h2>
                     {!isEditingAddress ? (
                       <button
                         onClick={() => setIsEditingAddress(true)}
-                        className="flex items-center space-x-2 bg-rose-400 text-white px-4 py-2 rounded-lg hover:bg-rose-500 transition-colors"
+                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-rose-400 px-4 py-2 text-white transition-colors hover:bg-rose-500 sm:w-auto"
                       >
                         <Edit className="h-4 w-4" />
                         <span>Editar</span>
                       </button>
                     ) : (
-                      <div className="flex space-x-2">
+                      <div className="grid grid-cols-2 gap-2 sm:flex">
                         <button
                           onClick={handleAddressSave}
                           disabled={isSaving}
-                          className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors disabled:bg-gray-400"
+                          className="flex items-center justify-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600 disabled:bg-gray-400"
                         >
                           {isSaving ? (
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -438,7 +438,7 @@ const Perfil: React.FC = () => {
                         <button
                           onClick={() => setIsEditingAddress(false)}
                           disabled={isSaving}
-                          className="flex items-center space-x-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:bg-gray-400"
+                          className="flex items-center justify-center gap-2 rounded-lg bg-gray-500 px-4 py-2 text-white transition-colors hover:bg-gray-600 disabled:bg-gray-400"
                         >
                           <X className="h-4 w-4" />
                           <span>Cancelar</span>
@@ -464,7 +464,7 @@ const Perfil: React.FC = () => {
                             }
                           }}
                           disabled={!isEditingAddress}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
+                          className="min-w-0 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                           placeholder="00000000"
                           maxLength={8}
                         />
@@ -485,7 +485,7 @@ const Perfil: React.FC = () => {
                         value={addressData.rua}
                         onChange={(e) => setAddressData({ ...addressData, rua: e.target.value })}
                         disabled={!isEditingAddress}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
+                        className="min-w-0 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                       />
                     </div>
 
@@ -498,7 +498,7 @@ const Perfil: React.FC = () => {
                         value={addressData.numero}
                         onChange={(e) => setAddressData({ ...addressData, numero: e.target.value })}
                         disabled={!isEditingAddress}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
+                        className="min-w-0 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                       />
                     </div>
 
@@ -511,7 +511,7 @@ const Perfil: React.FC = () => {
                         value={addressData.complemento}
                         onChange={(e) => setAddressData({ ...addressData, complemento: e.target.value })}
                         disabled={!isEditingAddress}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
+                        className="min-w-0 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                         placeholder="Apartamento, bloco, etc."
                       />
                     </div>
@@ -525,7 +525,7 @@ const Perfil: React.FC = () => {
                         value={addressData.bairro}
                         onChange={(e) => setAddressData({ ...addressData, bairro: e.target.value })}
                         disabled={!isEditingAddress}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
+                        className="min-w-0 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                       />
                     </div>
 
@@ -538,7 +538,7 @@ const Perfil: React.FC = () => {
                         value={addressData.cidade}
                         onChange={(e) => setAddressData({ ...addressData, cidade: e.target.value })}
                         disabled={!isEditingAddress}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
+                        className="min-w-0 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                       />
                     </div>
 
@@ -550,7 +550,7 @@ const Perfil: React.FC = () => {
                         value={addressData.estado}
                         onChange={(e) => setAddressData({ ...addressData, estado: e.target.value })}
                         disabled={!isEditingAddress}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
+                        className="min-w-0 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                       >
                         <option value="">Selecione um estado</option>
                         <option value="AC">Acre</option>
@@ -589,22 +589,22 @@ const Perfil: React.FC = () => {
               {/* Alterar Senha */}
               {activeTab === 'senha' && (
                 <div className="space-y-6">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <h2 className="text-xl font-semibold text-gray-800">Alterar Senha</h2>
                     {!isEditingPassword ? (
                       <button
                         onClick={() => setIsEditingPassword(true)}
-                        className="flex items-center space-x-2 bg-rose-400 text-white px-4 py-2 rounded-lg hover:bg-rose-500 transition-colors"
+                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-rose-400 px-4 py-2 text-white transition-colors hover:bg-rose-500 sm:w-auto"
                       >
                         <Edit className="h-4 w-4" />
                         <span>Alterar</span>
                       </button>
                     ) : (
-                      <div className="flex space-x-2">
+                      <div className="grid grid-cols-2 gap-2 sm:flex">
                         <button
                           onClick={handlePasswordSave}
                           disabled={isSaving}
-                          className="flex items-center space-x-2 bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors disabled:bg-gray-400"
+                          className="flex items-center justify-center gap-2 rounded-lg bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600 disabled:bg-gray-400"
                         >
                           {isSaving ? (
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
@@ -623,7 +623,7 @@ const Perfil: React.FC = () => {
                             });
                           }}
                           disabled={isSaving}
-                          className="flex items-center space-x-2 bg-gray-500 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition-colors disabled:bg-gray-400"
+                          className="flex items-center justify-center gap-2 rounded-lg bg-gray-500 px-4 py-2 text-white transition-colors hover:bg-gray-600 disabled:bg-gray-400"
                         >
                           <X className="h-4 w-4" />
                           <span>Cancelar</span>
@@ -643,7 +643,7 @@ const Perfil: React.FC = () => {
                           type="password"
                           value={passwordData.currentPassword}
                           onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent"
+                          className="min-w-0 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent"
                         />
                       </div>
 
@@ -655,7 +655,7 @@ const Perfil: React.FC = () => {
                           type="password"
                           value={passwordData.newPassword}
                           onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent"
+                          className="min-w-0 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent"
                         />
                       </div>
 
@@ -667,7 +667,7 @@ const Perfil: React.FC = () => {
                           type="password"
                           value={passwordData.confirmPassword}
                           onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent"
+                          className="min-w-0 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent"
                         />
                       </div>
                     </div>
@@ -702,13 +702,13 @@ const Perfil: React.FC = () => {
                                   dark:border-slate-700/50 rounded-lg p-4 shadow-sm 
                                   hover:shadow-md hover:border-rose-300 transition"
                       >
-                        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-                          <div className="flex items-center gap-3">
-                            <Package className="w-5 h-5 text-rose-400" />
-                            <div>
-                              <div className="font-semibold">Pedido #{o.id}</div>
-                              <div className="text-sm text-gray-600 dark:text-gray-300 flex items-center gap-2">
-                                <Calendar className="w-4 h-4" />
+                        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                          <div className="flex min-w-0 items-start gap-3">
+                            <Package className="mt-0.5 h-5 w-5 flex-shrink-0 text-rose-400" />
+                            <div className="min-w-0">
+                              <div className="break-all font-semibold">Pedido #{o.id}</div>
+                              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                                <Calendar className="h-4 w-4 flex-shrink-0" />
                                 {new Date(o.created_at).toLocaleString("pt-BR")}
                               </div>
                             </div>
@@ -721,18 +721,18 @@ const Perfil: React.FC = () => {
                           </div>
                         </div>
 
-                        <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3 text-sm">
-                          <div className="flex items-center gap-2">
-                            <CreditCard className="w-4 h-4" />
-                            <span>
+                        <div className="mt-3 grid grid-cols-1 gap-3 text-sm md:grid-cols-3">
+                          <div className="flex min-w-0 items-start gap-2">
+                            <CreditCard className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                            <span className="min-w-0 break-words">
                               Pagamento: {o.payment_method} ({o.payment_status})
                             </span>
                           </div>
-                          <div className="flex items-center gap-2">
-                            <Truck className="w-4 h-4" />
-                            <span>{isPickup ? 'Retirada' : 'Entrega'}: {o.shipping_method}</span>
+                          <div className="flex min-w-0 items-start gap-2">
+                            <Truck className="mt-0.5 h-4 w-4 flex-shrink-0" />
+                            <span className="min-w-0 break-words">{isPickup ? 'Retirada' : 'Entrega'}: {o.shipping_method}</span>
                           </div>
-                          <div className="text-right md:text-left font-semibold">
+                          <div className="font-semibold md:text-left">
                             Total: R$ {formatMoney(o.total + o.shipping_cost)}
                           </div>
                         </div>
@@ -749,12 +749,12 @@ const Perfil: React.FC = () => {
                               {o.items.map((it) => (
                                 <li
                                   key={it.id ?? `${it.product_id}-${it.price}`}
-                                  className="flex justify-between"
+                                  className="flex flex-col gap-1 sm:flex-row sm:justify-between"
                                 >
-                                  <span className="text-gray-700 dark:text-gray-200">
+                                  <span className="min-w-0 break-words text-gray-700 dark:text-gray-200">
                                     {it.product_name} × {it.quantity}
                                   </span>
-                                  <span className="text-gray-600">
+                                  <span className="flex-shrink-0 text-gray-600">
                                     R$ {formatMoney(it.price * it.quantity)}
                                   </span>
                                 </li>
