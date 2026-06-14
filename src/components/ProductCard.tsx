@@ -45,14 +45,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) =
 
   return (
     <Link to={`/product/${product.id}`} className="group">
-      <div className="bg-card product-card rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 hover-scale animate-fade-in">
+      <div className="bg-card product-card rounded-lg overflow-hidden shadow-sm transition-all duration-300 md:hover:shadow-lg animate-fade-in">
         {/* Image Container */}
         <div className={`relative overflow-hidden ${compact ? 'aspect-[4/3]' : 'aspect-square'}`}>
          {product.image_urls?.length > 0 ? (
           <img
             src={product.image_urls[0]}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="w-full h-full object-cover transition-transform duration-500 md:group-hover:scale-110"
           />
         ) : (
           <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400">
@@ -62,7 +62,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) =
 
           
           {/* Overlay Actions */}
-          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+          <div className="absolute inset-0 hidden bg-black/20 opacity-0 transition-opacity duration-300 md:flex md:items-center md:justify-center md:group-hover:opacity-100">
             <div className="flex space-x-2">
               <button className="p-2 bg-white/90 hover:bg-white rounded-full transition-colors">
                 <Heart className="h-5 w-5 text-gray-700" />
