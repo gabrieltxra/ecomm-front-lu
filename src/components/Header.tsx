@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { ShoppingCart, LogIn, Menu, X, Sun, Moon, Search } from 'lucide-react';
+import { ShoppingCart, LogIn, Menu, X, Search } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
-import { useTheme } from '../contexts/ThemeContext';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 
 const Header: React.FC = () => {
   const { getTotalItems } = useCart();
-  const { theme, toggleTheme } = useTheme();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -97,18 +95,6 @@ const Header: React.FC = () => {
               <Search className="h-5 w-5" />
             </button>
 
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-lg hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-rose-500 dark:focus:ring-rose-400"
-              aria-label={theme === 'light' ? 'Ativar modo escuro' : 'Ativar modo claro'}
-            >
-              {theme === 'light' ? (
-                <Moon className="h-5 w-5" />
-              ) : (
-                <Sun className="h-5 w-5" />
-              )}
-            </button>
             {/* Cart */}
             <Link 
               to="/cart" 
