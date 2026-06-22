@@ -28,6 +28,7 @@ import OrderDetail from "./pages/OrderDetail";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage";
 import OrderSupport from "./pages/OrderSupport";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -77,19 +78,19 @@ const App = () => (
                     <Route path="/product/:id" element={<ProductDetail />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/cadastro" element={<Cadastro />} />
-                    <Route path="/perfil" element={<Perfil />} />
-                    <Route path="/cart" element={<Cart />} />
+                    <Route path="/perfil" element={<ProtectedRoute><Perfil /></ProtectedRoute>} />
+                    <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
                     <Route path="/forgot-password" element={<ForgotPasswordPage />} />
                     <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
                     {/* <Route path="/cortinas" element={<Home />} />
                     <Route path="/persianas" element={<Home />} />
                     <Route path="/sob-medida" element={<Home />} /> */}
-                    <Route path="/checkout" element={<CheckoutPage />} />
-                    <Route path="/success" element={<CheckoutStep3 />} />
-                    <Route path="/checkout/pending" element={<CheckoutStepPending />} />
-                    <Route path="/checkout/error" element={<CheckoutStepError />} />
-                    <Route path="/order/:id" element={<OrderDetail />} />
-                    <Route path="/order/:id/support" element={<OrderSupport />} />
+                    <Route path="/checkout" element={<ProtectedRoute><CheckoutPage /></ProtectedRoute>} />
+                    <Route path="/success" element={<ProtectedRoute><CheckoutStep3 /></ProtectedRoute>} />
+                    <Route path="/checkout/pending" element={<ProtectedRoute><CheckoutStepPending /></ProtectedRoute>} />
+                    <Route path="/checkout/error" element={<ProtectedRoute><CheckoutStepError /></ProtectedRoute>} />
+                    <Route path="/order/:id" element={<ProtectedRoute><OrderDetail /></ProtectedRoute>} />
+                    <Route path="/order/:id/support" element={<ProtectedRoute><OrderSupport /></ProtectedRoute>} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>

@@ -17,7 +17,12 @@ function norm(v: any) {
     .replace(/[\u0300-\u036f]/g, "");
 }
 
+function isReviewLike(order: any) {
+  return norm(order?.payment_status) === "review" || norm(order?.status) === "payment_review";
+}
+
 function isPaidLike(order: any) {
+  if (isReviewLike(order)) return false;
   const ps = norm(order?.payment_status);
   const st = norm(order?.status);
   return ["succeeded", "paid", "pago", "concluido", "aprovado"].includes(ps)
@@ -38,6 +43,7 @@ function isExpiredLike(order: any) {
 }
 
 function getFriendlyStatus(order: any) {
+  if (isReviewLike(order)) return "Pagamento recebido, aguardando conferencia";
   if (!order) return "Aguardando atualização";
   if (isPaidLike(order)) return "Pagamento aprovado";
   if (isExpiredLike(order)) return "Pagamento expirado";

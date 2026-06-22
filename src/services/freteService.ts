@@ -4,20 +4,19 @@ const API_BASE_URL = import.meta.env.VITE_REACT_APP_API_URL || 'http://localhost
 
 export interface FreteParams {
   cep: string;
-  products_Ids: number[];
+  items: Array<{ id: string | number; quantity: number }>;
 }
 
 export interface FreteOption {
   id: string;
   name: string;
   price: number;
-  deadline: number;
-  // Adapte os campos conforme o retorno da sua API
+  delivery_time: number;
+  quote_token: string;
 }
 
 export const getFreteData = async (params: FreteParams): Promise<FreteOption[]> => {
   try {
-    const token = localStorage.getItem('token');
     const response = await fetch(`${API_BASE_URL}/frete`, {
       method: 'POST',
       headers: {

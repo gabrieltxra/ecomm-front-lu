@@ -136,16 +136,17 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
 
       setLoadingFrete(true);
       try {
-        const products_Ids = cart.map((item: any) => item.id);
-        const result = await getFreteData({ cep, products_Ids });
+        const items = cart.map((item) => ({ id: item.id, quantity: item.quantity }));
+        const result = await getFreteData({ cep, items });
 
-        let opcoesValidas = result
+        const opcoesValidas = result
           .filter((op: any) => !op.error)
           .map((op: any) => ({
             id: String(op.id),
             name: op.name || "Frete",
             price: typeof op.price === "number" ? op.price : parseFloat(op.price || "0"),
             delivery_time: op.delivery_time || 0,
+            quote_token: op.quote_token,
           }))
           // não aceita frete 0 / inválido para entrega
           .filter((op: any) => Number.isFinite(op.price) && op.price > 0)

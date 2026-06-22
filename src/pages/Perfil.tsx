@@ -20,15 +20,15 @@ function getPickupStatusLabel(status?: string | null) {
 }
 
 const Perfil: React.FC = () => {
-  const { user, isLoggedIn, isLoading, logout } = useAuth();
-  const navigate = useNavigate();
-  
-  const [activeTab, setActiveTab] = useState('perfil');
-  const [isEditing, setIsEditing] = useState(false);
-  const [isEditingAddress, setIsEditingAddress] = useState(false);
-  const [isEditingPassword, setIsEditingPassword] = useState(false);
-  const [isSearchingCep, setIsSearchingCep] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const { user, isLoggedIn, isLoading, logout, refreshProfile } = useAuth();
+  const navigate = useNavigate();
+
+  const [activeTab, setActiveTab] = useState('perfil');
+  const [isEditing, setIsEditing] = useState(false);
+  const [isEditingAddress, setIsEditingAddress] = useState(false);
+  const [isEditingPassword, setIsEditingPassword] = useState(false);
+  const [isSearchingCep, setIsSearchingCep] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
   const [ordersLoaded, setOrdersLoaded] = useState(false); 
@@ -157,12 +157,11 @@ const Perfil: React.FC = () => {
     try {
       const payload = {
         name: formData.name,
-        email: formData.email,
         telefone: formData.telefone || undefined,
-        cpf: formData.cpf || undefined
-      } as any;
+      };
 
       await updateProfile(payload);
+      await refreshProfile();
       toast.success('Dados pessoais atualizados com sucesso!');
       setIsEditing(false);
     } catch (error: any) {
@@ -190,6 +189,7 @@ const Perfil: React.FC = () => {
       } as any;
 
       await updateProfile(payload);
+      await refreshProfile();
       toast.success('Endereço atualizado com sucesso!');
       setIsEditingAddress(false);
     } catch (error: any) {
@@ -244,6 +244,9 @@ const Perfil: React.FC = () => {
       case 'Pendente': return `${base} bg-orange-100 text-orange-700`;
       case 'cancelled': return `${base} bg-red-100 text-red-700`;
       case 'returned': return `${base} bg-zinc-200 text-zinc-700`;
+      case 'Pronto para retirada': return `${base} bg-blue-100 text-blue-700`;
+      case 'Retirado': return `${base} bg-emerald-100 text-emerald-700`;
+      case 'Revisao necessaria': return `${base} bg-red-100 text-red-700`;
       default: return `${base} bg-gray-100 text-gray-700`;
     }
   };
@@ -371,8 +374,8 @@ const Perfil: React.FC = () => {
                       <input
                         type="email"
                         value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        disabled={!isEditing}
+                        readOnly
+                        disabled
                         className="min-w-0 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                       />
                     </div>
@@ -398,8 +401,8 @@ const Perfil: React.FC = () => {
                       <input
                         type="text"
                         value={formData.cpf}
-                        onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
-                        disabled={!isEditing}
+                        readOnly
+                        disabled
                         className="min-w-0 w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-rose-400 focus:border-transparent disabled:bg-gray-100"
                         placeholder="000.000.000-00"
                       />

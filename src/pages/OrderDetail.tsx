@@ -149,7 +149,7 @@ const OrderDetails: React.FC = () => {
 
   const canRequestReturn = useMemo(() => {
     const ps = order?.payment_status?.toLowerCase?.() || "";
-    return ps.includes("paid") || ps.includes("pago");
+    return ps.includes("paid") || ps.includes("pago") || ps === "succeeded";
   }, [order]);
 
   const isPickup = useMemo(() => {

@@ -1,8 +1,9 @@
 import { Product as ProductType } from '@/types/Product';
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
-interface Product extends ProductType {}
+type Product = ProductType;
 
 export interface CartItem extends Product {
   quantity: number;
@@ -12,9 +13,9 @@ const API = import.meta.env.VITE_REACT_APP_API_URL || 'http://localhost:3000/api
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product) => void;
-  removeFromCart: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
+  addToCart: (product: Product) => Promise<void>;
+  removeFromCart: (productId: number) => Promise<void>;
+  updateQuantity: (productId: number, quantity: number) => Promise<void>;
   getTotalItems: () => number;
   getTotalPrice: () => number;
   clearCart: () => void;
@@ -38,8 +39,7 @@ interface CartProviderProps {
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
-  const token = localStorage.getItem('token');
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
 
   const loadCartFromServer = async () => {
@@ -71,13 +71,14 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
 };
 
   const addToCart = async (product: Product) => {
+    const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
       return;
     }
 
     try {
-      await fetch(`${API}/cartItem`, {
+      const response = await fetch(`${API}/cartItem`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -85,6 +86,10 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         },
         body: JSON.stringify({ productId: product.id, quantity: 1 }),
       });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data?.message || 'Erro ao adicionar produto');
+      }
 
       setItems(prevItems => {
         const existingItem = prevItems.find(item => item.id === product.id);
@@ -99,23 +104,27 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       });
     } catch (err) {
       console.error('Erro ao adicionar produto no carrinho:', err);
+      toast.error(err instanceof Error ? err.message : 'Erro ao adicionar produto');
     }
   };
 
   const removeFromCart = async (productId: number) => {
+    const token = localStorage.getItem('token');
     if (!token) return;
 
     try {
-      await fetch(`${API}/cartItem/${productId}`, {
+      const response = await fetch(`${API}/cartItem/${productId}`, {
         method: 'DELETE',
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
+      if (!response.ok) throw new Error('Erro ao remover produto');
 
       setItems(prevItems => prevItems.filter(item => item.id !== productId));
     } catch (err) {
       console.error('Erro ao remover produto do carrinho:', err);
+      toast.error(err instanceof Error ? err.message : 'Erro ao remover produto');
     }
   };
 
@@ -125,14 +134,9 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     return;
   }
 
-  setItems(prevItems =>
-    prevItems.map(item =>
-      item.id === productId ? { ...item, quantity } : item
-    )
-  );
-
   try {
-    await fetch(`${API}/cartItem/${productId}`, {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API}/cartItem/${productId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -140,8 +144,16 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       },
       body: JSON.stringify({ quantity }),
     });
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(data?.message || 'Erro ao atualizar quantidade');
+    }
+    setItems(prevItems =>
+      prevItems.map(item => item.id === productId ? { ...item, quantity } : item)
+    );
   } catch (err) {
     console.error('Erro ao atualizar quantidade no backend:', err);
+    toast.error(err instanceof Error ? err.message : 'Erro ao atualizar quantidade');
   }
 };
 

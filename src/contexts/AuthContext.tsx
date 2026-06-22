@@ -40,6 +40,7 @@ interface AuthContextType {
   isLoading: boolean;
   login: (user: User, token: string) => void;
   logout: () => void;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -58,6 +59,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     localStorage.removeItem('token');
     clearCart();
     setUser(null);
+  };
+
+  const refreshProfile = async () => {
+    const userData = await getProfile();
+    setUser(userData);
   };
 
   useEffect(() => {
@@ -79,7 +85,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn: !!user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoggedIn: !!user, isLoading, login, logout, refreshProfile }}>
       {children}
     </AuthContext.Provider>
   );

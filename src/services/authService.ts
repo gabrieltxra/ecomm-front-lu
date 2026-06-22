@@ -25,19 +25,7 @@ interface ResetPasswordPayload {
 
 interface UpdateProfilePayload {
   name?: string;
-  email?: string;
   telefone?: string;
-  cpf?: string;
-  // (estrutura flattened)
-  cep?: string;
-  rua?: string;
-  numero?: string;
-  complemento?: string;
-  bairro?: string;
-  cidade?: string;
-  estado?: string;
-  pais?: string;
-  // Estrutura aninhada 
   endereco?: {
     cep: string;
     rua: string;
@@ -162,7 +150,10 @@ export async function updatePassword(currentPassword: string, newPassword: strin
     body: JSON.stringify({ currentPassword, newPassword })
   });
 
-  if (!res.ok) throw new Error('Erro ao atualizar senha');
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data?.error || 'Erro ao atualizar senha');
+  }
   return await res.json();
 }
 

@@ -28,6 +28,9 @@ export interface Order {
     | 'preparing_shipment'
     | 'shipped'
     | 'delivered'
+    | 'ready_for_pickup'
+    | 'picked_up'
+    | 'payment_review'
     | 'cancelled'
     | 'returned'
     | 'expired';
@@ -36,7 +39,7 @@ export interface Order {
   shipping_cost: number;
   payment_method: string;
   mp_payment_method_id?: string | null;
-  payment_status: 'pending' | 'succeeded' | 'failed' | 'expired';
+  payment_status: 'pending' | 'succeeded' | 'failed' | 'expired' | 'review';
   stripe_session_id?: string;
   stripe_payment_intent?: string;
 
@@ -70,6 +73,10 @@ const paymentStatusMap: Record<string, string> = {
   failed: 'Falhou',
   succeeded: 'Concluído',
   expired: 'Expirado',
+  payment_review: 'Revisao necessaria',
+  ready_for_pickup: 'Pronto para retirada',
+  picked_up: 'Retirado',
+  review: 'Revisao necessaria',
 };
 const API_BASE_URL =
   import.meta.env.VITE_REACT_APP_API_URL || 'http://localhost:3000';

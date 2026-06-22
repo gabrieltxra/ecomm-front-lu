@@ -5,8 +5,6 @@ export type PaymentMethod = "pix" | "card_mercadopago";
 export interface CheckoutPayload {
   cart: {
     id: string;
-    name: string;
-    price: number;
     quantity: number;
   }[];
   shipping_address: {
@@ -18,9 +16,8 @@ export interface CheckoutPayload {
     phone: string;
   } | null;
   shipping: {
-    method: string;
-    cost: number;
-    estimated_delivery: string;
+    mode: "pickup" | "delivery";
+    quote_token?: string;
   };
 }
 

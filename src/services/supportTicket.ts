@@ -10,7 +10,7 @@ export interface ContactValues {
 }
 
 export interface SupportTicket {
-  id?: number;
+  id?: string;
   user_id: number;
   order_id?: string | null;
   message: string;
@@ -41,7 +41,7 @@ function isoMinus3(rawDate: any): string | null {
 
 function normalizeSupportTicket(raw: any): SupportTicket {
   return {
-    id: raw.id != null ? Number(raw.id) : undefined,
+    id: raw.id != null ? String(raw.id) : undefined,
     user_id: Number(raw.user_id),
     order_id: raw.order_id ? String(raw.order_id) : null,
     message: String(raw.message ?? ""),

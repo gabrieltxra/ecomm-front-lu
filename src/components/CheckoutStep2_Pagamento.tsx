@@ -91,7 +91,7 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
 
     if (isRetirada) {
       return {
-        cart: items,
+        cart: items.map((item: any) => ({ id: String(item.id), quantity: Number(item.quantity) })),
         shipping_address: {
           cep: "",
           street: "",
@@ -101,15 +101,13 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
           phone: "",
         },
         shipping: {
-          method: "Retirada no local",
-          cost: 0,
-          estimated_delivery: "Retirada",
+          mode: "pickup",
         },
       };
     }
 
     return {
-      cart: items,
+      cart: items.map((item: any) => ({ id: String(item.id), quantity: Number(item.quantity) })),
       shipping_address: {
         cep: cepFormatted,
         street: data?.endereco?.rua || "",
@@ -119,9 +117,8 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
         phone: data?.endereco?.telefone || "",
       },
       shipping: {
-        method: data?.frete?.name || "Envio padrão",
-        cost: frete,
-        estimated_delivery: deliveryDays > 0 ? `${deliveryDays} dias` : "—",
+        mode: "delivery",
+        quote_token: data?.frete?.quote_token,
       },
     };
   };
