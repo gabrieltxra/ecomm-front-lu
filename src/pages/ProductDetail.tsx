@@ -20,25 +20,43 @@ const [product, setProduct] = useState<Product | null>(null);
 const [loading, setLoading] = useState(true);
 
 useEffect(() => {
+  let active = true;
+
   const fetchProduct = async () => {
-    if (!id) return;
+    setLoading(true);
+    setProduct(null);
+
+    if (!id) {
+      setLoading(false);
+      return;
+    }
+
     try {
       const data = await getProductById(id);
-      if (data) {
-        setProduct(data);
-      } else {
-        setProduct(null);
-      }
+      if (active) setProduct(data ?? null);
     } catch (error) {
       console.error(error);
-      setProduct(null);
+      if (active) setProduct(null);
     } finally {
-      setLoading(false);
+      if (active) setLoading(false);
     }
   };
 
   fetchProduct();
+
+  return () => {
+    active = false;
+  };
 }, [id]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" role="status">
+        <div className="h-10 w-10 animate-spin rounded-full border-4 border-rose-200 border-t-rose-500" />
+        <span className="sr-only">Carregando produto</span>
+      </div>
+    );
+  }
 
   if (!product) {
     return (
