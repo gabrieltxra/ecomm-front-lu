@@ -95,6 +95,13 @@ const legacyMercadoPagoCardMethods = new Set([
   'mercadopago',
 ]);
 
+function formatShippingMethod(value: string | null | undefined) {
+  const normalized = String(value ?? '').trim().toLowerCase();
+  if (!normalized) return '';
+  if (normalized.includes('retirada')) return 'Retirada no local';
+  return 'Entrega';
+}
+
 function formatMercadoPagoMethodDetail(value: string | null | undefined) {
   const normalized = String(value ?? '').trim().toLowerCase();
   if (!normalized) return null;
@@ -158,9 +165,11 @@ function normalizeOrder(raw: any): Order {
     status: paymentStatusMap[raw.status] || raw.status,
     nfe_pdf_url: raw.nfe_pdf_url ?? null,
     total: Number(raw.total ?? 0),
-    shipping_method: String(raw.shipping_method ?? ''),
+    shipping_method: formatShippingMethod(raw.shipping_method),
     shipping_cost: Number(raw.shipping_cost ?? 0),
-    payment_method: normalizedPaymentMethod,
+    payment_method: rawPaymentMethod === 'card_installments' || legacyMercadoPagoCardMethods.has(rawPaymentMethod)
+      ? 'Cartão de Crédito'
+      : normalizedPaymentMethod,
     mp_payment_method_id: raw.mp_payment_method_id ? String(raw.mp_payment_method_id) : null,
     payment_status: paymentStatusMap[raw.payment_status] || raw.payment_status,
     stripe_session_id: raw.stripe_session_id,
@@ -179,7 +188,7 @@ function normalizeOrder(raw: any): Order {
     shipping: raw.shipping
       ? {
           status: raw.shipping.status ? String(raw.shipping.status) : null,
-          method: raw.shipping.method ? String(raw.shipping.method) : null,
+          method: raw.shipping.method ? formatShippingMethod(raw.shipping.method) : null,
           tracking_code: raw.shipping.tracking_code ? String(raw.shipping.tracking_code) : null,
           estimated_delivery: raw.shipping.estimated_delivery ? String(raw.shipping.estimated_delivery) : null,
           cost: raw.shipping.cost != null ? Number(raw.shipping.cost) : null,
