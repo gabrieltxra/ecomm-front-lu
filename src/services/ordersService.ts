@@ -70,12 +70,17 @@ const paymentStatusMap: Record<string, string> = {
   pending: 'Pendente',
   pending_payment: 'Pendente',
   paid: 'Pago',
+  preparing_shipment: 'Preparando envio',
+  shipped: 'Enviado',
+  delivered: 'Entregue',
   failed: 'Falhou',
   succeeded: 'Concluído',
   expired: 'Expirado',
   payment_review: 'Revisao necessaria',
   ready_for_pickup: 'Pronto para retirada',
   picked_up: 'Retirado',
+  cancelled: 'Cancelado',
+  returned: 'Devolvido',
   review: 'Revisao necessaria',
 };
 const API_BASE_URL =

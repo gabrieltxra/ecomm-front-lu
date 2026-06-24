@@ -238,12 +238,12 @@ const Perfil: React.FC = () => {
     const base = 'px-2 py-1 text-xs rounded-full font-medium';
     switch (s) {
       case 'Pago': return `${base} bg-green-100 text-green-700`;
-      case 'preparing_shipment': return `${base} bg-amber-100 text-amber-700`;
-      case 'shipped': return `${base} bg-sky-100 text-sky-700`;
-      case 'delivered': return `${base} bg-emerald-100 text-emerald-700`;
+      case 'Preparando envio': return `${base} bg-amber-100 text-amber-700`;
+      case 'Enviado': return `${base} bg-sky-100 text-sky-700`;
+      case 'Entregue': return `${base} bg-emerald-100 text-emerald-700`;
       case 'Pendente': return `${base} bg-orange-100 text-orange-700`;
-      case 'cancelled': return `${base} bg-red-100 text-red-700`;
-      case 'returned': return `${base} bg-zinc-200 text-zinc-700`;
+      case 'Cancelado': return `${base} bg-red-100 text-red-700`;
+      case 'Devolvido': return `${base} bg-zinc-200 text-zinc-700`;
       case 'Pronto para retirada': return `${base} bg-blue-100 text-blue-700`;
       case 'Retirado': return `${base} bg-emerald-100 text-emerald-700`;
       case 'Revisao necessaria': return `${base} bg-red-100 text-red-700`;
@@ -719,7 +719,7 @@ const Perfil: React.FC = () => {
 
                           <div className="flex items-center gap-2">
                             <span className={statusPill(o.status)}>
-                              {o.status.replace("_", " ")}
+                              {o.status}
                             </span>
                           </div>
                         </div>
