@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { updateProfile, updatePassword } from '@/services/authService';
 import { searchCep } from '../services/viaCepService';
 import { 
-  User, MapPin, Lock, Edit, Save, X, LogOut, Camera,
+  User, MapPin, Lock, Edit, Save, X, LogOut,
   Package, Truck, Calendar, CreditCard
 } from 'lucide-react';
 import { getUserOrders, Order } from '@/services/ordersService';
@@ -280,9 +280,6 @@ const Perfil: React.FC = () => {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                <button className="absolute bottom-0 right-0 bg-rose-400 text-white p-2 rounded-full hover:bg-rose-500 transition-colors">
-                  <Camera className="h-4 w-4" />
-                </button>
               </div>
               <div className="min-w-0">
                 <h1 className="text-2xl font-bold text-rose-400 mb-2">Meu Perfil</h1>
