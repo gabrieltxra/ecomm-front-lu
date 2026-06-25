@@ -271,20 +271,9 @@ const Perfil: React.FC = () => {
         <div className="mx-auto w-full max-w-4xl">
           {/* Header */}
           <div className="bg-white dark:bg-slate-800/50 backdrop-blur-sm rounded-lg shadow-lg dark:shadow-dark p-4 sm:p-6 mb-6 sm:mb-8 border border-gray-200 dark:border-slate-700/50">
-            <div className="flex flex-col items-center gap-4 text-center sm:flex-row sm:items-center sm:gap-6 sm:text-left">
-              <div className="relative flex-shrink-0">
-                <div className="h-20 w-20 overflow-hidden rounded-full border-4 border-rose-100 dark:border-gray-600 sm:h-24 sm:w-24">
-                  <img
-                    src={user.avatarUrl || '/placeholder.svg'}
-                    alt="Avatar"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
-              <div className="min-w-0">
-                <h1 className="text-2xl font-bold text-rose-400 mb-2">Meu Perfil</h1>
-                <p className="max-w-full break-all text-gray-600 dark:text-gray-300">{user.email}</p>
-              </div>
+            <div className="mx-auto flex max-w-2xl flex-col items-center text-center">
+              <h1 className="text-2xl font-bold text-rose-400 sm:text-3xl">Meu Perfil</h1>
+              <p className="mt-2 max-w-full break-all text-gray-600 dark:text-gray-300">{user.email}</p>
             </div>
           </div>
 
