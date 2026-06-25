@@ -4,13 +4,20 @@ import { useMemo, useState, useEffect, useRef } from "react";
 import { getFreteData } from "@/services/freteService";
 import { searchCep } from "@/services/viaCepService";
 
+const onlyDigits = (value: string) => String(value || "").replace(/\D/g, "");
+
+const formatCep = (value: string) => {
+  const cleaned = onlyDigits(value).slice(0, 8);
+  return cleaned.length > 5 ? `${cleaned.slice(0, 5)}-${cleaned.slice(5)}` : cleaned;
+};
+
 export default function CheckoutStep1({ onNext, updateData }: any) {
   const { user } = useAuth();
   const { items: cart } = useCart();
 
   const [modoEntrega, setModoEntrega] = useState<"retirar" | "entregar">("entregar");
 
-  const [cep, setCep] = useState(user?.endereco?.cep || "");
+  const [cep, setCep] = useState(formatCep(user?.endereco?.cep || user?.cep || ""));
   const [rua, setRua] = useState(user?.endereco?.rua || "");
   const [numero, setNumero] = useState(user?.endereco?.numero || "");
   const [observacao, setObservacao] = useState(user?.endereco?.complemento || "");
@@ -26,11 +33,6 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
   const [freteOptions, setFreteOptions] = useState<any[]>([]);
   const [freteSelecionado, setFreteSelecionado] = useState<any>(null);
   const [loadingFrete, setLoadingFrete] = useState(false);
-
-  const formatCep = (value: string) => {
-    const cleaned = value.replace(/\D/g, "").slice(0, 8);
-    return cleaned.length > 5 ? `${cleaned.slice(0, 5)}-${cleaned.slice(5)}` : cleaned;
-  };
 
   const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCep(formatCep(e.target.value));
@@ -55,7 +57,7 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
   }, [user]);
 
   useEffect(() => {
-    const cleanCep = cep.replace(/\D/g, "");
+    const cleanCep = onlyDigits(cep);
     if (cleanCep.length !== 8) return;
     if (lastCepLookupRef.current === cleanCep) return;
 
@@ -102,13 +104,15 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
   }, [modoEntrega, freteSelecionado]);
 
   const total = useMemo(() => subtotal + freteValue, [subtotal, freteValue]);
+  const cepDigits = useMemo(() => onlyDigits(cep), [cep]);
+  const hasValidCep = cepDigits.length === 8;
 
   // ===== Validação: não deixa passar "entregar" com frete 0 =====
   useEffect(() => {
     const enderecoOk =
-      cep.trim().length === 9 &&
+      hasValidCep &&
       numero.trim().length > 0 &&
-      telefone.trim().length >= 8;
+      onlyDigits(telefone).length >= 10;
 
     const freteOk =
       modoEntrega === "retirar" ||
@@ -120,7 +124,7 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
     const valid = modoEntrega === "retirar" || (enderecoOk && freteOk);
 
     setIsValid(valid);
-  }, [cep, numero, telefone, modoEntrega, freteSelecionado]);
+  }, [hasValidCep, numero, telefone, modoEntrega, freteSelecionado]);
 
   // ===== Buscar frete =====
   useEffect(() => {
@@ -128,7 +132,7 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
       if (modoEntrega !== "entregar") return;
 
       // reset quando alterna pra entregar / muda CEP inválido
-      if (cep.trim().length !== 9 || cart.length === 0) {
+      if (!hasValidCep || cart.length === 0) {
         setFreteOptions([]);
         setFreteSelecionado(null);
         return;
@@ -137,7 +141,7 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
       setLoadingFrete(true);
       try {
         const items = cart.map((item) => ({ id: item.id, quantity: item.quantity }));
-        const result = await getFreteData({ cep, items });
+        const result = await getFreteData({ cep: cepDigits, items });
 
         const opcoesValidas = result
           .filter((op: any) => !op.error)
@@ -164,7 +168,7 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
     };
 
     fetchFrete();
-  }, [cep, cart, modoEntrega]);
+  }, [cepDigits, hasValidCep, cart, modoEntrega]);
 
   const handleNext = () => {
     // blindagem final: não passa entregar com frete 0
@@ -278,7 +282,7 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
             {/* Lista de opções de frete */}
             {loadingFrete && <p>Carregando opções...</p>}
 
-            {!loadingFrete && freteOptions.length === 0 && cep.trim().length === 9 && cart.length > 0 && (
+            {!loadingFrete && freteOptions.length === 0 && hasValidCep && cart.length > 0 && (
               <p className="text-sm text-gray-500">Nenhuma opção de frete disponível para este CEP.</p>
             )}
 
