@@ -39,7 +39,7 @@ const Products: React.FC = () => {
     if (!productsData || productsData.products.length === 0) return { min: 0, max: 10000 };
     const prices = productsData?.products?.map(p => Number(p.price));
     return {
-      min: Math.min(...prices),
+      min: 0,
       max: Math.max(...prices)
     };
   }, [productsData]);
@@ -47,12 +47,11 @@ const Products: React.FC = () => {
   useEffect(() => {
     if (productsData && productsData.products.length > 0 && filters.maxPrice === 0) {
       const prices = productsData?.products?.map(p => Number(p.price));
-      const min = Math.min(...prices);
       const max = Math.max(...prices);
 
       setFilters(prev => ({
         ...prev,
-        minPrice: min,
+        minPrice: 0,
         maxPrice: max,
       }));
     }
