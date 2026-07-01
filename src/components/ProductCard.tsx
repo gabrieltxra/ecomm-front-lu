@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { Link, useNavigate } from 'react-router-dom';
@@ -7,6 +7,12 @@ import { toast } from 'sonner';
 import { Product } from '@/types/Product';
 import { getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
 
+const formatPrice = (price: number) => {
+  return new Intl.NumberFormat('pt-BR', {
+    style: 'currency',
+    currency: 'BRL'
+  }).format(price);
+};
 
 interface ProductCardProps {
   product: Product;
@@ -25,7 +31,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ product, compact =
     quality: 72,
   });
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -41,18 +47,11 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ product, compact =
       toast.error('Você precisa estar logado para adicionar produtos ao carrinho.');
       navigate('/login');
     }
-  };
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(price);
-  };
+  }, [addToCart, isAvailable, navigate, product, token]);
 
   return (
     <Link to={`/product/${product.id}`} className="group block h-full">
-      <div className="bg-card product-card flex h-full flex-col overflow-hidden rounded-lg shadow-sm transition-shadow duration-200 md:hover:shadow-lg">
+      <div className="bg-card product-card flex h-full flex-col overflow-hidden rounded-lg border border-slate-100 shadow-sm transition-colors duration-150 md:hover:border-rose-100 md:hover:shadow-md">
         {/* Image Container */}
         <div className={`relative shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-800 ${imageHeightClass}`}>
          {product.image_urls?.length > 0 ? (
@@ -63,6 +62,8 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ product, compact =
             alt={product.name}
             loading="lazy"
             decoding="async"
+            width={compact ? 480 : 640}
+            height={compact ? 360 : 640}
             className="h-full w-full object-cover"
           />
         ) : (
@@ -73,7 +74,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ product, compact =
 
           
           {/* Overlay Actions */}
-          <div className="absolute inset-0 hidden bg-black/20 opacity-0 transition-opacity duration-300 md:flex md:items-center md:justify-center md:group-hover:opacity-100">
+          <div className="absolute inset-0 hidden bg-black/15 opacity-0 transition-opacity duration-150 md:flex md:items-center md:justify-center md:group-hover:opacity-100">
             <div className="flex space-x-2">
               <button className="p-2 bg-white/90 hover:bg-white rounded-full transition-colors">
                 <Heart className="h-5 w-5 text-gray-700" />
@@ -81,9 +82,9 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ product, compact =
               <button
                 onClick={handleAddToCart}
                 disabled={!isAvailable}
-                className={`p-2 rounded-full transition-all ${
+                className={`p-2 rounded-full transition-colors ${
                   isAvailable
-                    ? 'bg-atelie-gradient hover:scale-105 hover:opacity-90'
+                    ? 'bg-atelie-gradient hover:opacity-90'
                     : 'cursor-not-allowed bg-gray-300'
                 }`}
                 aria-label={isAvailable ? 'Adicionar ao carrinho' : 'Produto indisponível'}
@@ -119,9 +120,9 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ product, compact =
             <button
               onClick={handleAddToCart}
               disabled={!isAvailable}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-lg ${
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors shadow-sm ${
                 isAvailable
-                  ? 'bg-rose-500 text-white hover:bg-rose-600 hover:shadow-xl dark:bg-rose-400 dark:hover:bg-rose-500'
+                  ? 'bg-rose-500 text-white hover:bg-rose-600 dark:bg-rose-400 dark:hover:bg-rose-500'
                   : 'cursor-not-allowed bg-gray-300 text-gray-500 shadow-none dark:bg-gray-700 dark:text-gray-400'
               }`}
             >

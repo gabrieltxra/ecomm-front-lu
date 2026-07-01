@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import ProductCard from '../components/ProductCard';
-import { Filter, Search, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Filter, Search, X } from 'lucide-react';
 import { useProducts } from '@/services/productsService';
 import { useSearchParams } from 'react-router-dom';
 
@@ -113,6 +113,15 @@ const Products: React.FC = () => {
       return searchable.includes(term);
     });
   }, [productsData, searchFromUrl]);
+
+  const totalPages = productsData?.totalPages || 1;
+  const activePage = productsData?.page || currentPage;
+
+  const goToPage = useCallback((page: number) => {
+    const nextPage = Math.min(Math.max(page, 1), totalPages);
+    if (nextPage === currentPage || loading) return;
+    setCurrentPage(nextPage);
+  }, [currentPage, loading, totalPages]);
 
   if (loading && !productsData) {
     return (
@@ -253,25 +262,30 @@ const Products: React.FC = () => {
 
             {/* Paginação */}
             {!searchFromUrl && productsData?.totalPages > 1 && (
-              <div className="flex justify-center mt-10 gap-4">
+              <nav className="mt-12 flex flex-col items-center justify-center gap-3 border-t border-slate-100 pt-8 sm:flex-row sm:gap-4" aria-label={`Paginacao de produtos, pagina ${activePage} de ${totalPages}`}>
                 <button
-                  disabled={currentPage === 1}
-                  onClick={() => setCurrentPage(prev => prev - 1)}
-                  className="px-4 py-2 border rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+                  disabled={currentPage === 1 || loading}
+                  onClick={() => goToPage(currentPage - 1)}
+                  className="inline-flex h-11 min-w-32 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 disabled:shadow-none"
                 >
+                  <ChevronLeft className="h-4 w-4" />
                   Anterior
                 </button>
-                <span className="text-gray-700 font-medium">
+                <div className="flex min-h-11 items-center rounded-full bg-slate-50 px-4 text-sm font-semibold text-slate-700 ring-1 ring-slate-200">
                   Página {productsData.page} de {productsData.totalPages}
-                </span>
+                  {loading && (
+                    <span className="ml-2 h-2 w-2 animate-pulse rounded-full bg-rose-500" />
+                  )}
+                </div>
                 <button
-                  disabled={currentPage === productsData.totalPages}
-                  onClick={() => setCurrentPage(prev => prev + 1)}
-                  className="px-4 py-2 border rounded bg-gray-100 hover:bg-gray-200 disabled:opacity-50"
+                  disabled={currentPage === totalPages || loading}
+                  onClick={() => goToPage(currentPage + 1)}
+                  className="inline-flex h-11 min-w-32 items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 shadow-sm transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-400 disabled:shadow-none"
                 >
                   Próxima
+                  <ChevronRight className="h-4 w-4" />
                 </button>
-              </div>
+              </nav>
             )}
           </div>
         </div>

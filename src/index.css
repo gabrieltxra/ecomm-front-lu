@@ -163,12 +163,18 @@
 /* Gradientes já definidos no tailwind.config.ts - não redefinir aqui */
 
 /* Melhorias para cards de produtos - Design Premium */
+.product-card {
+  content-visibility: auto;
+  contain-intrinsic-size: 390px;
+  contain: layout paint style;
+}
+
 .dark .product-card {
-  @apply bg-slate-800/30 backdrop-blur-md border border-slate-700/40 shadow-lg;
+  @apply bg-slate-800/30 border border-slate-700/40 shadow-sm;
 }
 
 .dark .product-card:hover {
-  @apply bg-slate-800/50 border-slate-600/60 shadow-xl transition-colors duration-200;
+  @apply bg-slate-800/50 border-slate-600/60 shadow-md transition-colors duration-150;
 }
 
 /* Melhorias para seções - Design Elegante */
