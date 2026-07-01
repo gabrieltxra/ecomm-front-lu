@@ -168,7 +168,7 @@
 }
 
 .dark .product-card:hover {
-  @apply bg-slate-800/50 border-slate-600/60 shadow-xl transform scale-105 transition-all duration-300;
+  @apply bg-slate-800/50 border-slate-600/60 shadow-xl transition-colors duration-200;
 }
 
 /* Melhorias para seções - Design Elegante */

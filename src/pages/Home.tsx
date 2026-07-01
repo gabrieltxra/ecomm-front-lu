@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 
 import ProductGrid from '../components/ProductGrid';
 import { useProducts } from '@/services/productsService';
+import { getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
 
 const defaultFilters = {
   category: '',
@@ -13,11 +14,12 @@ const defaultFilters = {
 };
 
 const Home: React.FC = () => {
-  const { products, fetchProducts, loading } = useProducts();
+  const { products, fetchProducts, fetchFiltersConfig, filtersConfig, loading } = useProducts();
 
   useEffect(() => {
-    void fetchProducts(defaultFilters, 1, 200);
-  }, []);
+    void fetchProducts(defaultFilters, 1, 24);
+    void fetchFiltersConfig();
+  }, [fetchFiltersConfig, fetchProducts]);
 
   const featuredProducts = useMemo(() => products.slice(0, 8), [products]);
 
@@ -41,14 +43,22 @@ const Home: React.FC = () => {
       });
     }
 
-    return Array.from(seen.values())
-      .map((category) => ({
-        name: category.name,
-        image: category.image,
-        count: category.productIds.size,
-      }))
-      .slice(0, 4);
-  }, [products]);
+    const imageByCategory = new Map(
+      Array.from(seen.values()).map((category) => [category.name, category.image])
+    );
+    const sourceCategories = filtersConfig?.categories?.length
+      ? filtersConfig.categories
+      : Array.from(seen.values()).map((category) => ({
+          name: category.name,
+          count: category.productIds.size,
+        }));
+
+    return sourceCategories.slice(0, 4).map((category) => ({
+      name: category.name,
+      image: imageByCategory.get(category.name) || '',
+      count: category.count || 0,
+    }));
+  }, [filtersConfig, products]);
 
   const heroImage = featuredProducts[0]?.image_urls?.[0] || categories[0]?.image || '';
 
@@ -89,8 +99,12 @@ const Home: React.FC = () => {
           <div className="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-rose-100 dark:bg-slate-900 dark:ring-slate-800">
             {heroImage ? (
               <img
-                src={heroImage}
+                src={getOptimizedImageUrl(heroImage, { width: 960, quality: 76 })}
+                srcSet={getProductImageSrcSet(heroImage, [480, 720, 960, 1280])}
+                sizes="(min-width: 1024px) 45vw, 100vw"
                 alt="Produto do Atelie Lu Cortinas"
+                fetchPriority="high"
+                decoding="async"
                 className="h-[210px] w-full object-cover sm:h-[260px] md:h-[420px]"
               />
             ) : (
@@ -126,7 +140,15 @@ const Home: React.FC = () => {
                 >
                   <div className="h-40 bg-slate-100 dark:bg-slate-800">
                     {category.image ? (
-                      <img src={category.image} alt={category.name} className="h-full w-full object-cover" />
+                      <img
+                        src={getOptimizedImageUrl(category.image, { width: 480, quality: 72 })}
+                        srcSet={getProductImageSrcSet(category.image, [320, 480, 640])}
+                        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                        alt={category.name}
+                        loading="lazy"
+                        decoding="async"
+                        className="h-full w-full object-cover"
+                      />
                     ) : (
                       <div className="flex h-full items-center justify-center text-slate-500 dark:text-slate-400">
                         Sem imagem
@@ -163,10 +185,10 @@ const Home: React.FC = () => {
             </Link>
           </div>
 
-          {loading ? (
+          {loading && featuredProducts.length === 0 ? (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {[...Array(4)].map((_, index) => (
-                <div key={index} className="h-80 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" />
+                <div key={index} className="h-[360px] animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" />
               ))}
             </div>
           ) : (

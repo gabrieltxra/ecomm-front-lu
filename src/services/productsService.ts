@@ -2,7 +2,7 @@
 // Este arquivo demonstra como integrar os filtros com dados do banco
 
 import { Product } from '@/types/Product';
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 // Interfaces para API
 export interface Category {
@@ -54,9 +54,9 @@ export interface FiltersConfig {
 const API_BASE_URL = import.meta.env.VITE_REACT_APP_API_URL || 'http://localhost:3000/api';
 
 // Função para buscar configurações dos filtros
-export const getFiltersConfig = async (): Promise<FiltersConfig> => {
+export const getFiltersConfig = async (signal?: AbortSignal): Promise<FiltersConfig> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/products/filters-config`);
+    const response = await fetch(`${API_BASE_URL}/products/filters-config`, { signal });
     if (!response.ok) throw new Error('Erro ao buscar configurações dos filtros');
     
     return await response.json();
@@ -69,7 +69,8 @@ export const getFiltersConfig = async (): Promise<FiltersConfig> => {
 export const getProducts = async (
   filters: FilterState,
   page: number = 1,
-  limit: number = 12
+  limit: number = 12,
+  signal?: AbortSignal
 ): Promise<ProductsResponse> => {
   try {
     const queryParams = new URLSearchParams({
@@ -85,7 +86,7 @@ export const getProducts = async (
       ...(filters.availability && { availability: filters.availability }),
     });
 
-    const response = await fetch(`${API_BASE_URL}/products?${queryParams}`);
+    const response = await fetch(`${API_BASE_URL}/products?${queryParams}`, { signal });
     if (!response.ok) throw new Error('Erro ao buscar produtos');
 
     const data = await response.json();
@@ -106,7 +107,9 @@ export const getProducts = async (
     };
   } catch (error) {
     console.error('Erro ao buscar produtos:', error);
-};}
+    throw error;
+  }
+};
 
 
 // Função para buscar produto por ID
@@ -140,29 +143,49 @@ export const useProducts = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filtersConfig, setFiltersConfig] = useState<FiltersConfig | null>(null);
+  const productsRequestId = useRef(0);
+  const productsAbortRef = useRef<AbortController | null>(null);
+  const filtersAbortRef = useRef<AbortController | null>(null);
 
-  const fetchProducts = async (filters: FilterState, page: number = 1, limit: number = 12) => {
+  const fetchProducts = useCallback(async (filters: FilterState, page: number = 1, limit: number = 12) => {
+    const requestId = productsRequestId.current + 1;
+    productsRequestId.current = requestId;
+    productsAbortRef.current?.abort();
+    const controller = new AbortController();
+    productsAbortRef.current = controller;
+
     setLoading(true);
     setError(null);
 
     try {
-      const response = await getProducts(filters, page, limit);
-      setProductsData(response);
+      const response = await getProducts(filters, page, limit, controller.signal);
+      if (productsRequestId.current === requestId) {
+        setProductsData(response);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Erro desconhecido');
+      if (err instanceof DOMException && err.name === 'AbortError') return;
+      if (productsRequestId.current === requestId) {
+        setError(err instanceof Error ? err.message : 'Erro desconhecido');
+      }
     } finally {
-      setLoading(false);
+      if (productsRequestId.current === requestId) {
+        setLoading(false);
+      }
     }
-  };
+  }, []);
 
-  const fetchFiltersConfig = async () => {
+  const fetchFiltersConfig = useCallback(async () => {
+    filtersAbortRef.current?.abort();
+    const controller = new AbortController();
+    filtersAbortRef.current = controller;
+
     try {
-      const config = await getFiltersConfig();
+      const config = await getFiltersConfig(controller.signal);
       setFiltersConfig(config);
     } catch (err) {
       console.error('Erro ao buscar configurações dos filtros:', err);
     }
-  };
+  }, []);
 
   return {
     products: productsData?.products || [],

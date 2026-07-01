@@ -21,11 +21,11 @@ const Products: React.FC = () => {
 
   useEffect(() => {
     fetchFiltersConfig();
-  }, []);
+  }, [fetchFiltersConfig]);
 
   useEffect(() => {
     fetchProducts(filters, searchFromUrl ? 1 : currentPage, searchFromUrl ? 200 : 12);
-  }, [filters, currentPage, searchFromUrl]);
+  }, [currentPage, fetchProducts, filters, searchFromUrl]);
 
   useEffect(() => {
     setFilters((prev) => {
@@ -36,26 +36,14 @@ const Products: React.FC = () => {
   }, [categoryFromUrl]);
 
   const defaultPriceRange = useMemo(() => {
+    if (filtersConfig?.priceRange) return filtersConfig.priceRange;
     if (!productsData || productsData.products.length === 0) return { min: 0, max: 10000 };
-    const prices = productsData?.products?.map(p => Number(p.price));
+    const prices = productsData.products.map(p => Number(p.price));
     return {
       min: 0,
       max: Math.max(...prices)
     };
-  }, [productsData]);
-
-  useEffect(() => {
-    if (productsData && productsData.products.length > 0 && filters.maxPrice === 0) {
-      const prices = productsData?.products?.map(p => Number(p.price));
-      const max = Math.max(...prices);
-
-      setFilters(prev => ({
-        ...prev,
-        minPrice: 0,
-        maxPrice: max,
-      }));
-    }
-  }, [productsData]);
+  }, [filtersConfig, productsData]);
 
   const clearFilters = () => {
     setSearchParams({});
@@ -95,14 +83,20 @@ const Products: React.FC = () => {
   };
 
   const defaultCategories = useMemo(() => {
+    if (filtersConfig?.categories?.length) return filtersConfig.categories;
     if (!productsData) return [];
-    const unique = [...new Set(productsData?.products?.map(p => p.category))];
-    return unique.map((cat, i) => ({
+
+    const counts = new Map<string, number>();
+    for (const product of productsData.products) {
+      counts.set(product.category, (counts.get(product.category) || 0) + 1);
+    }
+
+    return Array.from(counts.entries()).map(([name, count], i) => ({
       id: i + 1,
-      name: cat,
-      count: productsData.products.filter(p => p.category === cat).length
+      name,
+      count,
     }));
-  }, [productsData]);
+  }, [filtersConfig, productsData]);
 
   const displayedProducts = useMemo(() => {
     const products = productsData?.products || [];
@@ -120,7 +114,7 @@ const Products: React.FC = () => {
     });
   }, [productsData, searchFromUrl]);
 
-  if (loading) {
+  if (loading && !productsData) {
     return (
       <div className="min-h-screen pt-20 bg-white">
         <div className="container mx-auto px-4 py-8">
@@ -246,7 +240,7 @@ const Products: React.FC = () => {
           </div>
 
           {/* Lista de produtos */}
-          <div className="flex-1">
+          <div className={`flex-1 transition-opacity duration-200 ${loading ? 'opacity-70' : 'opacity-100'}`}>
             {displayedProducts.length === 0 ? (
               <p className="text-gray-500">Nenhum produto encontrado.</p>
             ) : (

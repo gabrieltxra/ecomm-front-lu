@@ -7,7 +7,7 @@ interface ProductGridProps {
   products: Product[];
 }
 
-const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
+const ProductGrid: React.FC<ProductGridProps> = React.memo(({ products }) => {
   return (
     <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       {products.map((product) => (
@@ -15,6 +15,6 @@ const ProductGrid: React.FC<ProductGridProps> = ({ products }) => {
       ))}
     </div>
   );
-};
+});
 
 export default ProductGrid;

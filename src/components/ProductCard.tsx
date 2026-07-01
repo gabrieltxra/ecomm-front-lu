@@ -5,6 +5,7 @@ import { useCart } from '../contexts/CartContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Product } from '@/types/Product';
+import { getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
 
 
 interface ProductCardProps {
@@ -12,11 +13,17 @@ interface ProductCardProps {
   compact?: boolean;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) => {
+const ProductCard: React.FC<ProductCardProps> = React.memo(({ product, compact = false }) => {
   const { addToCart } = useCart();
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
   const isAvailable = Number(product.stock) > 0;
+  const imageHeightClass = compact ? 'h-44 sm:h-48' : 'h-56 sm:h-60 md:h-64';
+  const productImage = product.image_urls?.[0];
+  const optimizedImage = getOptimizedImageUrl(productImage, {
+    width: compact ? 480 : 640,
+    quality: 72,
+  });
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -44,15 +51,19 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) =
   };
 
   return (
-    <Link to={`/product/${product.id}`} className="group">
-      <div className="bg-card product-card rounded-lg overflow-hidden shadow-sm transition-all duration-300 md:hover:shadow-lg animate-fade-in">
+    <Link to={`/product/${product.id}`} className="group block h-full">
+      <div className="bg-card product-card flex h-full flex-col overflow-hidden rounded-lg shadow-sm transition-shadow duration-200 md:hover:shadow-lg">
         {/* Image Container */}
-        <div className={`relative overflow-hidden ${compact ? 'aspect-[4/3]' : 'aspect-square'}`}>
+        <div className={`relative shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-800 ${imageHeightClass}`}>
          {product.image_urls?.length > 0 ? (
           <img
-            src={product.image_urls[0]}
+            src={optimizedImage}
+            srcSet={getProductImageSrcSet(productImage, compact ? [320, 480, 640] : [360, 540, 720])}
+            sizes={compact ? '(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw' : '(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw'}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-500 md:group-hover:scale-110"
+            loading="lazy"
+            decoding="async"
+            className="h-full w-full object-cover"
           />
         ) : (
           <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-400">
@@ -91,7 +102,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) =
         </div>
 
                 {/* Product Info */}
-        <div className={compact ? 'p-3' : 'p-4'}>
+        <div className={`flex flex-1 flex-col ${compact ? 'p-3' : 'p-4'}`}>
           <h3 className={`font-elegant font-semibold text-foreground mb-2 line-clamp-2 ${compact ? 'text-base' : 'text-lg'}`}>
             {product.name}
           </h3>
@@ -100,7 +111,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) =
             {product.description}
           </p>
           
-          <div className="flex items-center justify-between gap-2">
+          <div className="mt-auto flex items-center justify-between gap-2">
             <span className={`font-bold text-rose-500 dark:text-rose-400 ${compact ? 'text-xl' : 'text-2xl'}`}>
               {formatPrice(product.price)}
             </span>
@@ -121,6 +132,6 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, compact = false }) =
       </div>
     </Link>
   );
-};
+});
 
 export default ProductCard;
