@@ -208,8 +208,8 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
         </DialogContent>
       </Dialog>
 
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
-        <div className="flex items-center justify-center mb-6 w-full max-w-2xl">
+      <div className="min-h-screen w-full overflow-x-hidden px-3 pb-28 pt-24 sm:px-4 lg:px-6">
+        <div className="mx-auto mb-5 flex w-full max-w-2xl items-center justify-center sm:mb-6">
           <div className="flex items-center w-full">
             <div className="w-8 h-8 bg-rose-200 text-gray-500 rounded-full flex items-center justify-center">1</div>
             <div className="flex-1 h-1 bg-rose-200 mx-2"></div>
@@ -219,18 +219,18 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
           </div>
         </div>
 
-        <div className="w-full max-w-5xl rounded-3xl bg-white p-6 shadow-lg md:p-8">
-          <h2 className="text-2xl font-semibold text-rose-300 mb-4">Revisar e pagar</h2>
+        <div className="mx-auto w-full max-w-5xl overflow-hidden rounded-2xl bg-white p-4 shadow-lg sm:rounded-3xl sm:p-6 md:p-8">
+          <h2 className="mb-4 text-2xl font-semibold text-rose-300 sm:text-3xl">Revisar e pagar</h2>
 
-          <div className="grid gap-6 lg:grid-cols-[1.5fr_1fr] lg:items-start">
-            <div className="space-y-4">
-              <div className="rounded-2xl border border-rose-100 bg-rose-50/40 p-4 text-sm text-gray-700 md:p-5">
-                <div className="mb-4 flex items-center justify-between gap-3">
-                  <div>
+          <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,1.5fr)_minmax(280px,1fr)] lg:items-start">
+            <div className="min-w-0 space-y-4">
+              <div className="min-w-0 rounded-2xl border border-rose-100 bg-rose-50/40 p-3 text-sm text-gray-700 sm:p-4 md:p-5">
+                <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="min-w-0">
                     <h3 className="font-semibold text-gray-900">Resumo do pedido</h3>
                     <p className="text-xs text-gray-500">Confira os itens antes de seguir para o pagamento.</p>
                   </div>
-                  <div className="rounded-full bg-white px-3 py-1 text-xs font-medium text-rose-400 shadow-sm">
+                  <div className="w-fit rounded-full bg-white px-3 py-1 text-xs font-medium text-rose-400 shadow-sm">
                     {cartItems.length} {cartItems.length === 1 ? "item" : "itens"}
                   </div>
                 </div>
@@ -242,7 +242,7 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
                     const price = Number(item?.price ?? 0);
 
                     return (
-                      <div key={item.id} className="flex gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-rose-100">
+                      <div key={item.id} className="flex min-w-0 gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-rose-100">
                         <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl bg-rose-100 text-xs font-medium text-rose-400">
                           {imageUrl ? (
                             <img
@@ -256,13 +256,13 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
                         </div>
 
                         <div className="min-w-0 flex-1">
-                          <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                          <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
                             <div className="min-w-0">
-                              <h4 className="truncate font-semibold text-gray-900">{item.name}</h4>
+                              <h4 className="line-clamp-2 break-words font-semibold leading-snug text-gray-900">{item.name}</h4>
                               <p className="text-xs text-gray-500">Quantidade: {quantity}</p>
                               <p className="text-xs text-gray-500">Unitário: {formatBRL(price)}</p>
                             </div>
-                            <div className="text-sm font-semibold text-gray-900">
+                            <div className="shrink-0 text-sm font-semibold text-gray-900">
                               {formatBRL(price * quantity)}
                             </div>
                           </div>
@@ -274,46 +274,46 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
               </div>
 
               {isRetirada ? (
-                <div className="rounded-2xl border p-4 text-sm text-gray-700 md:p-5">
+                <div className="min-w-0 rounded-2xl border p-4 text-sm text-gray-700 md:p-5">
                   <h3 className="mb-2 font-semibold text-gray-900">Retirada no local</h3>
-                  <div>Lu Cortinas Ateliê — Rua Jurunas, 398, Santa Bárbara d'Oeste - SP</div>
-                  <div>CEP: 13457-038 • Tel: (19) 99189-3513</div>
+                  <div className="break-words">Lu Cortinas Ateliê — Rua Jurunas, 398, Santa Bárbara d'Oeste - SP</div>
+                  <div className="break-words">CEP: 13457-038 • Tel: (19) 99189-3513</div>
                   <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 shadow-sm">
                     <div className="mb-1 font-semibold uppercase tracking-wide text-amber-700">Aviso de retirada</div>
-                    <p>
+                    <p className="break-words">
                       Entraremos em contato para avisar quando seu pedido estiver disponível para retirada.
                     </p>
                   </div>
                 </div>
               ) : (
                 data?.endereco && (
-                  <div className="rounded-2xl border p-4 text-sm text-gray-700 md:p-5">
+                  <div className="min-w-0 rounded-2xl border p-4 text-sm text-gray-700 md:p-5">
                     <h3 className="mb-2 font-semibold text-gray-900">Endereço de entrega</h3>
                     <div className="space-y-0.5">
-                      <div>{data.endereco.rua || "Rua não informada"}, {data.endereco.numero || "s/n"}</div>
-                      <div>{data.endereco.cidade || "Cidade não informada"} - {data.endereco.estado || "Estado não informado"}</div>
-                      {data.endereco.bairro && <div>Bairro: {data.endereco.bairro}</div>}
-                      <div>CEP: {data.endereco.cep || "—"}</div>
-                      <div>Telefone: {data.endereco.telefone || "—"}</div>
+                      <div className="break-words">{data.endereco.rua || "Rua não informada"}, {data.endereco.numero || "s/n"}</div>
+                      <div className="break-words">{data.endereco.cidade || "Cidade não informada"} - {data.endereco.estado || "Estado não informado"}</div>
+                      {data.endereco.bairro && <div className="break-words">Bairro: {data.endereco.bairro}</div>}
+                      <div className="break-words">CEP: {data.endereco.cep || "—"}</div>
+                      <div className="break-words">Telefone: {data.endereco.telefone || "—"}</div>
                     </div>
                   </div>
                 )
               )}
             </div>
 
-            <div className="space-y-4 lg:sticky lg:top-24">
+            <div className="min-w-0 space-y-4 lg:sticky lg:top-24">
               <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700 md:p-5">
                 <h3 className="mb-4 font-semibold text-gray-900">Resumo financeiro</h3>
 
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-3">
                     <span>Subtotal</span>
-                    <span>{formatBRL(subtotal)}</span>
+                    <span className="shrink-0 font-medium">{formatBRL(subtotal)}</span>
                   </div>
 
-                  <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between gap-3">
                     <span>Frete</span>
-                    <span>{formatBRL(frete)}</span>
+                    <span className="shrink-0 font-medium">{formatBRL(frete)}</span>
                   </div>
 
                   {!isRetirada && deliveryDays > 0 && (
@@ -323,9 +323,9 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
                   )}
 
                   <div className="border-t border-dashed border-gray-300 pt-3">
-                    <div className="flex items-center justify-between text-base font-semibold text-gray-900">
+                    <div className="flex items-center justify-between gap-3 text-base font-semibold text-gray-900">
                       <span>Total</span>
-                      <span>{formatBRL(total)}</span>
+                      <span className="shrink-0">{formatBRL(total)}</span>
                     </div>
                   </div>
                 </div>
@@ -334,17 +334,17 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
               <div className="rounded-2xl border p-4 text-sm text-gray-700 md:p-5">
                 <h3 className="mb-2 font-semibold text-gray-900">Forma de pagamento</h3>
                 <div className="flex flex-col gap-3">
-                  <label className="flex items-center gap-3 rounded-xl border p-3 cursor-pointer transition hover:bg-gray-50">
-                    <input type="radio" name="paymentMethod" value="pix" checked={paymentMethod === "pix"} onChange={() => setPaymentMethod("pix")} />
-                    <div>
+                  <label className="flex min-w-0 cursor-pointer items-start gap-3 rounded-xl border p-3 transition hover:bg-gray-50">
+                    <input className="mt-1 shrink-0" type="radio" name="paymentMethod" value="pix" checked={paymentMethod === "pix"} onChange={() => setPaymentMethod("pix")} />
+                    <div className="min-w-0">
                       <div className="font-semibold">Pix</div>
                       <div className="text-xs text-gray-500">Você será redirecionado para pagar via Pix</div>
                     </div>
                   </label>
 
-                  <label className="flex items-center gap-3 rounded-xl border p-3 cursor-pointer transition hover:bg-gray-50">
-                    <input type="radio" name="paymentMethod" value="card_mercadopago" checked={paymentMethod === "card_mercadopago"} onChange={() => setPaymentMethod("card_mercadopago")} />
-                    <div>
+                  <label className="flex min-w-0 cursor-pointer items-start gap-3 rounded-xl border p-3 transition hover:bg-gray-50">
+                    <input className="mt-1 shrink-0" type="radio" name="paymentMethod" value="card_mercadopago" checked={paymentMethod === "card_mercadopago"} onChange={() => setPaymentMethod("card_mercadopago")} />
+                    <div className="min-w-0">
                       <div className="font-semibold">Cartão de crédito</div>
                       <div className="text-xs text-gray-500">Você será redirecionado para o Mercado Pago</div>
                     </div>
@@ -355,11 +355,11 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
               <div className="rounded-2xl bg-gray-900 p-4 text-sm text-gray-100 md:p-5">
                 <p className="mb-4 text-gray-200">Clique em <strong>“Finalizar pagamento”</strong> para continuar.</p>
 
-                <div className="flex gap-4">
+                <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
                   <button
                     onClick={onBack}
                     disabled={loading}
-                    className="flex-1 rounded-md bg-white/10 py-2 font-semibold text-white transition hover:bg-white/20 disabled:opacity-60"
+                    className="min-h-11 flex-1 rounded-md bg-white/10 px-4 py-2 font-semibold text-white transition hover:bg-white/20 disabled:opacity-60"
                   >
                     Voltar
                   </button>
@@ -367,7 +367,7 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
                   <button
                     onClick={handlePagamento}
                     disabled={!canPay}
-                    className="flex-1 rounded-md bg-rose-300 py-2 font-semibold text-white transition hover:bg-rose-500 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="min-h-11 flex-1 rounded-md bg-rose-300 px-4 py-2 font-semibold text-white transition hover:bg-rose-500 disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {loading ? "Processando..." : paymentMethod === "pix" ? "Ir para o Pix" : "Ir para pagamento"}
                   </button>
