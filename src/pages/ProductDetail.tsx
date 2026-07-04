@@ -9,6 +9,7 @@ import { Product } from '@/types/Product';
 import { useEffect } from 'react';
 import SimilarProducts from '@/components/SimilarProducts';
 import { getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
+import AddToCartDialog from '@/components/AddToCartDialog';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -16,6 +17,7 @@ const ProductDetail: React.FC = () => {
   const { addToCart } = useCart();
   const token = localStorage.getItem('token');
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isCartDialogOpen, setIsCartDialogOpen] = useState(false);
 
 const [product, setProduct] = useState<Product | null>(null);
 const [loading, setLoading] = useState(true);
@@ -78,15 +80,15 @@ useEffect(() => {
   const isAvailable = Number(product.stock) > 0;
   const selectedImage = product.image_urls?.[selectedImageIndex] || product.image_urls?.[0] || '';
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (!isAvailable) {
       toast.error('Produto indisponível no momento.');
       return;
     }
 
     if (token) {
-      addToCart(product);
-      toast.success(`${product.name} adicionado ao carrinho!`);
+      const added = await addToCart(product);
+      if (added) setIsCartDialogOpen(true);
     } else {
       toast.error('Você precisa estar logado para adicionar produtos ao carrinho.');
       navigate('/login');
@@ -218,6 +220,11 @@ useEffect(() => {
       
       {/* Produtos Similares */}
       {product && <SimilarProducts currentProduct={product} />}
+      <AddToCartDialog
+        product={product}
+        open={isCartDialogOpen}
+        onOpenChange={setIsCartDialogOpen}
+      />
     </div>
   );
 };

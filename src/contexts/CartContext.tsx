@@ -13,7 +13,7 @@ const API = import.meta.env.VITE_REACT_APP_API_URL || 'http://localhost:3000/api
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product) => Promise<void>;
+  addToCart: (product: Product) => Promise<boolean>;
   removeFromCart: (productId: number) => Promise<void>;
   updateQuantity: (productId: number, quantity: number) => Promise<void>;
   getTotalItems: () => number;
@@ -74,7 +74,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     const token = localStorage.getItem('token');
     if (!token) {
       navigate('/login');
-      return;
+      return false;
     }
 
     try {
@@ -102,9 +102,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         }
         return [...prevItems, { ...product, quantity: 1 }];
       });
+      return true;
     } catch (err) {
       console.error('Erro ao adicionar produto no carrinho:', err);
       toast.error(err instanceof Error ? err.message : 'Erro ao adicionar produto');
+      return false;
     }
   };
 

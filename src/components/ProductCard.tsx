@@ -1,11 +1,12 @@
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Product } from '@/types/Product';
 import { getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
+import AddToCartDialog from './AddToCartDialog';
 
 const formatPrice = (price: number) => {
   return new Intl.NumberFormat('pt-BR', {
@@ -23,6 +24,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ product, compact =
   const { addToCart } = useCart();
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
+  const [isCartDialogOpen, setIsCartDialogOpen] = useState(false);
   const isAvailable = Number(product.stock) > 0;
   const imageHeightClass = compact ? 'h-44 sm:h-48' : 'h-56 sm:h-60 md:h-64';
   const productImage = product.image_urls?.[0];
@@ -31,7 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ product, compact =
     quality: 72,
   });
 
-  const handleAddToCart = useCallback((e: React.MouseEvent) => {
+  const handleAddToCart = useCallback(async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -41,8 +43,8 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ product, compact =
     }
 
     if (token) {
-      addToCart(product);
-      toast.success(`${product.name} adicionado ao carrinho!`);
+      const added = await addToCart(product);
+      if (added) setIsCartDialogOpen(true);
     } else {
       toast.error('Você precisa estar logado para adicionar produtos ao carrinho.');
       navigate('/login');
@@ -50,6 +52,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ product, compact =
   }, [addToCart, isAvailable, navigate, product, token]);
 
   return (
+    <>
     <Link to={`/product/${product.id}`} className="group block h-full">
       <div className="bg-card product-card flex h-full flex-col overflow-hidden rounded-lg border border-slate-100 shadow-sm transition-colors duration-150 md:hover:border-rose-100 md:hover:shadow-md">
         {/* Image Container */}
@@ -132,6 +135,12 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({ product, compact =
         </div>
       </div>
     </Link>
+    <AddToCartDialog
+      product={product}
+      open={isCartDialogOpen}
+      onOpenChange={setIsCartDialogOpen}
+    />
+    </>
   );
 });
 
