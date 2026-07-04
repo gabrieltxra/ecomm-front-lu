@@ -58,8 +58,10 @@ const Header: React.FC = () => {
               <Link
                 key={item.name}
                 to={item.href}
-                className={`text-sm font-medium transition-colors hover:text-rose-500 dark:hover:text-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-500 dark:focus:ring-rose-400 rounded px-2 py-1 ${
-                  isActive(item.href) ? 'text-rose-500 dark:text-rose-400 font-semibold' : 'text-muted-foreground'
+                className={`rounded-lg px-3 py-2 text-sm font-semibold transition-all duration-150 hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
+                  isActive(item.href)
+                    ? 'bg-accent text-accent-foreground ring-1 ring-primary/20 shadow-sm'
+                    : 'text-muted-foreground'
                 }`}
                 aria-current={isActive(item.href) ? 'page' : undefined}
               >
@@ -89,7 +91,7 @@ const Header: React.FC = () => {
             <button
               type="button"
               onClick={() => setIsSearchOpen((open) => !open)}
-              className="p-2 rounded-lg hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-rose-500 dark:focus:ring-rose-400 md:hidden"
+              className="rounded-lg p-2 text-muted-foreground transition-all duration-150 hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 md:hidden"
               aria-label="Buscar produtos"
             >
               <Search className="h-5 w-5" />
@@ -98,7 +100,7 @@ const Header: React.FC = () => {
             {/* Cart */}
             <Link 
               to="/cart" 
-              className="relative p-2 rounded-lg hover:bg-accent transition-colors focus:outline-none focus:ring-2 focus:ring-rose-500 dark:focus:ring-rose-400"
+              className="relative rounded-lg p-2 text-muted-foreground transition-all duration-150 hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
               aria-label={`Carrinho de compras com ${getTotalItems()} itens`}
             >
               <ShoppingCart className="h-5 w-5" />
@@ -127,13 +129,13 @@ const Header: React.FC = () => {
             )}
               </Link>
             ) : (
-              <Link to="/login" className="p-2 rounded-lg hover:bg-accent transition-colors">
+              <Link to="/login" className="rounded-lg p-2 text-muted-foreground transition-all duration-150 hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
                 <LogIn className="h-5 w-5" />
               </Link>
             )}
             {/* Mobile Menu Button */}
             <button
-              className="md:hidden p-2 rounded-lg hover:bg-accent transition-colors"
+              className="rounded-lg p-2 text-muted-foreground transition-all duration-150 hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 md:hidden"
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -168,8 +170,10 @@ const Header: React.FC = () => {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className={`text-sm font-medium transition-colors hover:text-primary ${
-                    isActive(item.href) ? 'text-primary' : 'text-muted-foreground'
+                  className={`rounded-lg px-3 py-2 text-sm font-semibold transition-all duration-150 hover:bg-accent hover:text-accent-foreground ${
+                    isActive(item.href)
+                      ? 'bg-accent text-accent-foreground ring-1 ring-primary/20'
+                      : 'text-muted-foreground'
                   }`}
                   onClick={() => setIsMenuOpen(false)}
                 >

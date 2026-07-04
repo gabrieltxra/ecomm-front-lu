@@ -54,14 +54,14 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				atelie: {
-					rose: '#F8B9B9',
-					peach: '#FAD0C4',
+					rose: '#E11D48',
+					peach: '#F97316',
 					dark: '#1a1a1a',
 					gold: '#D4AF37'
 				}
 			},
 			backgroundImage: {
-				'atelie-gradient': 'linear-gradient(135deg, #F8B9B9 0%, #FAD0C4 100%)',
+				'atelie-gradient': 'linear-gradient(135deg, #E11D48 0%, #BE123C 100%)',
 				'atelie-gradient-dark': 'linear-gradient(135deg, #1e293b 0%, #334155 100%)',
 			},
 			fontFamily: {
