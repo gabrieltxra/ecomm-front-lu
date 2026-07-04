@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import ProductCard from '../components/ProductCard';
+import ProductGrid from '../components/ProductGrid';
 import { ChevronLeft, ChevronRight, Filter, Search, X } from 'lucide-react';
 import { useProducts } from '@/services/productsService';
 import { useSearchParams } from 'react-router-dom';
@@ -24,7 +24,11 @@ const Products: React.FC = () => {
   }, [fetchFiltersConfig]);
 
   useEffect(() => {
-    fetchProducts(filters, searchFromUrl ? 1 : currentPage, searchFromUrl ? 200 : 12);
+    const timeoutId = window.setTimeout(() => {
+      void fetchProducts(filters, searchFromUrl ? 1 : currentPage, searchFromUrl ? 200 : 12);
+    }, 180);
+
+    return () => window.clearTimeout(timeoutId);
   }, [currentPage, fetchProducts, filters, searchFromUrl]);
 
   useEffect(() => {
@@ -253,11 +257,7 @@ const Products: React.FC = () => {
             {displayedProducts.length === 0 ? (
               <p className="text-gray-500">Nenhum produto encontrado.</p>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {displayedProducts.map(product => (
-                  <ProductCard key={product.id} product={product} compact />
-                ))}
-              </div>
+              <ProductGrid products={displayedProducts} compact />
             )}
 
             {/* Paginação */}

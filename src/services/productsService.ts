@@ -1,10 +1,7 @@
-// Serviço para integração com API de produtos
-// Este arquivo demonstra como integrar os filtros com dados do banco
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { Product } from '@/types/Product';
-import { useCallback, useRef, useState } from 'react';
 
-// Interfaces para API
 export interface Category {
   id: string | number;
   name: string;
@@ -50,22 +47,30 @@ export interface FiltersConfig {
   materials?: string[];
 }
 
-// Configuração da API
 const API_BASE_URL = import.meta.env.VITE_REACT_APP_API_URL || 'http://localhost:3000/api';
 
-// Função para buscar configurações dos filtros
+const EMPTY_FILTERS_CONFIG: FiltersConfig = {
+  categories: [],
+  priceRange: { min: 0, max: 10000 },
+  sortOptions: [],
+};
+
+const isAbortError = (error: unknown) => error instanceof DOMException && error.name === 'AbortError';
+
 export const getFiltersConfig = async (signal?: AbortSignal): Promise<FiltersConfig> => {
   try {
     const response = await fetch(`${API_BASE_URL}/products/filters-config`, { signal });
-    if (!response.ok) throw new Error('Erro ao buscar configurações dos filtros');
-    
+    if (!response.ok) throw new Error('Erro ao buscar configuracoes dos filtros');
+
     return await response.json();
   } catch (error) {
-    console.error('Erro ao buscar configurações dos filtros:', error);
+    if (isAbortError(error)) throw error;
+
+    console.error('Erro ao buscar configuracoes dos filtros:', error);
+    return EMPTY_FILTERS_CONFIG;
   }
 };
 
-// Função para buscar produtos com filtros
 export const getProducts = async (
   filters: FilterState,
   page: number = 1,
@@ -90,13 +95,10 @@ export const getProducts = async (
     if (!response.ok) throw new Error('Erro ao buscar produtos');
 
     const data = await response.json();
-
-
-    const products: Product[] = data.products.map((p: any) => ({
-      ...p,
-      price: Number(p.price)
+    const products: Product[] = data.products.map((product: Product) => ({
+      ...product,
+      price: Number(product.price),
     }));
-
 
     return {
       products,
@@ -106,38 +108,41 @@ export const getProducts = async (
       totalPages: data.totalPages,
     };
   } catch (error) {
+    if (isAbortError(error)) throw error;
+
     console.error('Erro ao buscar produtos:', error);
     throw error;
   }
 };
 
-
-// Função para buscar produto por ID
 export const getProductById = async (id: string | number): Promise<Product | null> => {
   try {
     const response = await fetch(`${API_BASE_URL}/product/${id}`);
-    if (!response.ok) throw new Error('Produto não encontrado');
-    
+    if (!response.ok) throw new Error('Produto nao encontrado');
+
     return await response.json();
   } catch (error) {
     console.error('Erro ao buscar produto:', error);
+    return null;
   }
 };
 
-// Função para buscar produtos relacionados
-export const getRelatedProducts = async (productId: string | number, category: string, limit: number = 4): Promise<Product[]> => {
+export const getRelatedProducts = async (
+  productId: string | number,
+  _category: string,
+  limit: number = 4
+): Promise<Product[]> => {
   try {
     const response = await fetch(`${API_BASE_URL}/products/${productId}/related?limit=${limit}`);
     if (!response.ok) throw new Error('Erro ao buscar produtos relacionados');
-    
+
     return await response.json();
   } catch (error) {
     console.error('Erro ao buscar produtos relacionados:', error);
+    return [];
+  }
 };
-  return [];
-}
 
-// Hook personalizado para gerenciar produtos (exemplo de uso)
 export const useProducts = () => {
   const [productsData, setProductsData] = useState<ProductsResponse | null>(null);
   const [loading, setLoading] = useState(false);
@@ -146,11 +151,23 @@ export const useProducts = () => {
   const productsRequestId = useRef(0);
   const productsAbortRef = useRef<AbortController | null>(null);
   const filtersAbortRef = useRef<AbortController | null>(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+
+    return () => {
+      mountedRef.current = false;
+      productsAbortRef.current?.abort();
+      filtersAbortRef.current?.abort();
+    };
+  }, []);
 
   const fetchProducts = useCallback(async (filters: FilterState, page: number = 1, limit: number = 12) => {
     const requestId = productsRequestId.current + 1;
     productsRequestId.current = requestId;
     productsAbortRef.current?.abort();
+
     const controller = new AbortController();
     productsAbortRef.current = controller;
 
@@ -159,16 +176,18 @@ export const useProducts = () => {
 
     try {
       const response = await getProducts(filters, page, limit, controller.signal);
-      if (productsRequestId.current === requestId) {
+
+      if (mountedRef.current && productsRequestId.current === requestId) {
         setProductsData(response);
       }
     } catch (err) {
-      if (err instanceof DOMException && err.name === 'AbortError') return;
-      if (productsRequestId.current === requestId) {
+      if (isAbortError(err)) return;
+
+      if (mountedRef.current && productsRequestId.current === requestId) {
         setError(err instanceof Error ? err.message : 'Erro desconhecido');
       }
     } finally {
-      if (productsRequestId.current === requestId) {
+      if (mountedRef.current && productsRequestId.current === requestId) {
         setLoading(false);
       }
     }
@@ -176,14 +195,16 @@ export const useProducts = () => {
 
   const fetchFiltersConfig = useCallback(async () => {
     filtersAbortRef.current?.abort();
+
     const controller = new AbortController();
     filtersAbortRef.current = controller;
 
     try {
       const config = await getFiltersConfig(controller.signal);
-      setFiltersConfig(config);
+      if (mountedRef.current) setFiltersConfig(config);
     } catch (err) {
-      console.error('Erro ao buscar configurações dos filtros:', err);
+      if (isAbortError(err)) return;
+      console.error('Erro ao buscar configuracoes dos filtros:', err);
     }
   }, []);
 
@@ -194,38 +215,6 @@ export const useProducts = () => {
     error,
     filtersConfig,
     fetchProducts,
-    fetchFiltersConfig
+    fetchFiltersConfig,
   };
 };
-
-// Exemplo de como usar no componente Products:
-/*
-import { useProducts } from '../services/productsService';
-
-const Products = () => {
-  const { products, loading, error, filtersConfig, fetchProducts, fetchFiltersConfig } = useProducts();
-  const [filters, setFilters] = useState<FilterState>({...});
-
-  useEffect(() => {
-    fetchFiltersConfig();
-  }, []);
-
-  useEffect(() => {
-    fetchProducts(filters);
-  }, [filters]);
-
-  const handleFiltersChange = (newFilters: FilterState) => {
-    setFilters(newFilters);
-  };
-
-  return (
-    <Products
-      categories={filtersConfig?.categories}
-      priceRange={filtersConfig?.priceRange}
-      sortOptions={filtersConfig?.sortOptions}
-      loading={loading}
-      onFiltersChange={handleFiltersChange}
-    />
-  );
-};
-*/ 
