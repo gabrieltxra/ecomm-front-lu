@@ -8,7 +8,7 @@ import { getProductById } from '@/services/productsService';
 import { Product } from '@/types/Product';
 import { useEffect } from 'react';
 import SimilarProducts from '@/components/SimilarProducts';
-import { getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
+import { fallbackToOriginalImage, getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
 import AddToCartDialog from '@/components/AddToCartDialog';
 
 const ProductDetail: React.FC = () => {
@@ -126,6 +126,7 @@ useEffect(() => {
                 alt={product.name}
                 fetchPriority="high"
                 decoding="async"
+                onError={(event) => fallbackToOriginalImage(event, selectedImage)}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -147,6 +148,7 @@ useEffect(() => {
                     alt={`${product.name} ${index + 1}`}
                     loading="lazy"
                     decoding="async"
+                    onError={(event) => fallbackToOriginalImage(event, image)}
                     className="w-full h-full object-cover"
                   />
                 </button>

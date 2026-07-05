@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { getOptimizedImageUrl } from "@/lib/productImages";
+import { fallbackToOriginalImage, getOptimizedImageUrl } from "@/lib/productImages";
 import { Product } from "@/types/Product";
 
 const formatPrice = (price: number) => {
@@ -54,6 +54,7 @@ const AddToCartDialog = ({ product, open, onOpenChange }: AddToCartDialogProps) 
                   className="h-full w-full object-cover"
                   loading="lazy"
                   decoding="async"
+                  onError={(event) => fallbackToOriginalImage(event, productImage)}
                 />
               ) : (
                 <div className="flex h-full w-full items-center justify-center px-2 text-center text-xs text-muted-foreground">

@@ -4,7 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import { useCart } from '../contexts/CartContext';
-import { getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
+import { fallbackToOriginalImage, getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
 import { Product } from '@/types/Product';
 
 const formatPrice = (price: number) => {
@@ -36,6 +36,10 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
     width: compact ? 480 : 640,
     quality: 72,
   });
+
+  const handleImageError = useCallback((event: React.SyntheticEvent<HTMLImageElement>) => {
+    fallbackToOriginalImage(event, productImage);
+  }, [productImage]);
 
   const handleAddToCart = useCallback(async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -69,10 +73,11 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
               sizes={compact ? '(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw' : '(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw'}
               alt={product.name}
               loading={priority ? 'eager' : 'lazy'}
-              fetchPriority={priority ? 'high' : undefined}
+              fetchPriority={priority ? 'high' : 'low'}
               decoding="async"
               width={compact ? 480 : 640}
               height={compact ? 360 : 640}
+              onError={handleImageError}
               className="h-full w-full object-cover"
             />
           ) : (

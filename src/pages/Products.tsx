@@ -257,7 +257,7 @@ const Products: React.FC = () => {
             {displayedProducts.length === 0 ? (
               <p className="text-gray-500">Nenhum produto encontrado.</p>
             ) : (
-              <ProductGrid products={displayedProducts} compact />
+              <ProductGrid products={displayedProducts} compact priorityCount={2} />
             )}
 
             {/* Paginação */}

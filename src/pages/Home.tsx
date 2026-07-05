@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 
 import ProductGrid from '../components/ProductGrid';
 import { useProducts } from '@/services/productsService';
-import { getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
+import { fallbackToOriginalImage, getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
 
 const defaultFilters = {
   category: '',
@@ -105,6 +105,7 @@ const Home: React.FC = () => {
                 alt="Produto do Atelie Lu Cortinas"
                 fetchPriority="high"
                 decoding="async"
+                onError={(event) => fallbackToOriginalImage(event, heroImage)}
                 className="h-[210px] w-full object-cover sm:h-[260px] md:h-[420px]"
               />
             ) : (
@@ -147,6 +148,7 @@ const Home: React.FC = () => {
                         alt={category.name}
                         loading="lazy"
                         decoding="async"
+                        onError={(event) => fallbackToOriginalImage(event, category.image)}
                         className="h-full w-full object-cover"
                       />
                     ) : (

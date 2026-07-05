@@ -7,9 +7,14 @@ import { Product } from '@/types/Product';
 interface ProductGridProps {
   products: Product[];
   compact?: boolean;
+  priorityCount?: number;
 }
 
-const ProductGrid: React.FC<ProductGridProps> = React.memo(({ products, compact = false }) => {
+const ProductGrid: React.FC<ProductGridProps> = React.memo(({
+  products,
+  compact = false,
+  priorityCount = 4,
+}) => {
   const [addedProduct, setAddedProduct] = useState<Product | null>(null);
 
   const handleDialogChange = useCallback((open: boolean) => {
@@ -24,7 +29,7 @@ const ProductGrid: React.FC<ProductGridProps> = React.memo(({ products, compact 
             key={product.id}
             product={product}
             compact={compact}
-            priority={index < 4}
+            priority={index < priorityCount}
             onAddedToCart={setAddedProduct}
           />
         ))}
