@@ -15,6 +15,7 @@ import {
   Image as ImageIcon,
   Copy,
 } from "lucide-react";
+import CachedImage from "@/components/CachedImage";
 
 const PICKUP_ADDRESS = {
   street: "R. Jurunas",
@@ -433,11 +434,13 @@ const OrderDetails: React.FC = () => {
                       <div className="flex items-start gap-3 min-w-0">
                         <div className="h-14 w-14 rounded-xl overflow-hidden border bg-slate-50 flex items-center justify-center shrink-0 dark:bg-white/5 dark:border-white/10">
                           {img ? (
-                            <img
+                            <CachedImage
                               src={img}
+                              fallbackSrc={img}
                               alt={it.product_name ?? "Produto"}
                               className="h-full w-full object-cover"
                               loading="lazy"
+                              decoding="async"
                             />
                           ) : (
                             <ImageIcon className="h-5 w-5 text-slate-400" />

@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { getProductById } from '@/services/productsService';
 import { Product } from '@/types/Product';
 import { useEffect } from 'react';
+import CachedImage from '@/components/CachedImage';
 import SimilarProducts from '@/components/SimilarProducts';
 import { fallbackToOriginalImage } from '@/lib/productImages';
 import AddToCartDialog from '@/components/AddToCartDialog';
@@ -119,9 +120,10 @@ useEffect(() => {
           <div className="space-y-4">
             {/* Main Image */}
             <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
-              <img
+              <CachedImage
                 key={selectedImage}
                 src={selectedImage}
+                fallbackSrc={selectedImage}
                 alt={product.name}
                 fetchPriority="high"
                 decoding="async"
@@ -142,8 +144,9 @@ useEffect(() => {
                       : 'border-transparent hover:border-border'
                   }`}
                 >
-                  <img
+                  <CachedImage
                     src={image}
+                    fallbackSrc={image}
                     alt={`${product.name} ${index + 1}`}
                     loading="lazy"
                     decoding="async"

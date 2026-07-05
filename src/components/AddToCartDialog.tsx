@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import CachedImage from "@/components/CachedImage";
 import { fallbackToOriginalImage, getOptimizedImageUrl } from "@/lib/productImages";
 import { Product } from "@/types/Product";
 
@@ -48,8 +49,9 @@ const AddToCartDialog = ({ product, open, onOpenChange }: AddToCartDialogProps) 
           <div className="mt-5 flex gap-4 rounded-lg border border-border bg-muted/30 p-3">
             <div className="h-20 w-20 flex-shrink-0 overflow-hidden rounded-md bg-muted">
               {productImage ? (
-                <img
+                <CachedImage
                   src={getOptimizedImageUrl(productImage, { width: 180, height: 180, quality: 70 })}
+                  fallbackSrc={productImage}
                   alt={product.name}
                   className="h-full w-full object-cover"
                   loading="lazy"

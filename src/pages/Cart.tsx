@@ -5,6 +5,8 @@ import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
+import CachedImage from '@/components/CachedImage';
+
 const Cart: React.FC = () => {
   const { items, removeFromCart, updateQuantity, getTotalPrice, clearCartFromServer } = useCart();
 
@@ -67,10 +69,13 @@ const Cart: React.FC = () => {
                   {/* Product Image */}
                   <div className="flex min-w-0 flex-1 items-center gap-4">
                     <div className="flex-shrink-0">
-                      <img
+                      <CachedImage
                         src={item.image_urls[0]}
+                        fallbackSrc={item.image_urls[0]}
                         alt={item.name}
                         className="h-20 w-20 object-cover rounded-lg"
+                        loading="lazy"
+                        decoding="async"
                       />
                     </div>
 

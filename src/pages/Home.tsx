@@ -2,9 +2,10 @@ import React, { useEffect, useMemo } from 'react';
 import { ArrowRight, ChevronRight, Phone } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
+import CachedImage from '@/components/CachedImage';
 import ProductGrid from '../components/ProductGrid';
 import { useProducts } from '@/services/productsService';
-import { fallbackToOriginalImage, getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
+import { fallbackToOriginalImage, getOptimizedImageUrl } from '@/lib/productImages';
 
 const defaultFilters = {
   category: '',
@@ -98,10 +99,9 @@ const Home: React.FC = () => {
 
           <div className="overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-rose-100 dark:bg-slate-900 dark:ring-slate-800">
             {heroImage ? (
-              <img
+              <CachedImage
                 src={getOptimizedImageUrl(heroImage, { width: 960, quality: 76 })}
-                srcSet={getProductImageSrcSet(heroImage, [480, 720, 960, 1280])}
-                sizes="(min-width: 1024px) 45vw, 100vw"
+                fallbackSrc={heroImage}
                 alt="Produto do Atelie Lu Cortinas"
                 fetchPriority="high"
                 decoding="async"
@@ -141,10 +141,9 @@ const Home: React.FC = () => {
                 >
                   <div className="h-40 bg-slate-100 dark:bg-slate-800">
                     {category.image ? (
-                      <img
+                      <CachedImage
                         src={getOptimizedImageUrl(category.image, { width: 480, quality: 72 })}
-                        srcSet={getProductImageSrcSet(category.image, [320, 480, 640])}
-                        sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                        fallbackSrc={category.image}
                         alt={category.name}
                         loading="lazy"
                         decoding="async"

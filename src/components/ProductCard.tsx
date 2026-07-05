@@ -3,8 +3,9 @@ import { ShoppingCart } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
+import CachedImage from './CachedImage';
 import { useCart } from '../contexts/CartContext';
-import { fallbackToOriginalImage, getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
+import { getOptimizedImageUrl } from '@/lib/productImages';
 import { Product } from '@/types/Product';
 
 const formatPrice = (price: number) => {
@@ -37,10 +38,6 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
     quality: 72,
   });
 
-  const handleImageError = useCallback((event: React.SyntheticEvent<HTMLImageElement>) => {
-    fallbackToOriginalImage(event, productImage);
-  }, [productImage]);
-
   const handleAddToCart = useCallback(async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     event.stopPropagation();
@@ -67,17 +64,15 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
       <Link to={`/product/${product.id}`} className="block">
         <div className={`relative shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-800 ${imageHeightClass}`}>
           {productImage ? (
-            <img
+            <CachedImage
               src={optimizedImage}
-              srcSet={getProductImageSrcSet(productImage, compact ? [320, 480, 640] : [360, 540, 720])}
-              sizes={compact ? '(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw' : '(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw'}
+              fallbackSrc={productImage}
               alt={product.name}
               loading={priority ? 'eager' : 'lazy'}
               fetchPriority={priority ? 'high' : 'low'}
               decoding="async"
               width={compact ? 480 : 640}
               height={compact ? 360 : 640}
-              onError={handleImageError}
               className="h-full w-full object-cover"
             />
           ) : (
