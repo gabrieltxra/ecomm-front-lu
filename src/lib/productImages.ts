@@ -54,9 +54,12 @@ export function fallbackToOriginalImage(
   event: React.SyntheticEvent<HTMLImageElement>,
   originalUrl?: string
 ) {
-  if (!originalUrl || event.currentTarget.dataset.fallback === 'true') return;
+  const image = event.currentTarget;
+  if (!originalUrl || image.dataset.fallback === 'true') return;
 
-  event.currentTarget.dataset.fallback = 'true';
-  event.currentTarget.srcset = '';
-  event.currentTarget.src = originalUrl;
+  image.dataset.fallback = 'true';
+  image.removeAttribute('srcset');
+  image.removeAttribute('sizes');
+  image.srcset = '';
+  image.src = originalUrl;
 }

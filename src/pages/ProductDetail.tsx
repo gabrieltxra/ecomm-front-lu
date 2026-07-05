@@ -120,6 +120,7 @@ useEffect(() => {
             {/* Main Image */}
             <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
               <img
+                key={selectedImage}
                 src={getOptimizedImageUrl(selectedImage, { width: 960, quality: 78 })}
                 srcSet={getProductImageSrcSet(selectedImage, [480, 720, 960, 1280])}
                 sizes="(min-width: 1024px) 50vw, 100vw"
