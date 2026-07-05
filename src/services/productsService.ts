@@ -56,13 +56,60 @@ const EMPTY_FILTERS_CONFIG: FiltersConfig = {
 };
 
 const isAbortError = (error: unknown) => error instanceof DOMException && error.name === 'AbortError';
+const PRODUCTS_CACHE_TTL_MS = 60_000;
+const FILTERS_CACHE_TTL_MS = 5 * 60_000;
+
+type ClientCacheEntry<T> = {
+  expiresAt: number;
+  value: T;
+};
+
+const productsCache = new Map<string, ClientCacheEntry<ProductsResponse>>();
+const productByIdCache = new Map<string, ClientCacheEntry<Product>>();
+let filtersConfigCache: ClientCacheEntry<FiltersConfig> | null = null;
+
+function getClientCache<T>(cache: Map<string, ClientCacheEntry<T>>, key: string) {
+  const entry = cache.get(key);
+  if (!entry) return null;
+
+  if (entry.expiresAt <= Date.now()) {
+    cache.delete(key);
+    return null;
+  }
+
+  cache.delete(key);
+  cache.set(key, entry);
+  return entry.value;
+}
+
+function setClientCache<T>(cache: Map<string, ClientCacheEntry<T>>, key: string, value: T, ttlMs: number) {
+  cache.set(key, {
+    value,
+    expiresAt: Date.now() + ttlMs,
+  });
+
+  if (cache.size <= 30) return;
+
+  const oldestKey = cache.keys().next().value;
+  if (oldestKey) cache.delete(oldestKey);
+}
 
 export const getFiltersConfig = async (signal?: AbortSignal): Promise<FiltersConfig> => {
+  if (filtersConfigCache && filtersConfigCache.expiresAt > Date.now()) {
+    return filtersConfigCache.value;
+  }
+
   try {
     const response = await fetch(`${API_BASE_URL}/products/filters-config`, { signal });
     if (!response.ok) throw new Error('Erro ao buscar configuracoes dos filtros');
 
-    return await response.json();
+    const config = await response.json();
+    filtersConfigCache = {
+      value: config,
+      expiresAt: Date.now() + FILTERS_CACHE_TTL_MS,
+    };
+
+    return config;
   } catch (error) {
     if (isAbortError(error)) throw error;
 
@@ -91,7 +138,11 @@ export const getProducts = async (
       ...(filters.availability && { availability: filters.availability }),
     });
 
-    const response = await fetch(`${API_BASE_URL}/products?${queryParams}`, { signal });
+    const requestUrl = `${API_BASE_URL}/products?${queryParams}`;
+    const cached = getClientCache(productsCache, requestUrl);
+    if (cached) return cached;
+
+    const response = await fetch(requestUrl, { signal });
     if (!response.ok) throw new Error('Erro ao buscar produtos');
 
     const data = await response.json();
@@ -100,13 +151,17 @@ export const getProducts = async (
       price: Number(product.price),
     }));
 
-    return {
+    const result = {
       products,
       total: data.total,
       page: data.page,
       limit: data.limit,
       totalPages: data.totalPages,
     };
+
+    setClientCache(productsCache, requestUrl, result, PRODUCTS_CACHE_TTL_MS);
+
+    return result;
   } catch (error) {
     if (isAbortError(error)) throw error;
 
@@ -116,11 +171,18 @@ export const getProducts = async (
 };
 
 export const getProductById = async (id: string | number): Promise<Product | null> => {
+  const cacheKey = String(id);
+  const cached = getClientCache(productByIdCache, cacheKey);
+  if (cached) return cached;
+
   try {
     const response = await fetch(`${API_BASE_URL}/product/${id}`);
     if (!response.ok) throw new Error('Produto nao encontrado');
 
-    return await response.json();
+    const product = await response.json();
+    setClientCache(productByIdCache, cacheKey, product, PRODUCTS_CACHE_TTL_MS);
+
+    return product;
   } catch (error) {
     console.error('Erro ao buscar produto:', error);
     return null;

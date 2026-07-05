@@ -8,7 +8,7 @@ import { getProductById } from '@/services/productsService';
 import { Product } from '@/types/Product';
 import { useEffect } from 'react';
 import SimilarProducts from '@/components/SimilarProducts';
-import { fallbackToOriginalImage, getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
+import { fallbackToOriginalImage } from '@/lib/productImages';
 import AddToCartDialog from '@/components/AddToCartDialog';
 
 const ProductDetail: React.FC = () => {
@@ -121,9 +121,7 @@ useEffect(() => {
             <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
               <img
                 key={selectedImage}
-                src={getOptimizedImageUrl(selectedImage, { width: 960, quality: 78 })}
-                srcSet={getProductImageSrcSet(selectedImage, [480, 720, 960, 1280])}
-                sizes="(min-width: 1024px) 50vw, 100vw"
+                src={selectedImage}
                 alt={product.name}
                 fetchPriority="high"
                 decoding="async"
@@ -145,7 +143,7 @@ useEffect(() => {
                   }`}
                 >
                   <img
-                    src={getOptimizedImageUrl(image, { width: 180, height: 180, quality: 68 })}
+                    src={image}
                     alt={`${product.name} ${index + 1}`}
                     loading="lazy"
                     decoding="async"

@@ -6,6 +6,7 @@ type OptimizedImageOptions = {
   quality?: number;
   resize?: 'cover' | 'contain' | 'fill';
   format?: 'origin' | 'webp';
+  proxy?: boolean;
 };
 
 const API_BASE_URL = (import.meta.env.VITE_REACT_APP_API_URL || 'http://localhost:3000/api').replace(/\/+$/, '');
@@ -48,6 +49,8 @@ export function getOptimizedImageUrl(
   options: OptimizedImageOptions = {}
 ) {
   if (!imageUrl) return '';
+
+  if (options.proxy === false || options.format === 'origin') return imageUrl;
 
   const fileName = getSupabaseProductFileName(imageUrl);
   if (!fileName) return imageUrl;

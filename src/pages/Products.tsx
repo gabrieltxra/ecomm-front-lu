@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from 'react';
+import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import ProductGrid from '../components/ProductGrid';
 import { ChevronLeft, ChevronRight, Filter, Search, X } from 'lucide-react';
 import { useProducts } from '@/services/productsService';
@@ -11,6 +11,7 @@ const Products: React.FC = () => {
   const { productsData, loading, fetchProducts, fetchFiltersConfig, filtersConfig } = useProducts();
   const categoryFromUrl = searchParams.get('category') || '';
   const searchFromUrl = searchParams.get('search') || '';
+  const lastFetchKeyRef = useRef('');
 
   const [filters, setFilters] = useState({
     category: categoryFromUrl,
@@ -24,9 +25,13 @@ const Products: React.FC = () => {
   }, [fetchFiltersConfig]);
 
   useEffect(() => {
+    const fetchKey = JSON.stringify({ filters, searchFromUrl });
+    const shouldDebounce = lastFetchKeyRef.current !== fetchKey;
+    lastFetchKeyRef.current = fetchKey;
+
     const timeoutId = window.setTimeout(() => {
       void fetchProducts(filters, searchFromUrl ? 1 : currentPage, searchFromUrl ? 200 : 12);
-    }, 180);
+    }, shouldDebounce ? 180 : 0);
 
     return () => window.clearTimeout(timeoutId);
   }, [currentPage, fetchProducts, filters, searchFromUrl]);
