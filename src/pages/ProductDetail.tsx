@@ -9,7 +9,7 @@ import { Product } from '@/types/Product';
 import { useEffect } from 'react';
 import CachedImage from '@/components/CachedImage';
 import SimilarProducts from '@/components/SimilarProducts';
-import { fallbackToOriginalImage } from '@/lib/productImages';
+import { fallbackToOriginalImage, getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
 import AddToCartDialog from '@/components/AddToCartDialog';
 
 const ProductDetail: React.FC = () => {
@@ -122,11 +122,13 @@ useEffect(() => {
             <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
               <CachedImage
                 key={selectedImage}
-                src={selectedImage}
+                src={getOptimizedImageUrl(selectedImage, { width: 960, quality: 76 })}
                 fallbackSrc={selectedImage}
                 alt={product.name}
                 fetchPriority="high"
                 decoding="async"
+                srcSet={getProductImageSrcSet(selectedImage, [640, 960, 1280])}
+                sizes="(min-width: 1024px) 50vw, 100vw"
                 onError={(event) => fallbackToOriginalImage(event, selectedImage)}
                 className="w-full h-full object-cover"
               />
@@ -145,11 +147,13 @@ useEffect(() => {
                   }`}
                 >
                   <CachedImage
-                    src={image}
+                    src={getOptimizedImageUrl(image, { width: 240, quality: 70 })}
                     fallbackSrc={image}
                     alt={`${product.name} ${index + 1}`}
                     loading="lazy"
                     decoding="async"
+                    srcSet={getProductImageSrcSet(image, [160, 240, 320])}
+                    sizes="33vw"
                     onError={(event) => fallbackToOriginalImage(event, image)}
                     className="w-full h-full object-cover"
                   />

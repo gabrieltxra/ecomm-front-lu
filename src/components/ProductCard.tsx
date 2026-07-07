@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 
 import CachedImage from './CachedImage';
 import { useCart } from '../contexts/CartContext';
-import { getOptimizedImageUrl } from '@/lib/productImages';
+import { getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
 import { Product } from '@/types/Product';
 
 const formatPrice = (price: number) => {
@@ -37,6 +37,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
     width: compact ? 480 : 640,
     quality: 72,
   });
+  const imageSrcSet = getProductImageSrcSet(productImage, compact ? [320, 480, 640] : [480, 640, 960]);
 
   const handleAddToCart = useCallback(async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -71,6 +72,8 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
               loading={priority ? 'eager' : 'lazy'}
               fetchPriority={priority ? 'high' : 'low'}
               decoding="async"
+              srcSet={imageSrcSet}
+              sizes={compact ? '(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw' : '(min-width: 1280px) 25vw, (min-width: 768px) 33vw, (min-width: 640px) 50vw, 100vw'}
               width={compact ? 480 : 640}
               height={compact ? 360 : 640}
               className="h-full w-full object-cover"
