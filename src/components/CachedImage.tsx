@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Loader2 } from 'lucide-react';
 
 import { isImagePreloaded, preloadImage } from '@/lib/imagePreloadCache';
 import { cn } from '@/lib/utils';
@@ -68,9 +69,15 @@ const CachedImage = React.memo(({
   if (!isReady) {
     return (
       <div
-        className={cn(className, 'animate-pulse bg-slate-100 dark:bg-slate-800')}
-        aria-hidden="true"
-      />
+        className={cn(
+          className,
+          'flex items-center justify-center bg-slate-100 text-rose-500 dark:bg-slate-800 dark:text-rose-300'
+        )}
+        role="status"
+        aria-label="Carregando imagem"
+      >
+        <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+      </div>
     );
   }
 
