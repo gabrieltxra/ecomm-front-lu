@@ -65,23 +65,28 @@ const CachedImage = React.memo(({
     };
   }, [fallbackSrc, src]);
 
+  if (!isReady) {
+    return (
+      <div
+        className={cn(className, 'animate-pulse bg-slate-100 dark:bg-slate-800')}
+        aria-hidden="true"
+      />
+    );
+  }
+
   return (
     <img
       {...props}
       src={displaySrc}
-      className={cn(
-        className,
-        'transition-opacity duration-150',
-        isReady ? 'opacity-100' : 'opacity-0'
-      )}
-      onLoad={(event) => {
-        const loadedSrc = event.currentTarget.currentSrc || displaySrc;
-        void preloadImage(loadedSrc).finally(() => setIsReady(true));
-        onLoad?.(event);
-      }}
+      className={cn(className, 'transition-opacity duration-150 opacity-100')}
+      onLoad={onLoad}
       onError={(event) => {
         if (fallbackSrc && displaySrc !== fallbackSrc) {
           setDisplaySrc(fallbackSrc);
+          setIsReady(false);
+          preloadImage(fallbackSrc)
+            .catch(() => undefined)
+            .finally(() => setIsReady(true));
           return;
         }
 
