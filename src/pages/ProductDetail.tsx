@@ -4,12 +4,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Phone, ShoppingCart } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'sonner';
-import { getProductById } from '@/services/productsService';
+import { getCachedProductById, getProductById } from '@/services/productsService';
 import { Product } from '@/types/Product';
 import { useEffect } from 'react';
 import CachedImage from '@/components/CachedImage';
 import SimilarProducts from '@/components/SimilarProducts';
-import { fallbackToOriginalImage, getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
+import { fallbackToOriginalImage, getOptimizedImageUrl } from '@/lib/productImages';
 import AddToCartDialog from '@/components/AddToCartDialog';
 
 const ProductDetail: React.FC = () => {
@@ -17,23 +17,32 @@ const ProductDetail: React.FC = () => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
   const token = localStorage.getItem('token');
+  const cachedInitialProduct = id ? getCachedProductById(id) : null;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isCartDialogOpen, setIsCartDialogOpen] = useState(false);
 
-const [product, setProduct] = useState<Product | null>(null);
-const [loading, setLoading] = useState(true);
+const [product, setProduct] = useState<Product | null>(() => cachedInitialProduct);
+const [loading, setLoading] = useState(() => Boolean(id && !cachedInitialProduct));
 
 useEffect(() => {
   let active = true;
+  const cachedProduct = id ? getCachedProductById(id) : null;
 
   const fetchProduct = async () => {
-    setLoading(true);
-    setProduct(null);
-
     if (!id) {
+      setLoading(false);
+      setProduct(null);
+      return;
+    }
+
+    if (cachedProduct) {
+      setProduct(cachedProduct);
       setLoading(false);
       return;
     }
+
+    setLoading(true);
+    setProduct(null);
 
     try {
       const data = await getProductById(id);
@@ -127,8 +136,6 @@ useEffect(() => {
                 alt={product.name}
                 fetchPriority="high"
                 decoding="async"
-                srcSet={getProductImageSrcSet(selectedImage, [640, 960, 1280])}
-                sizes="(min-width: 1024px) 50vw, 100vw"
                 onError={(event) => fallbackToOriginalImage(event, selectedImage)}
                 className="w-full h-full object-cover"
               />
@@ -152,8 +159,6 @@ useEffect(() => {
                     alt={`${product.name} ${index + 1}`}
                     loading="lazy"
                     decoding="async"
-                    srcSet={getProductImageSrcSet(image, [160, 240, 320])}
-                    sizes="33vw"
                     onError={(event) => fallbackToOriginalImage(event, image)}
                     className="w-full h-full object-cover"
                   />

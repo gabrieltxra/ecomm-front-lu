@@ -56,8 +56,10 @@ const EMPTY_FILTERS_CONFIG: FiltersConfig = {
 };
 
 const isAbortError = (error: unknown) => error instanceof DOMException && error.name === 'AbortError';
-const PRODUCTS_CACHE_TTL_MS = 60_000;
-const FILTERS_CACHE_TTL_MS = 5 * 60_000;
+const PRODUCTS_CACHE_TTL_MS = 5 * 60_000;
+const PRODUCT_DETAIL_CACHE_TTL_MS = 10 * 60_000;
+const FILTERS_CACHE_TTL_MS = 15 * 60_000;
+const SESSION_CACHE_PREFIX = 'lu-ecom-cache:';
 
 type ClientCacheEntry<T> = {
   expiresAt: number;
@@ -67,6 +69,41 @@ type ClientCacheEntry<T> = {
 const productsCache = new Map<string, ClientCacheEntry<ProductsResponse>>();
 const productByIdCache = new Map<string, ClientCacheEntry<Product>>();
 let filtersConfigCache: ClientCacheEntry<FiltersConfig> | null = null;
+
+function getSessionCache<T>(key: string) {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const raw = window.sessionStorage.getItem(`${SESSION_CACHE_PREFIX}${key}`);
+    if (!raw) return null;
+
+    const entry = JSON.parse(raw) as ClientCacheEntry<T>;
+    if (!entry?.expiresAt || entry.expiresAt <= Date.now()) {
+      window.sessionStorage.removeItem(`${SESSION_CACHE_PREFIX}${key}`);
+      return null;
+    }
+
+    return entry.value;
+  } catch {
+    return null;
+  }
+}
+
+function setSessionCache<T>(key: string, value: T, ttlMs: number) {
+  if (typeof window === 'undefined') return;
+
+  try {
+    window.sessionStorage.setItem(
+      `${SESSION_CACHE_PREFIX}${key}`,
+      JSON.stringify({
+        value,
+        expiresAt: Date.now() + ttlMs,
+      })
+    );
+  } catch {
+    // Ignore storage quota/private mode errors. Memory cache still works.
+  }
+}
 
 function getClientCache<T>(cache: Map<string, ClientCacheEntry<T>>, key: string) {
   const entry = cache.get(key);
@@ -94,9 +131,64 @@ function setClientCache<T>(cache: Map<string, ClientCacheEntry<T>>, key: string,
   if (oldestKey) cache.delete(oldestKey);
 }
 
+function buildProductsRequestUrl(filters: FilterState, page: number = 1, limit: number = 12) {
+  const queryParams = new URLSearchParams({
+    page: page.toString(),
+    limit: limit.toString(),
+    ...(filters.category && { category: filters.category }),
+    ...(filters.minPrice && { minPrice: filters.minPrice.toString() }),
+    ...(filters.maxPrice && { maxPrice: filters.maxPrice.toString() }),
+    ...(filters.sortBy && { sortBy: filters.sortBy }),
+    ...(filters.brand && { brand: filters.brand }),
+    ...(filters.color && { color: filters.color }),
+    ...(filters.material && { material: filters.material }),
+    ...(filters.availability && { availability: filters.availability }),
+  });
+
+  return `${API_BASE_URL}/products?${queryParams}`;
+}
+
+function getCachedProductsByUrl(requestUrl: string) {
+  return getClientCache(productsCache, requestUrl)
+    || getSessionCache<ProductsResponse>(requestUrl);
+}
+
+function setProductsCache(requestUrl: string, response: ProductsResponse) {
+  setClientCache(productsCache, requestUrl, response, PRODUCTS_CACHE_TTL_MS);
+  setSessionCache(requestUrl, response, PRODUCTS_CACHE_TTL_MS);
+  response.products.forEach(primeProductCache);
+}
+
+export function getCachedProducts(filters: FilterState, page: number = 1, limit: number = 12) {
+  return getCachedProductsByUrl(buildProductsRequestUrl(filters, page, limit));
+}
+
+export function primeProductCache(product?: Product | null) {
+  if (!product?.id) return;
+
+  const cacheKey = String(product.id);
+  setClientCache(productByIdCache, cacheKey, product, PRODUCT_DETAIL_CACHE_TTL_MS);
+  setSessionCache(`product:${cacheKey}`, product, PRODUCT_DETAIL_CACHE_TTL_MS);
+}
+
+export function getCachedProductById(id: string | number) {
+  const cacheKey = String(id);
+  return getClientCache(productByIdCache, cacheKey)
+    || getSessionCache<Product>(`product:${cacheKey}`);
+}
+
 export const getFiltersConfig = async (signal?: AbortSignal): Promise<FiltersConfig> => {
   if (filtersConfigCache && filtersConfigCache.expiresAt > Date.now()) {
     return filtersConfigCache.value;
+  }
+
+  const cached = getSessionCache<FiltersConfig>('filters-config');
+  if (cached) {
+    filtersConfigCache = {
+      value: cached,
+      expiresAt: Date.now() + FILTERS_CACHE_TTL_MS,
+    };
+    return cached;
   }
 
   try {
@@ -108,6 +200,7 @@ export const getFiltersConfig = async (signal?: AbortSignal): Promise<FiltersCon
       value: config,
       expiresAt: Date.now() + FILTERS_CACHE_TTL_MS,
     };
+    setSessionCache('filters-config', config, FILTERS_CACHE_TTL_MS);
 
     return config;
   } catch (error) {
@@ -125,21 +218,8 @@ export const getProducts = async (
   signal?: AbortSignal
 ): Promise<ProductsResponse> => {
   try {
-    const queryParams = new URLSearchParams({
-      page: page.toString(),
-      limit: limit.toString(),
-      ...(filters.category && { category: filters.category }),
-      ...(filters.minPrice && { minPrice: filters.minPrice.toString() }),
-      ...(filters.maxPrice && { maxPrice: filters.maxPrice.toString() }),
-      ...(filters.sortBy && { sortBy: filters.sortBy }),
-      ...(filters.brand && { brand: filters.brand }),
-      ...(filters.color && { color: filters.color }),
-      ...(filters.material && { material: filters.material }),
-      ...(filters.availability && { availability: filters.availability }),
-    });
-
-    const requestUrl = `${API_BASE_URL}/products?${queryParams}`;
-    const cached = getClientCache(productsCache, requestUrl);
+    const requestUrl = buildProductsRequestUrl(filters, page, limit);
+    const cached = getCachedProductsByUrl(requestUrl);
     if (cached) return cached;
 
     const response = await fetch(requestUrl, { signal });
@@ -159,7 +239,7 @@ export const getProducts = async (
       totalPages: data.totalPages,
     };
 
-    setClientCache(productsCache, requestUrl, result, PRODUCTS_CACHE_TTL_MS);
+    setProductsCache(requestUrl, result);
 
     return result;
   } catch (error) {
@@ -172,7 +252,7 @@ export const getProducts = async (
 
 export const getProductById = async (id: string | number): Promise<Product | null> => {
   const cacheKey = String(id);
-  const cached = getClientCache(productByIdCache, cacheKey);
+  const cached = getCachedProductById(cacheKey);
   if (cached) return cached;
 
   try {
@@ -180,7 +260,7 @@ export const getProductById = async (id: string | number): Promise<Product | nul
     if (!response.ok) throw new Error('Produto nao encontrado');
 
     const product = await response.json();
-    setClientCache(productByIdCache, cacheKey, product, PRODUCTS_CACHE_TTL_MS);
+    primeProductCache(product);
 
     return product;
   } catch (error) {
@@ -228,6 +308,15 @@ export const useProducts = () => {
   const fetchProducts = useCallback(async (filters: FilterState, page: number = 1, limit: number = 12) => {
     const requestId = productsRequestId.current + 1;
     productsRequestId.current = requestId;
+
+    const cached = getCachedProducts(filters, page, limit);
+    if (cached) {
+      setProductsData(cached);
+      setError(null);
+      setLoading(false);
+      return;
+    }
+
     productsAbortRef.current?.abort();
 
     const controller = new AbortController();

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import ProductGrid from '../components/ProductGrid';
 import { ChevronLeft, ChevronRight, Filter, Search, X } from 'lucide-react';
-import { useProducts } from '@/services/productsService';
+import { getProducts, useProducts } from '@/services/productsService';
 import { useSearchParams } from 'react-router-dom';
 
 const Products: React.FC = () => {
@@ -125,6 +125,17 @@ const Products: React.FC = () => {
 
   const totalPages = productsData?.totalPages || 1;
   const activePage = productsData?.page || currentPage;
+
+  useEffect(() => {
+    if (!productsData || searchFromUrl || loading) return;
+
+    const pagesToPrefetch = [activePage + 1, activePage - 1]
+      .filter((page) => page >= 1 && page <= totalPages && page !== activePage);
+
+    for (const page of pagesToPrefetch) {
+      void getProducts(filters, page, 12).catch(() => undefined);
+    }
+  }, [activePage, filters, loading, productsData, searchFromUrl, totalPages]);
 
   const goToPage = useCallback((page: number) => {
     const nextPage = Math.min(Math.max(page, 1), totalPages);
