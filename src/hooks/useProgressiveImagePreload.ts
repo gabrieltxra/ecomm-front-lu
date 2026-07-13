@@ -58,7 +58,13 @@ export function useProgressiveImagePreload(
         .slice(startIndex, startIndex + plan.batchSize)
         .map((product) => product.image_urls?.[0])
         .filter((url): url is string => Boolean(url))
-        .map((url) => getOptimizedImageUrl(url, { width: plan.imageWidth, quality: 70 }));
+        .map((url) => ({
+          original: url,
+          optimized: getOptimizedImageUrl(url, { width: plan.imageWidth, quality: 70 }),
+        }))
+        // Never batch-preload a heavy original when its storage path is unknown.
+        .filter(({ original, optimized }) => optimized !== original)
+        .map(({ optimized }) => optimized);
 
       // Two concurrent decodes keep the next cards ready without saturating mobile networks.
       for (let index = 0; index < urls.length && !cancelled; index += 2) {
