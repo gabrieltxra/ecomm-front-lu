@@ -1,4 +1,4 @@
-const decodedImages = new Map<string, HTMLImageElement>();
+const decodedImages = new Set<string>();
 const pendingImages = new Map<string, Promise<void>>();
 
 function canPreloadImages() {
@@ -20,7 +20,7 @@ export function preloadImage(src?: string) {
       decode
         .catch(() => undefined)
         .then(() => {
-          decodedImages.set(src, image);
+          decodedImages.add(src);
           resolve();
         });
     };
@@ -37,4 +37,8 @@ export function preloadImage(src?: string) {
 
 export function isImagePreloaded(src?: string) {
   return Boolean(src && decodedImages.has(src));
+}
+
+export function markImageLoaded(src?: string) {
+  if (src) decodedImages.add(src);
 }

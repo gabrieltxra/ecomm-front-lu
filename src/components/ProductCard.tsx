@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import CachedImage from './CachedImage';
 import { useCart } from '../contexts/CartContext';
 import { preloadImage } from '@/lib/imagePreloadCache';
-import { getOptimizedImageUrl } from '@/lib/productImages';
+import { getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
 import { primeProductCache } from '@/services/productsService';
 import { Product } from '@/types/Product';
 
@@ -48,9 +48,9 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 
     const detailImage = getOptimizedImageUrl(productImage, { width: 960, quality: 76 });
 
-    void preloadImage(productImage);
-    if (optimizedImage !== productImage) void preloadImage(optimizedImage);
-    if (detailImage !== productImage && detailImage !== optimizedImage) void preloadImage(detailImage);
+    if (detailImage !== productImage && detailImage !== optimizedImage) {
+      void preloadImage(detailImage).catch(() => undefined);
+    }
   }, [optimizedImage, product, productImage]);
 
   const handleAddToCart = useCallback(async (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -94,13 +94,15 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
           {productImage ? (
             <CachedImage
               src={optimizedImage}
+              srcSet={getProductImageSrcSet(productImage, [320, 480, 640])}
+              sizes="(max-width: 639px) calc(100vw - 2rem), (max-width: 1023px) calc(50vw - 2rem), (max-width: 1279px) calc(33vw - 2rem), 300px"
               fallbackSrc={productImage}
               alt={product.name}
               loading={priority ? 'eager' : 'lazy'}
               fetchPriority={priority ? 'high' : 'low'}
               decoding="async"
               width={compact ? 480 : 640}
-              height={compact ? 360 : 640}
+              height={compact ? 360 : 480}
               className="h-full w-full object-cover"
             />
           ) : (

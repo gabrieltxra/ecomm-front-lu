@@ -16,6 +16,7 @@ import {
   Copy,
 } from "lucide-react";
 import CachedImage from "@/components/CachedImage";
+import { getOptimizedImageUrl } from "@/lib/productImages";
 
 const PICKUP_ADDRESS = {
   street: "R. Jurunas",
@@ -435,12 +436,14 @@ const OrderDetails: React.FC = () => {
                         <div className="h-14 w-14 rounded-xl overflow-hidden border bg-slate-50 flex items-center justify-center shrink-0 dark:bg-white/5 dark:border-white/10">
                           {img ? (
                             <CachedImage
-                              src={img}
+                              src={getOptimizedImageUrl(img, { width: 112, height: 112, quality: 66 })}
                               fallbackSrc={img}
                               alt={it.product_name ?? "Produto"}
                               className="h-full w-full object-cover"
                               loading="lazy"
                               decoding="async"
+                              width={112}
+                              height={112}
                             />
                           ) : (
                             <ImageIcon className="h-5 w-5 text-slate-400" />

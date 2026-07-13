@@ -9,7 +9,8 @@ import { Product } from '@/types/Product';
 import { useEffect } from 'react';
 import CachedImage from '@/components/CachedImage';
 import SimilarProducts from '@/components/SimilarProducts';
-import { fallbackToOriginalImage, getOptimizedImageUrl } from '@/lib/productImages';
+import { getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
+import { preloadImage } from '@/lib/imagePreloadCache';
 import AddToCartDialog from '@/components/AddToCartDialog';
 
 const ProductDetail: React.FC = () => {
@@ -91,6 +92,11 @@ useEffect(() => {
   const isAvailable = Number(product.stock) > 0;
   const selectedImage = product.image_urls?.[selectedImageIndex] || product.image_urls?.[0] || '';
 
+  const preloadDetailImage = (image: string) => {
+    const optimized = getOptimizedImageUrl(image, { width: 960, quality: 76 });
+    if (optimized !== image) void preloadImage(optimized).catch(() => undefined);
+  };
+
   const handleAddToCart = async () => {
     if (isAddingToCart) return;
 
@@ -141,11 +147,15 @@ useEffect(() => {
               <CachedImage
                 key={selectedImage}
                 src={getOptimizedImageUrl(selectedImage, { width: 960, quality: 76 })}
+                srcSet={getProductImageSrcSet(selectedImage, [480, 720, 960, 1280])}
+                sizes="(max-width: 1023px) calc(100vw - 2rem), 50vw"
                 fallbackSrc={selectedImage}
                 alt={product.name}
+                loading="eager"
                 fetchPriority="high"
                 decoding="async"
-                onError={(event) => fallbackToOriginalImage(event, selectedImage)}
+                width={960}
+                height={960}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -156,6 +166,9 @@ useEffect(() => {
                 <button
                   key={index}
                   onClick={() => setSelectedImageIndex(index)}
+                  onPointerEnter={() => preloadDetailImage(image)}
+                  onFocus={() => preloadDetailImage(image)}
+                  onTouchStart={() => preloadDetailImage(image)}
                   className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
                     selectedImageIndex === index
                       ? 'border-primary scale-105'
@@ -164,11 +177,14 @@ useEffect(() => {
                 >
                   <CachedImage
                     src={getOptimizedImageUrl(image, { width: 240, quality: 70 })}
+                    srcSet={getProductImageSrcSet(image, [120, 180, 240])}
+                    sizes="(max-width: 1023px) calc((100vw - 4rem) / 3), 160px"
                     fallbackSrc={image}
                     alt={`${product.name} ${index + 1}`}
                     loading="lazy"
                     decoding="async"
-                    onError={(event) => fallbackToOriginalImage(event, image)}
+                    width={240}
+                    height={240}
                     className="w-full h-full object-cover"
                   />
                 </button>

@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 
 import CachedImage from '@/components/CachedImage';
+import { getOptimizedImageUrl } from '@/lib/productImages';
 
 const Cart: React.FC = () => {
   const { items, removeFromCart, updateQuantity, getTotalPrice, clearCartFromServer } = useCart();
@@ -70,12 +71,14 @@ const Cart: React.FC = () => {
                   <div className="flex min-w-0 flex-1 items-center gap-4">
                     <div className="flex-shrink-0">
                       <CachedImage
-                        src={item.image_urls[0]}
-                        fallbackSrc={item.image_urls[0]}
+                        src={getOptimizedImageUrl(item.image_urls?.[0], { width: 160, height: 160, quality: 68 })}
+                        fallbackSrc={item.image_urls?.[0]}
                         alt={item.name}
                         className="h-20 w-20 object-cover rounded-lg"
                         loading="lazy"
                         decoding="async"
+                        width={160}
+                        height={160}
                       />
                     </div>
 

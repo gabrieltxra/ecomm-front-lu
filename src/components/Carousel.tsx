@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import CachedImage from '@/components/CachedImage';
+import { getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
 
 interface CarouselItem {
   id: number;
@@ -56,9 +58,17 @@ const Carousel: React.FC<CarouselProps> = ({
               index === currentIndex ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <img 
-              src={item.image} 
+            <CachedImage
+              src={getOptimizedImageUrl(item.image, { width: 1280, quality: 76 })}
+              srcSet={getProductImageSrcSet(item.image, [480, 768, 1024, 1280])}
+              sizes="(max-width: 1279px) calc(100vw - 2rem), 1200px"
+              fallbackSrc={item.image}
               alt={item.title}
+              loading={index === 0 ? 'eager' : 'lazy'}
+              fetchPriority={index === 0 ? 'high' : 'low'}
+              decoding="async"
+              width={1280}
+              height={500}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/40 flex items-center justify-center">

@@ -15,18 +15,25 @@ const SUPABASE_STORAGE_MARKERS = [
   '/storage/v1/object/public/',
   '/storage/v1/render/image/public/',
 ];
+const PRODUCT_FILE_RE = /^[a-z0-9_-]+\.(?:jpe?g|png|webp)$/i;
 
-function getSupabaseProductFileName(imageUrl: string) {
+function getProductFileName(imageUrl: string) {
   try {
     const url = new URL(imageUrl);
-    const marker = SUPABASE_STORAGE_MARKERS.find((item) => url.pathname.includes(item));
-    if (!marker) return null;
+    if (!['http:', 'https:'].includes(url.protocol)) return null;
 
-    const publicPath = decodeURIComponent(url.pathname.split(marker)[1] || '');
+    const marker = SUPABASE_STORAGE_MARKERS.find((item) => url.pathname.includes(item));
+    const publicPath = decodeURIComponent(marker
+      ? url.pathname.split(marker)[1] || ''
+      : url.pathname);
     const parts = publicPath.split('/').filter(Boolean);
     const fileName = parts[parts.length - 1];
+    const productsIndex = parts.lastIndexOf('products');
 
-    if (!fileName || !/\.(jpe?g|png|webp)$/i.test(fileName)) return null;
+    // Product uploads use /products/<uuid>.<ext> on both Supabase and R2.
+    // Keeping this check strict prevents arbitrary remote images from being proxied.
+    if (productsIndex < 0 || productsIndex !== parts.length - 2) return null;
+    if (!fileName || !PRODUCT_FILE_RE.test(fileName)) return null;
     return fileName;
   } catch {
     return null;
@@ -52,7 +59,7 @@ export function getOptimizedImageUrl(
 
   if (options.proxy === false || options.format === 'origin') return imageUrl;
 
-  const fileName = getSupabaseProductFileName(imageUrl);
+  const fileName = getProductFileName(imageUrl);
   if (!fileName) return imageUrl;
 
   return getProxyImageUrl(fileName, options);
@@ -62,7 +69,7 @@ export function getProductImageSrcSet(
   imageUrl?: string,
   widths: number[] = [320, 480, 640, 960]
 ) {
-  if (!imageUrl || !getSupabaseProductFileName(imageUrl)) return undefined;
+  if (!imageUrl || !getProductFileName(imageUrl)) return undefined;
 
   return widths
     .map((width) => `${getOptimizedImageUrl(imageUrl, { width, quality: 70 })} ${width}w`)

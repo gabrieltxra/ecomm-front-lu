@@ -13,7 +13,7 @@ interface ProductGridProps {
 const ProductGrid: React.FC<ProductGridProps> = React.memo(({
   products,
   compact = false,
-  priorityCount = 4,
+  priorityCount = 0,
 }) => {
   const [addedProduct, setAddedProduct] = useState<Product | null>(null);
 

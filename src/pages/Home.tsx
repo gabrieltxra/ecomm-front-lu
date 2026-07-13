@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import CachedImage from '@/components/CachedImage';
 import ProductGrid from '../components/ProductGrid';
 import { useProducts } from '@/services/productsService';
-import { fallbackToOriginalImage, getOptimizedImageUrl } from '@/lib/productImages';
+import { getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
 
 const defaultFilters = {
   category: '',
@@ -101,11 +101,15 @@ const Home: React.FC = () => {
             {heroImage ? (
               <CachedImage
                 src={getOptimizedImageUrl(heroImage, { width: 960, quality: 76 })}
+                srcSet={getProductImageSrcSet(heroImage, [480, 720, 960, 1280])}
+                sizes="(max-width: 1023px) calc(100vw - 2rem), 45vw"
                 fallbackSrc={heroImage}
                 alt="Produto do Atelie Lu Cortinas"
+                loading="eager"
                 fetchPriority="high"
                 decoding="async"
-                onError={(event) => fallbackToOriginalImage(event, heroImage)}
+                width={960}
+                height={720}
                 className="h-[210px] w-full object-cover sm:h-[260px] md:h-[420px]"
               />
             ) : (
@@ -143,11 +147,14 @@ const Home: React.FC = () => {
                     {category.image ? (
                       <CachedImage
                         src={getOptimizedImageUrl(category.image, { width: 480, quality: 72 })}
+                        srcSet={getProductImageSrcSet(category.image, [240, 360, 480, 640])}
+                        sizes="(max-width: 639px) calc(100vw - 2rem), (max-width: 1023px) calc(50vw - 2rem), 25vw"
                         fallbackSrc={category.image}
                         alt={category.name}
                         loading="lazy"
                         decoding="async"
-                        onError={(event) => fallbackToOriginalImage(event, category.image)}
+                        width={480}
+                        height={320}
                         className="h-full w-full object-cover"
                       />
                     ) : (

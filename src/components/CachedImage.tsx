@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
+import { isImagePreloaded, markImageLoaded } from '@/lib/imagePreloadCache';
 
 type CachedImageProps = Omit<React.ImgHTMLAttributes<HTMLImageElement>, 'src'> & {
   src?: string;
@@ -14,14 +15,18 @@ const CachedImage = React.memo(({
   className,
   onError,
   onLoad,
+  srcSet,
+  sizes,
   ...props
 }: CachedImageProps) => {
   const [displaySrc, setDisplaySrc] = useState(src);
-  const [isLoading, setIsLoading] = useState(Boolean(src));
+  const [isFallback, setIsFallback] = useState(false);
+  const [isLoading, setIsLoading] = useState(Boolean(src) && !isImagePreloaded(src));
 
   useEffect(() => {
     setDisplaySrc(src);
-    setIsLoading(Boolean(src));
+    setIsFallback(false);
+    setIsLoading(Boolean(src) && !isImagePreloaded(src));
   }, [src]);
 
   return (
@@ -29,15 +34,19 @@ const CachedImage = React.memo(({
       <img
         {...props}
         src={displaySrc}
+        srcSet={isFallback ? undefined : srcSet}
+        sizes={isFallback ? undefined : sizes}
         className={cn(className, 'h-full w-full transition-opacity duration-150', isLoading ? 'opacity-0' : 'opacity-100')}
         onLoad={(event) => {
+          markImageLoaded(displaySrc);
           setIsLoading(false);
           onLoad?.(event);
         }}
         onError={(event) => {
           if (fallbackSrc && displaySrc !== fallbackSrc) {
+            setIsFallback(true);
             setDisplaySrc(fallbackSrc);
-            setIsLoading(true);
+            setIsLoading(!isImagePreloaded(fallbackSrc));
             return;
           }
 

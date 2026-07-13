@@ -1,6 +1,8 @@
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { CheckoutError, CheckoutPayload, PaymentMethod, iniciarCheckout } from "@/services/checkoutService";
 import { useMemo, useState } from "react";
+import CachedImage from "@/components/CachedImage";
+import { getOptimizedImageUrl } from "@/lib/productImages";
 
 function formatCheckoutError(err: unknown) {
   if (err instanceof Error && err.message) {
@@ -245,10 +247,15 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
                       <div key={item.id} className="flex min-w-0 gap-3 rounded-2xl bg-white p-3 shadow-sm ring-1 ring-rose-100">
                         <div className="flex h-20 w-20 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl bg-rose-100 text-xs font-medium text-rose-400">
                           {imageUrl ? (
-                            <img
-                              src={imageUrl}
+                            <CachedImage
+                              src={getOptimizedImageUrl(imageUrl, { width: 160, height: 160, quality: 68 })}
+                              fallbackSrc={imageUrl}
                               alt={item.name}
                               className="h-full w-full object-cover"
+                              loading="lazy"
+                              decoding="async"
+                              width={160}
+                              height={160}
                             />
                           ) : (
                             <span>Sem imagem</span>
