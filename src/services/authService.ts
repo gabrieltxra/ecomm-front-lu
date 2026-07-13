@@ -4,8 +4,8 @@ interface RegisterPayload {
   name: string;
   email: string;
   password: string;
-  telefone?: string;
-  cpf?: string;
+  telefone: string;
+  cpf: string;
   endereco?: {
     cep: string;
     rua: string;

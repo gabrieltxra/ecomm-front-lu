@@ -114,14 +114,13 @@ const Cadastro: React.FC = () => {
     if (normalized.name.length < 3) return "Informe seu nome (mínimo 3 caracteres)";
     if (!isValidEmail(normalized.email)) return "E-mail inválido";
 
-    if (formData.telefone) {
-      const len = normalized.phoneDigits.length;
-      if (len !== 10 && len !== 11) return "Telefone inválido (use DDD + número)";
-    }
+    if (!normalized.phoneDigits) return "Informe seu telefone com DDD";
+    const phoneLength = normalized.phoneDigits.length;
+    if (phoneLength !== 10 && phoneLength !== 11)
+      return "Telefone inválido (use DDD + número)";
 
-    if (formData.cpf) {
-      if (!isValidCPF(formData.cpf)) return "CPF inválido";
-    }
+    if (!normalized.cpfDigits) return "Informe seu CPF";
+    if (!isValidCPF(formData.cpf)) return "CPF inválido";
 
     if (formData.senha !== formData.confirmarSenha) return "As senhas não coincidem";
 
@@ -192,8 +191,8 @@ const Cadastro: React.FC = () => {
         name: normalized.name,
         email: normalized.email,
         password: formData.senha,
-        telefone: normalized.phoneDigits ? normalized.phoneDigits : undefined,
-        cpf: normalized.cpfDigits ? normalized.cpfDigits : undefined,
+        telefone: normalized.phoneDigits,
+        cpf: normalized.cpfDigits,
         endereco: addressData.cep
           ? {
               cep: addressData.cep,
@@ -341,7 +340,7 @@ const Cadastro: React.FC = () => {
 
                   <div>
                     <label className="block text-gray-700 dark:text-gray-200 mb-1 text-sm font-medium">
-                      Telefone
+                      Telefone *
                     </label>
                     <input
                       type="tel"
@@ -356,12 +355,13 @@ const Cadastro: React.FC = () => {
                       placeholder="(11) 99999-9999"
                       maxLength={15}
                       autoComplete="tel"
+                      required
                     />
                   </div>
 
                   <div>
                     <label className="block text-gray-700 dark:text-gray-200 mb-1 text-sm font-medium">
-                      CPF
+                      CPF *
                     </label>
                     <input
                       type="text"
@@ -377,8 +377,13 @@ const Cadastro: React.FC = () => {
                       maxLength={14}
                       autoComplete="off"
                       inputMode="numeric"
+                      required
                     />
                   </div>
+
+                  <p className="md:col-span-2 text-xs text-gray-500 dark:text-gray-300 -mt-1">
+                    Telefone e CPF são necessários para processar pagamentos com segurança.
+                  </p>
 
                   {/* ✅ Senha com olhinho */}
                   <div className="md:col-span-1">
