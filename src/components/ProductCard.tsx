@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react';
-import { ShoppingCart } from 'lucide-react';
+import React, { useCallback, useState } from 'react';
+import { Loader2, ShoppingCart } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -32,6 +32,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 }) => {
   const { addToCart } = useCart();
   const navigate = useNavigate();
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const isAvailable = Number(product.stock) > 0;
   const imageHeightClass = compact ? 'h-44 sm:h-48' : 'h-56 sm:h-60 md:h-64';
   const productImage = product.image_urls?.[0];
@@ -56,6 +57,8 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
     event.preventDefault();
     event.stopPropagation();
 
+    if (isAddingToCart) return;
+
     if (!isAvailable) {
       toast.error('Produto indisponivel no momento.');
       return;
@@ -69,9 +72,15 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
       return;
     }
 
-    const added = await addToCart(product);
-    if (added) onAddedToCart?.(product);
-  }, [addToCart, isAvailable, navigate, onAddedToCart, product]);
+    setIsAddingToCart(true);
+
+    try {
+      const added = await addToCart(product);
+      if (added) onAddedToCart?.(product);
+    } finally {
+      setIsAddingToCart(false);
+    }
+  }, [addToCart, isAddingToCart, isAvailable, navigate, onAddedToCart, product]);
 
   return (
     <article
@@ -127,16 +136,21 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
           <button
             type="button"
             onClick={handleAddToCart}
-            disabled={!isAvailable}
+            disabled={!isAvailable || isAddingToCart}
             className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition-colors ${
               isAvailable
-                ? 'bg-rose-500 text-white hover:bg-rose-600 dark:bg-rose-400 dark:hover:bg-rose-500'
+                ? 'bg-rose-500 text-white hover:bg-rose-600 disabled:cursor-wait disabled:opacity-85 dark:bg-rose-400 dark:hover:bg-rose-500'
                 : 'cursor-not-allowed bg-gray-300 text-gray-500 shadow-none dark:bg-gray-700 dark:text-gray-400'
             }`}
             aria-label={isAvailable ? `Adicionar ${product.name} ao carrinho` : `${product.name} indisponivel`}
+            aria-busy={isAddingToCart}
           >
-            <ShoppingCart className="h-4 w-4" />
-            {isAvailable ? 'Comprar' : 'Indisponivel'}
+            {isAddingToCart ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <ShoppingCart className="h-4 w-4" />
+            )}
+            {isAddingToCart ? 'Adicionando...' : isAvailable ? 'Comprar' : 'Indisponivel'}
           </button>
         </div>
       </div>

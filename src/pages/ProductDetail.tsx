@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Phone, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, Loader2, Phone, ShoppingCart } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'sonner';
 import { getCachedProductById, getProductById } from '@/services/productsService';
@@ -20,6 +20,7 @@ const ProductDetail: React.FC = () => {
   const cachedInitialProduct = id ? getCachedProductById(id) : null;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isCartDialogOpen, setIsCartDialogOpen] = useState(false);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
 
 const [product, setProduct] = useState<Product | null>(() => cachedInitialProduct);
 const [loading, setLoading] = useState(() => Boolean(id && !cachedInitialProduct));
@@ -91,14 +92,22 @@ useEffect(() => {
   const selectedImage = product.image_urls?.[selectedImageIndex] || product.image_urls?.[0] || '';
 
   const handleAddToCart = async () => {
+    if (isAddingToCart) return;
+
     if (!isAvailable) {
       toast.error('Produto indisponível no momento.');
       return;
     }
 
     if (token) {
-      const added = await addToCart(product);
-      if (added) setIsCartDialogOpen(true);
+      setIsAddingToCart(true);
+
+      try {
+        const added = await addToCart(product);
+        if (added) setIsCartDialogOpen(true);
+      } finally {
+        setIsAddingToCart(false);
+      }
     } else {
       toast.error('Você precisa estar logado para adicionar produtos ao carrinho.');
       navigate('/login');
@@ -196,16 +205,21 @@ useEffect(() => {
             <div className="flex flex-col sm:flex-row gap-4">
               <button
                 onClick={handleAddToCart}
-                disabled={!isAvailable}
+                disabled={!isAvailable || isAddingToCart}
+                aria-busy={isAddingToCart}
                 className={`flex-1 py-3 px-6 rounded-lg font-semibold flex items-center justify-center space-x-2
                   ${!isAvailable 
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
-                    : "bg-atelie-gradient text-white hover:opacity-90 transition-opacity"
+                    : "bg-atelie-gradient text-white hover:opacity-90 disabled:cursor-wait disabled:opacity-85 transition-opacity"
                   }`}
               >
-                <ShoppingCart className="h-5 w-5" />
+                {isAddingToCart ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <ShoppingCart className="h-5 w-5" />
+                )}
                 <span>
-                  {!isAvailable ? "Indisponível" : "Adicionar ao Carrinho"}
+                  {isAddingToCart ? "Adicionando..." : !isAvailable ? "Indisponível" : "Adicionar ao Carrinho"}
                 </span>
               </button>
             </div>

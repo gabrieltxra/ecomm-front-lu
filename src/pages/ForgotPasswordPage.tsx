@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { ApiError, forgotPasswordApi } from '@/services/authService';
 import { useNavigate } from 'react-router-dom';
 
-const PRIMARY_COLOR = '#F0B5BA';
+const PRIMARY_COLOR = '#E11D48';
 const DARK_TEXT_COLOR = '#333333';
 const GRAY_BACKGROUND = '#f6f8fb';
 const COOLDOWN_MS = 5 * 60 * 1000; // 5 minutos

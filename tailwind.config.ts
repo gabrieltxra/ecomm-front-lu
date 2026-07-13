@@ -53,6 +53,19 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
+				rose: {
+					50: '#FFF1F4',
+					100: '#FFE4EA',
+					200: '#FECDD8',
+					300: '#F43F5E',
+					400: '#E11D48',
+					500: '#E11D48',
+					600: '#BE123C',
+					700: '#9F1239',
+					800: '#881337',
+					900: '#4C0519',
+					950: '#2A0210',
+				},
 				atelie: {
 					rose: '#E11D48',
 					peach: '#F97316',

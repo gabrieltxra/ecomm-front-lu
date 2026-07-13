@@ -4,7 +4,7 @@ import React, { useState, FormEvent, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 
 // Cores baseadas no seu design (image_89d298.jpg)
-const PRIMARY_COLOR = '#F0B5BA';
+const PRIMARY_COLOR = '#E11D48';
 const DARK_TEXT_COLOR = '#333333';
 const GRAY_BACKGROUND = '#f6f8fb';
 
