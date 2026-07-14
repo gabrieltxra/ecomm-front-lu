@@ -89,7 +89,7 @@ const SimilarProducts: React.FC<SimilarProductsProps> = ({
           <div>
             <h2 className="text-3xl font-bold">Produtos similares</h2>
             <p className="mt-2 text-lg text-slate-600 dark:text-slate-300">
-              Outros produtos do catalogo que podem combinar com sua escolha.
+              Outros produtos do catálogo que podem combinar com sua escolha.
             </p>
           </div>
           <Link to="/produtos" className="text-lg font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-300">

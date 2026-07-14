@@ -37,7 +37,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const PageFallback = () => (
   <div className="flex min-h-[60vh] items-center justify-center" role="status">
     <div className="h-10 w-10 animate-spin rounded-full border-4 border-rose-200 border-t-rose-500" />
-    <span className="sr-only">Carregando pagina</span>
+    <span className="sr-only">Carregando página</span>
   </div>
 );
 

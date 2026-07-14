@@ -127,6 +127,28 @@ function formatMercadoPagoMethodDetail(value: string | null | undefined) {
   return labels[normalized] || normalized.toUpperCase();
 }
 
+function formatPaymentMethod(method: string | null | undefined, mercadoPagoMethod?: string | null) {
+  const normalizedMethod = String(method ?? '').trim().toLowerCase();
+  const normalizedMercadoPagoMethod = String(mercadoPagoMethod ?? '').trim().toLowerCase();
+
+  if (normalizedMercadoPagoMethod === 'account_money') {
+    return 'Saldo no Mercado Pago';
+  }
+
+  if (normalizedMercadoPagoMethod === 'pix') {
+    return 'Pix pelo Mercado Pago';
+  }
+
+  if (normalizedMethod === 'card_installments' || legacyMercadoPagoCardMethods.has(normalizedMethod)) {
+    const detail = formatMercadoPagoMethodDetail(mercadoPagoMethod)
+      || formatMercadoPagoMethodDetail(normalizedMethod === 'card_installments' ? null : normalizedMethod);
+
+    return detail ? `Cartão de Crédito (${detail})` : 'Cartão de Crédito';
+  }
+
+  return paymentMethodMap[normalizedMethod] || method || 'Não informado';
+}
+
 function normalizeOrder(raw: any): Order {
   const items: OrderItem[] = Array.isArray(raw.items)
     ? raw.items.map((it: any) => ({
@@ -141,28 +163,20 @@ function normalizeOrder(raw: any): Order {
     : [];
 
   const createdAtDate = new Date(raw.created_at);
-  createdAtDate.setHours(createdAtDate.getHours() - 3);
-  const created_at = createdAtDate.toISOString();
+  const created_at = Number.isNaN(createdAtDate.getTime())
+    ? String(raw.created_at ?? '')
+    : createdAtDate.toISOString();
 
   let updated_at: string | undefined = undefined;
   if (raw.updated_at) {
     const updatedAtDate = new Date(raw.updated_at);
-    updatedAtDate.setHours(updatedAtDate.getHours() - 3);
-    updated_at = updatedAtDate.toISOString();
+    updated_at = Number.isNaN(updatedAtDate.getTime())
+      ? String(raw.updated_at)
+      : updatedAtDate.toISOString();
   }
 
   const rawPaymentMethod = String(raw.payment_method ?? '').toLowerCase();
-  const paymentMethodDetail = formatMercadoPagoMethodDetail(raw.mp_payment_method_id);
-  const legacyPaymentMethodDetail = legacyMercadoPagoCardMethods.has(rawPaymentMethod)
-    ? formatMercadoPagoMethodDetail(raw.payment_method)
-    : null;
-  const normalizedPaymentMethod = rawPaymentMethod === 'card_installments' || legacyMercadoPagoCardMethods.has(rawPaymentMethod)
-    ? paymentMethodDetail
-      ? `Cartão de Crédito parcelado (${paymentMethodDetail})`
-      : legacyPaymentMethodDetail
-      ? `Cartão de Crédito parcelado (${legacyPaymentMethodDetail})`
-      : 'Cartão de Crédito parcelado'
-    : paymentMethodMap[rawPaymentMethod] || raw.payment_method;
+  const normalizedPaymentMethod = formatPaymentMethod(rawPaymentMethod, raw.mp_payment_method_id);
 
   return {
     id: raw.id?.toString(),
@@ -172,9 +186,7 @@ function normalizeOrder(raw: any): Order {
     total: Number(raw.total ?? 0),
     shipping_method: formatShippingMethod(raw.shipping_method),
     shipping_cost: Number(raw.shipping_cost ?? 0),
-    payment_method: rawPaymentMethod === 'card_installments' || legacyMercadoPagoCardMethods.has(rawPaymentMethod)
-      ? 'Cartão de Crédito'
-      : normalizedPaymentMethod,
+    payment_method: normalizedPaymentMethod,
     mp_payment_method_id: raw.mp_payment_method_id ? String(raw.mp_payment_method_id) : null,
     payment_status: paymentStatusMap[raw.payment_status] || raw.payment_status,
     stripe_session_id: raw.stripe_session_id,

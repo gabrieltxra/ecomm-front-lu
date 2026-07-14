@@ -68,7 +68,7 @@ const Home: React.FC = () => {
       <section className="border-b border-rose-100 bg-rose-50/70 pt-20 md:pt-24 dark:border-slate-800 dark:bg-slate-900">
         <div className="container mx-auto grid gap-6 px-4 pb-8 md:gap-8 md:pb-14 lg:grid-cols-[1fr_0.9fr] lg:items-center">
           <div className="max-w-2xl">
-            <p className="text-lg font-semibold text-rose-600 dark:text-rose-300">Atelie Lu Cortinas</p>
+            <p className="text-lg font-semibold text-rose-600 dark:text-rose-300">Ateliê Lu Cortinas</p>
             <h1 className="mt-3 text-4xl font-bold leading-tight md:text-5xl">
               Cortinas, persianas e almofadas para deixar sua casa mais bonita.
             </h1>
@@ -104,7 +104,7 @@ const Home: React.FC = () => {
                 srcSet={getProductImageSrcSet(heroImage, [480, 720, 960, 1280])}
                 sizes="(max-width: 1023px) calc(100vw - 2rem), 45vw"
                 fallbackSrc={heroImage}
-                alt="Produto do Atelie Lu Cortinas"
+                alt="Produto do Ateliê Lu Cortinas"
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"
@@ -128,7 +128,7 @@ const Home: React.FC = () => {
               <div>
                 <h2 className="text-3xl font-bold">Escolha por categoria</h2>
                 <p className="mt-2 text-lg text-slate-600 dark:text-slate-300">
-                  Comece pelo tipo de produto que voce procura.
+                  Comece pelo tipo de produto que você procura.
                 </p>
               </div>
               <Link to="/produtos" className="text-lg font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-300">
@@ -185,7 +185,7 @@ const Home: React.FC = () => {
             <div>
               <h2 className="text-3xl font-bold">Produtos em destaque</h2>
               <p className="mt-2 text-lg text-slate-600 dark:text-slate-300">
-                Alguns produtos para voce conhecer primeiro.
+                Alguns produtos para você conhecer primeiro.
               </p>
             </div>
             <Link to="/produtos" className="text-lg font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-300">
@@ -208,9 +208,9 @@ const Home: React.FC = () => {
       <section className="border-t border-slate-200 bg-rose-50 py-10 dark:border-slate-800 dark:bg-slate-900">
         <div className="container mx-auto flex flex-col gap-5 px-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-3xl font-bold">Ficou com duvida?</h2>
+            <h2 className="text-3xl font-bold">Ficou com dúvida?</h2>
             <p className="mt-2 text-lg text-slate-700 dark:text-slate-200">
-              A gente ajuda voce a escolher o melhor produto.
+              A gente ajuda você a escolher o melhor produto.
             </p>
           </div>
           <a

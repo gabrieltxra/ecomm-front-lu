@@ -58,8 +58,8 @@ const Products: React.FC = () => {
     setSearchParams({});
     setFilters({
       category: '',
-      minPrice: defaultPriceRange.min,
-      maxPrice: defaultPriceRange.max,
+      minPrice: 0,
+      maxPrice: 0,
       sortBy: 'name'
     });
     setCurrentPage(1);
@@ -241,11 +241,13 @@ const Products: React.FC = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-600 mb-1">Máximo</label>
+                    <label className="block text-sm text-gray-600 mb-1">Máximo (opcional)</label>
                     <input
                       type="number"
-                      value={filters.maxPrice}
+                      value={filters.maxPrice || ''}
                       onChange={(e) => setFilters({ ...filters, maxPrice: Number(e.target.value) })}
+                      min={0}
+                      placeholder={`Sem limite (até ${formatPrice(defaultPriceRange.max)})`}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg"
                     />
                   </div>
@@ -278,7 +280,7 @@ const Products: React.FC = () => {
 
             {/* Paginação */}
             {!searchFromUrl && productsData?.totalPages > 1 && (
-              <nav className="mt-12 flex flex-col items-center justify-center gap-3 border-t border-slate-100 pt-8 sm:flex-row sm:gap-4" aria-label={`Paginacao de produtos, pagina ${activePage} de ${totalPages}`}>
+              <nav className="mt-12 flex flex-col items-center justify-center gap-3 border-t border-slate-100 pt-8 sm:flex-row sm:gap-4" aria-label={`Paginação de produtos, página ${activePage} de ${totalPages}`}>
                 <button
                   disabled={currentPage === 1 || loading}
                   onClick={() => goToPage(currentPage - 1)}

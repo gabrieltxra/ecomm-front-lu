@@ -11,6 +11,7 @@ import { getUserOrders, Order } from '@/services/ordersService';
 import { Link } from "react-router-dom";
 
 import { toast } from 'sonner';
+import { formatDateTimeBr } from '@/utils/dateTime';
 
 function getPickupStatusLabel(status?: string | null) {
   const normalized = String(status || '').toLowerCase();
@@ -698,7 +699,7 @@ const Perfil: React.FC = () => {
                               <div className="break-all font-semibold">Pedido #{o.id}</div>
                               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
                                 <Calendar className="h-4 w-4 flex-shrink-0" />
-                                {new Date(o.created_at).toLocaleString("pt-BR")}
+                                {formatDateTimeBr(o.created_at)}
                               </div>
                             </div>
                           </div>

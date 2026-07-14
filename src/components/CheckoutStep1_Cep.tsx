@@ -33,6 +33,9 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
   const [freteOptions, setFreteOptions] = useState<any[]>([]);
   const [freteSelecionado, setFreteSelecionado] = useState<any>(null);
   const [loadingFrete, setLoadingFrete] = useState(false);
+  const [freteError, setFreteError] = useState<string | null>(null);
+  const [freteRetryKey, setFreteRetryKey] = useState(0);
+  const [isSlowFrete, setIsSlowFrete] = useState(false);
 
   const handleCepChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setCep(formatCep(e.target.value));
@@ -107,6 +110,16 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
   const cepDigits = useMemo(() => onlyDigits(cep), [cep]);
   const hasValidCep = cepDigits.length === 8;
 
+  useEffect(() => {
+    if (!loadingFrete) {
+      setIsSlowFrete(false);
+      return;
+    }
+
+    const timeoutId = window.setTimeout(() => setIsSlowFrete(true), 4000);
+    return () => window.clearTimeout(timeoutId);
+  }, [loadingFrete]);
+
   // ===== Validação: não deixa passar "entregar" com frete 0 =====
   useEffect(() => {
     const enderecoOk =
@@ -135,10 +148,12 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
       if (!hasValidCep || cart.length === 0) {
         setFreteOptions([]);
         setFreteSelecionado(null);
+        setFreteError(null);
         return;
       }
 
       setLoadingFrete(true);
+      setFreteError(null);
       try {
         const items = cart.map((item) => ({ id: item.id, quantity: item.quantity }));
         const result = await getFreteData({ cep: cepDigits, items });
@@ -162,13 +177,14 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
         console.error("Erro ao calcular frete:", err);
         setFreteOptions([]);
         setFreteSelecionado(null);
+        setFreteError("Não foi possível calcular o frete agora. Tente novamente.");
       } finally {
         setLoadingFrete(false);
       }
     };
 
     fetchFrete();
-  }, [cepDigits, hasValidCep, cart, modoEntrega]);
+  }, [cepDigits, hasValidCep, cart, modoEntrega, freteRetryKey]);
 
   const handleNext = () => {
     // blindagem final: não passa entregar com frete 0
@@ -280,9 +296,38 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
             </div>
 
             {/* Lista de opções de frete */}
-            {loadingFrete && <p>Carregando opções...</p>}
+            {loadingFrete && (
+              <div
+                role="status"
+                aria-live="polite"
+                className="flex items-center gap-3 rounded-lg border border-rose-100 bg-rose-50 px-4 py-3 text-sm text-gray-700"
+              >
+                <span className="h-5 w-5 animate-spin rounded-full border-2 border-rose-200 border-t-rose-500" />
+                <div>
+                  <p className="font-medium">Calculando o frete...</p>
+                  {isSlowFrete && (
+                    <p className="mt-1 text-xs text-gray-500">
+                      A transportadora está demorando um pouco, mas a consulta continua em andamento.
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
 
-            {!loadingFrete && freteOptions.length === 0 && hasValidCep && cart.length > 0 && (
+            {!loadingFrete && freteError && (
+              <div role="alert" className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                <p>{freteError}</p>
+                <button
+                  type="button"
+                  onClick={() => setFreteRetryKey((key) => key + 1)}
+                  className="mt-2 font-semibold underline underline-offset-2"
+                >
+                  Tentar novamente
+                </button>
+              </div>
+            )}
+
+            {!loadingFrete && !freteError && freteOptions.length === 0 && hasValidCep && cart.length > 0 && (
               <p className="text-sm text-gray-500">Nenhuma opção de frete disponível para este CEP.</p>
             )}
 

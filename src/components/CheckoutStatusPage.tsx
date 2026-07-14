@@ -1,5 +1,6 @@
 import { checkOrderStatus, syncMercadoPagoOrder } from "@/services/checkoutService";
 import { getOrderById } from "@/services/ordersService";
+import { formatDateTimeBr } from "@/utils/dateTime";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
 
@@ -119,16 +120,13 @@ export default function CheckoutStatusPage({ variant }: Props) {
           if (provider === "mercadopago" && !mercadoPagoSyncAttemptedRef.current) {
             mercadoPagoSyncAttemptedRef.current = true;
             try {
-              const syncResult = await syncMercadoPagoOrder(orderId, paymentId);
-              data = syncResult?.order ?? null;
+              await syncMercadoPagoOrder(orderId, paymentId);
             } catch {
-              data = null;
+              // A consulta do pedido abaixo ainda pode refletir uma atualização via webhook.
             }
           }
 
-          if (!data) {
-            data = await getOrderById(orderId);
-          }
+          data = await getOrderById(orderId);
         } else if (sessionId) {
           data = await checkOrderStatus(sessionId);
         } else {
@@ -196,7 +194,7 @@ export default function CheckoutStatusPage({ variant }: Props) {
       cancelled = true;
       stop();
     };
-  }, [navigate, orderId, search, sessionId, variant]);
+  }, [navigate, orderId, paymentId, provider, search, sessionId, variant]);
 
   const title = variant === "success"
     ? paid
@@ -243,7 +241,7 @@ export default function CheckoutStatusPage({ variant }: Props) {
               <p><strong>Pedido:</strong> #{order.id}</p>
               <p><strong>Forma de pagamento:</strong> {paymentMethodLabel}</p>
               <p><strong>Status:</strong> {friendlyStatus}</p>
-              <p><strong>Atualizado em:</strong> {order.updated_at ? new Date(order.updated_at).toLocaleString("pt-BR") : "—"}</p>
+              <p><strong>Atualizado em:</strong> {formatDateTimeBr(order.updated_at)}</p>
             </div>
 
             {paid ? (

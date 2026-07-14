@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import CachedImage from "@/components/CachedImage";
 import { getOptimizedImageUrl } from "@/lib/productImages";
+import { formatDateTimeBr } from "@/utils/dateTime";
 
 const PICKUP_ADDRESS = {
   street: "R. Jurunas",
@@ -36,7 +37,7 @@ function getPickupStatusMeta(status?: string | null) {
   if (normalized === "pronto_para_retirada") {
     return {
       label: "Pronto para retirada",
-      message: "Seu pedido esta pronto para retirada em nossa loja.",
+      message: "Seu pedido está pronto para retirada em nossa loja.",
       className:
         "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200",
     };
@@ -45,7 +46,7 @@ function getPickupStatusMeta(status?: string | null) {
   if (normalized === "retirado") {
     return {
       label: "Retirado",
-      message: "Este pedido ja foi retirado.",
+      message: "Este pedido já foi retirado.",
       className:
         "border-slate-200 bg-slate-50 text-slate-800 dark:border-white/10 dark:bg-white/5 dark:text-slate-200",
     };
@@ -53,7 +54,7 @@ function getPickupStatusMeta(status?: string | null) {
 
   return {
     label: "Aguardando retirada",
-    message: "Entraremos em contato quando seu pedido estiver disponivel para retirada.",
+    message: "Entraremos em contato quando seu pedido estiver disponível para retirada.",
     className:
       "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-100",
   };
@@ -292,7 +293,7 @@ const OrderDetails: React.FC = () => {
                   <span className="text-sm font-medium">Data</span>
                 </div>
                 <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                  {new Date(order.created_at).toLocaleString("pt-BR")}
+                  {formatDateTimeBr(order.created_at)}
                 </p>
               </div>
 

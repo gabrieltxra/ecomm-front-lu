@@ -60,7 +60,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
     if (isAddingToCart) return;
 
     if (!isAvailable) {
-      toast.error('Produto indisponivel no momento.');
+      toast.error('Produto indisponível no momento.');
       return;
     }
 
@@ -144,7 +144,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
                 ? 'bg-rose-500 text-white hover:bg-rose-600 disabled:cursor-wait disabled:opacity-85 dark:bg-rose-400 dark:hover:bg-rose-500'
                 : 'cursor-not-allowed bg-gray-300 text-gray-500 shadow-none dark:bg-gray-700 dark:text-gray-400'
             }`}
-            aria-label={isAvailable ? `Adicionar ${product.name} ao carrinho` : `${product.name} indisponivel`}
+            aria-label={isAvailable ? `Adicionar ${product.name} ao carrinho` : `${product.name} indisponível`}
             aria-busy={isAddingToCart}
           >
             {isAddingToCart ? (
@@ -152,7 +152,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
             ) : (
               <ShoppingCart className="h-4 w-4" />
             )}
-            {isAddingToCart ? 'Adicionando...' : isAvailable ? 'Comprar' : 'Indisponivel'}
+            {isAddingToCart ? 'Adicionando...' : isAvailable ? 'Comprar' : 'Indisponível'}
           </button>
         </div>
       </div>

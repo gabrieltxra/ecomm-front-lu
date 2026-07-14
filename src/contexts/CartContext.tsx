@@ -20,7 +20,8 @@ interface CartContextType {
   getTotalPrice: () => number;
   clearCart: () => void;
   clearCartFromServer: () => Promise<void>;
-  loadCartFromServer: () => Promise<void>; 
+  loadCartFromServer: () => Promise<void>;
+  isLoading: boolean;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -39,13 +40,19 @@ interface CartProviderProps {
 
 export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
 
   const loadCartFromServer = async () => {
   const token = localStorage.getItem('token'); 
-  if (!token) return;
+  if (!token) {
+    setItems([]);
+    setIsLoading(false);
+    return;
+  }
 
+  setIsLoading(true);
   try {
     const res = await fetch(`${API}/me`, {
       headers: {
@@ -67,6 +74,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   } catch (err) {
     console.error('Erro ao carregar carrinho do backend:', err);
+  } finally {
+    setIsLoading(false);
   }
 };
 
@@ -212,7 +221,8 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         getTotalPrice,
         clearCart,
         clearCartFromServer,
-        loadCartFromServer 
+        loadCartFromServer,
+        isLoading,
       }}
     >
       {children}
