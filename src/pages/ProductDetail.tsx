@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Loader2, Phone, ShoppingCart } from 'lucide-react';
+import { ArrowLeft, Loader2, Phone, Share2, ShoppingCart } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'sonner';
 import { getCachedProductById, getProductById } from '@/services/productsService';
@@ -117,6 +117,34 @@ useEffect(() => {
     } else {
       toast.error('Você precisa estar logado para adicionar produtos ao carrinho.');
       navigate('/login');
+    }
+  };
+
+  const handleShare = async () => {
+    const url = new URL(`/product/${product.id}`, window.location.origin).toString();
+    const shareData = {
+      title: product.name,
+      text: `Confira ${product.name} na Lu Cortinas.`,
+      url,
+    };
+
+    try {
+      if (navigator.share && (!navigator.canShare || navigator.canShare(shareData))) {
+        await navigator.share(shareData);
+        return;
+      }
+
+      await navigator.clipboard.writeText(url);
+      toast.success('Link do produto copiado!');
+    } catch (error) {
+      if (error instanceof DOMException && error.name === 'AbortError') return;
+
+      try {
+        await navigator.clipboard.writeText(url);
+        toast.success('Link do produto copiado!');
+      } catch {
+        toast.error('Não foi possível compartilhar o produto.');
+      }
     }
   };
 
@@ -237,6 +265,14 @@ useEffect(() => {
                 <span>
                   {isAddingToCart ? "Adicionando..." : !isAvailable ? "Indisponível" : "Adicionar ao Carrinho"}
                 </span>
+              </button>
+              <button
+                type="button"
+                onClick={handleShare}
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-border bg-background px-6 py-3 font-semibold text-foreground transition-colors hover:bg-accent"
+              >
+                <Share2 className="h-5 w-5" />
+                <span>Compartilhar</span>
               </button>
             </div>
 
