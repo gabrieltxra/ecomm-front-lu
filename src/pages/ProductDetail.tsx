@@ -1,7 +1,16 @@
 
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Loader2, Phone, Share2, ShoppingCart } from 'lucide-react';
+import {
+  ArrowLeft,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
+  Maximize2,
+  Phone,
+  Share2,
+  ShoppingCart,
+} from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { toast } from 'sonner';
 import { getCachedProductById, getProductById } from '@/services/productsService';
@@ -12,6 +21,7 @@ import SimilarProducts from '@/components/SimilarProducts';
 import { getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages';
 import { preloadImage } from '@/lib/imagePreloadCache';
 import AddToCartDialog from '@/components/AddToCartDialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -20,6 +30,7 @@ const ProductDetail: React.FC = () => {
   const token = localStorage.getItem('token');
   const cachedInitialProduct = id ? getCachedProductById(id) : null;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false);
   const [isCartDialogOpen, setIsCartDialogOpen] = useState(false);
   const [isAddingToCart, setIsAddingToCart] = useState(false);
 
@@ -97,6 +108,18 @@ useEffect(() => {
     if (optimized !== image) void preloadImage(optimized).catch(() => undefined);
   };
 
+  const showPreviousImage = () => {
+    setSelectedImageIndex((current) => (
+      current === 0 ? product.image_urls.length - 1 : current - 1
+    ));
+  };
+
+  const showNextImage = () => {
+    setSelectedImageIndex((current) => (
+      current === product.image_urls.length - 1 ? 0 : current + 1
+    ));
+  };
+
   const handleAddToCart = async () => {
     if (isAddingToCart) return;
 
@@ -171,7 +194,12 @@ useEffect(() => {
           {/* Images Section */}
           <div className="space-y-4">
             {/* Main Image */}
-            <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
+            <button
+              type="button"
+              onClick={() => setIsImageDialogOpen(true)}
+              className="group relative block aspect-square w-full cursor-zoom-in overflow-hidden rounded-lg bg-gray-100 text-left"
+              aria-label={`Ampliar imagem de ${product.name}`}
+            >
               <CachedImage
                 key={selectedImage}
                 src={getOptimizedImageUrl(selectedImage, { width: 960, quality: 76 })}
@@ -186,7 +214,11 @@ useEffect(() => {
                 height={960}
                 className="w-full h-full object-cover"
               />
-            </div>
+              <span className="absolute bottom-3 right-3 inline-flex items-center gap-2 rounded-full bg-black/65 px-3 py-2 text-sm font-medium text-white opacity-90 shadow-sm transition group-hover:bg-black/80 group-focus-visible:ring-2 group-focus-visible:ring-white">
+                <Maximize2 className="h-4 w-4" aria-hidden="true" />
+                Ampliar
+              </span>
+            </button>
 
             {/* Thumbnail Images */}
             <div className="grid grid-cols-3 gap-4">
@@ -304,6 +336,59 @@ useEffect(() => {
         open={isCartDialogOpen}
         onOpenChange={setIsCartDialogOpen}
       />
+      <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
+        <DialogContent
+          className="h-[min(92vh,900px)] w-[calc(100vw-1rem)] max-w-6xl border-0 bg-black p-2 text-white sm:rounded-xl [&>button]:right-3 [&>button]:top-3 [&>button]:z-20 [&>button]:rounded-full [&>button]:bg-black/60 [&>button]:p-2 [&>button]:opacity-100 [&>button_svg]:h-5 [&>button_svg]:w-5"
+          onKeyDown={(event) => {
+            if (product.image_urls.length <= 1) return;
+            if (event.key === 'ArrowLeft') showPreviousImage();
+            if (event.key === 'ArrowRight') showNextImage();
+          }}
+        >
+          <DialogTitle className="sr-only">
+            Imagem ampliada de {product.name}
+          </DialogTitle>
+          <div className="relative flex h-full min-h-0 items-center justify-center overflow-hidden rounded-lg">
+            <CachedImage
+              key={`expanded-${selectedImage}`}
+              src={getOptimizedImageUrl(selectedImage, { width: 1600, quality: 88 })}
+              srcSet={getProductImageSrcSet(selectedImage, [720, 960, 1280, 1600])}
+              sizes="calc(100vw - 1rem)"
+              fallbackSrc={selectedImage}
+              alt={product.name}
+              loading="eager"
+              decoding="async"
+              width={1600}
+              height={1600}
+              className="h-full w-full object-contain"
+            />
+
+            {product.image_urls.length > 1 && (
+              <>
+                <button
+                  type="button"
+                  onClick={showPreviousImage}
+                  className="absolute left-2 inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/60 text-white transition hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:left-4"
+                  aria-label="Imagem anterior"
+                >
+                  <ChevronLeft className="h-6 w-6" aria-hidden="true" />
+                </button>
+                <button
+                  type="button"
+                  onClick={showNextImage}
+                  className="absolute right-2 inline-flex h-11 w-11 items-center justify-center rounded-full bg-black/60 text-white transition hover:bg-black/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white sm:right-4"
+                  aria-label="Próxima imagem"
+                >
+                  <ChevronRight className="h-6 w-6" aria-hidden="true" />
+                </button>
+                <span className="absolute bottom-3 rounded-full bg-black/65 px-3 py-1 text-sm text-white">
+                  {selectedImageIndex + 1} / {product.image_urls.length}
+                </span>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
