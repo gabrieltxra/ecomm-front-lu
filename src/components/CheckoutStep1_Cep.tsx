@@ -27,7 +27,6 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
   const [pais, setPais] = useState(user?.endereco?.pais || "Brasil");
   const [telefone, setTelefone] = useState(user?.telefone || "");
   const [isValid, setIsValid] = useState(false);
-  const didHydrateFromProfileRef = useRef(false);
   const lastCepLookupRef = useRef<string>("");
 
   const [freteOptions, setFreteOptions] = useState<any[]>([]);
@@ -42,7 +41,7 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
   };
 
   useEffect(() => {
-    if (!user || didHydrateFromProfileRef.current) return;
+    if (!user) return;
 
     const profileAddress = user.endereco;
 
@@ -56,7 +55,6 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
     setPais((prev) => prev || profileAddress?.pais || user.pais || "Brasil");
     setTelefone((prev) => prev || user.telefone || "");
 
-    didHydrateFromProfileRef.current = true;
   }, [user]);
 
   useEffect(() => {
