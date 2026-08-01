@@ -1,5 +1,7 @@
 export interface Product {
   id: number;
+  variant_group_id?: string;
+  variant_label?: string | null;
   name: string;
   description: string;
   category: string;

@@ -14,6 +14,8 @@ import Header from "./components/Header";
 import ScrollToTop from "./components/ScrollToTop";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { MessageCircle } from "lucide-react";
+import AnalyticsConsent from "./components/AnalyticsConsent";
+import AnalyticsRouteTracker from "./components/AnalyticsRouteTracker";
 
 const queryClient = new QueryClient();
 
@@ -44,6 +46,7 @@ const PageFallback = () => (
 const App = () => (
   <HelmetProvider>
     <BrowserRouter>
+      <AnalyticsRouteTracker />
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <ThemeProvider>
@@ -107,6 +110,7 @@ const App = () => (
                   </Suspense>
                 </main>
                 <Footer />
+                <AnalyticsConsent />
                 {/* Botão flutuante do WhatsApp */}
                 <a
                   href="https://wa.me/5519991893513"

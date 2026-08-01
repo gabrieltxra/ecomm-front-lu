@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useCart } from '../contexts/CartContext';
 import { Trash2, Plus, Minus, ShoppingBag } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -7,9 +7,18 @@ import { toast } from 'sonner';
 
 import CachedImage from '@/components/CachedImage';
 import { getOptimizedImageUrl } from '@/lib/productImages';
+import { trackBeginCheckout, trackViewCart } from '@/lib/analytics';
 
 const Cart: React.FC = () => {
   const { items, removeFromCart, updateQuantity, getTotalPrice, clearCartFromServer } = useCart();
+  const viewCartTrackedRef = useRef(false);
+
+  useEffect(() => {
+    if (!viewCartTrackedRef.current && items.length > 0) {
+      viewCartTrackedRef.current = true;
+      trackViewCart(items);
+    }
+  }, [items]);
 
   const handleClearCart = async () => {
     try {
@@ -162,6 +171,7 @@ const Cart: React.FC = () => {
               <div className="space-y-3">
                 <Link
                   to="/checkout"
+                  onClick={() => trackBeginCheckout(items)}
                   className="w-full bg-atelie-gradient text-white py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity text-center block"
                 >
                   Finalizar Compra

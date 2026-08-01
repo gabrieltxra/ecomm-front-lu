@@ -3,6 +3,7 @@ import ProductGrid from '../components/ProductGrid';
 import { ChevronLeft, ChevronRight, Filter, Search, X } from 'lucide-react';
 import { getProducts, useProducts } from '@/services/productsService';
 import { useSearchParams } from 'react-router-dom';
+import { trackSearch, trackViewItemList } from '@/lib/analytics';
 
 const Products: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -12,6 +13,8 @@ const Products: React.FC = () => {
   const categoryFromUrl = searchParams.get('category') || '';
   const searchFromUrl = searchParams.get('search') || '';
   const lastFetchKeyRef = useRef('');
+  const lastAnalyticsListKeyRef = useRef('');
+  const lastAnalyticsSearchRef = useRef('');
 
   const [filters, setFilters] = useState({
     category: categoryFromUrl,
@@ -122,6 +125,28 @@ const Products: React.FC = () => {
       return searchable.includes(term);
     });
   }, [productsData, searchFromUrl]);
+
+  useEffect(() => {
+    if (loading || !productsData || displayedProducts.length === 0) return;
+
+    const listName = searchFromUrl
+      ? `Busca: ${searchFromUrl}`
+      : filters.category
+      ? `Categoria: ${filters.category}`
+      : 'Catálogo';
+    const listKey = `${listName}:${displayedProducts.map((product) => product.id).join(',')}`;
+
+    if (lastAnalyticsListKeyRef.current !== listKey) {
+      lastAnalyticsListKeyRef.current = listKey;
+      trackViewItemList(displayedProducts, listName);
+    }
+
+    const searchTerm = searchFromUrl.trim();
+    if (searchTerm && lastAnalyticsSearchRef.current !== searchTerm) {
+      lastAnalyticsSearchRef.current = searchTerm;
+      trackSearch(searchTerm);
+    }
+  }, [displayedProducts, filters.category, loading, productsData, searchFromUrl]);
 
   const totalPages = productsData?.totalPages || 1;
   const activePage = productsData?.page || currentPage;

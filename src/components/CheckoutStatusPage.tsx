@@ -3,6 +3,7 @@ import { getOrderById } from "@/services/ordersService";
 import { formatDateTimeBr } from "@/utils/dateTime";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { trackPurchase } from "@/lib/analytics";
 
 type Variant = "success" | "pending" | "error";
 
@@ -95,6 +96,30 @@ export default function CheckoutStatusPage({ variant }: Props) {
   const expired = useMemo(() => isExpiredLike(order), [order]);
   const failed = useMemo(() => isFailedLike(order), [order]);
   const pending = useMemo(() => !!order && !paid && !failed && !expired, [order, paid, failed, expired]);
+
+  useEffect(() => {
+    const sendPurchase = () => {
+      if (!paid || !order?.id) return;
+
+      trackPurchase({
+        transactionId: String(order.id),
+        value: Number(order.total || 0),
+        shipping: Number(order.shipping_cost || 0),
+        items: Array.isArray(order.items)
+          ? order.items.map((item: any) => ({
+              id: String(item.product_id),
+              name: String(item.product_name || "Produto"),
+              price: Number(item.price || 0),
+              quantity: Number(item.quantity || 1),
+            }))
+          : [],
+      });
+    };
+
+    sendPurchase();
+    window.addEventListener("analytics-consent-changed", sendPurchase);
+    return () => window.removeEventListener("analytics-consent-changed", sendPurchase);
+  }, [order, paid]);
 
   useEffect(() => {
     let cancelled = false;

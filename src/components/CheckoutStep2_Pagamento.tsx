@@ -3,6 +3,7 @@ import { CheckoutError, CheckoutPayload, PaymentMethod, iniciarCheckout } from "
 import { useMemo, useState } from "react";
 import CachedImage from "@/components/CachedImage";
 import { getOptimizedImageUrl } from "@/lib/productImages";
+import { trackAddPaymentInfo } from "@/lib/analytics";
 
 function formatCheckoutError(err: unknown) {
   if (err instanceof Error && err.message) {
@@ -149,6 +150,8 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
         total,
         payment_method: paymentMethod,
       });
+
+      trackAddPaymentInfo(cartItems, paymentMethod);
 
       const result: any = await iniciarCheckout(checkoutData, paymentMethod);
 

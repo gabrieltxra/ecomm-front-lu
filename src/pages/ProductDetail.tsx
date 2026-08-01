@@ -22,6 +22,7 @@ import { getOptimizedImageUrl, getProductImageSrcSet } from '@/lib/productImages
 import { preloadImage } from '@/lib/imagePreloadCache';
 import AddToCartDialog from '@/components/AddToCartDialog';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { trackViewItem } from '@/lib/analytics';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -74,6 +75,10 @@ useEffect(() => {
     active = false;
   };
 }, [id]);
+
+useEffect(() => {
+  if (product) trackViewItem(product);
+}, [product]);
 
   if (loading) {
     return (

@@ -3,6 +3,7 @@ import { useCart } from "@/contexts/CartContext";
 import { useMemo, useState, useEffect, useRef } from "react";
 import { getFreteData } from "@/services/freteService";
 import { searchCep } from "@/services/viaCepService";
+import { trackAddShippingInfo } from "@/lib/analytics";
 
 const onlyDigits = (value: string) => String(value || "").replace(/\D/g, "");
 
@@ -207,6 +208,8 @@ export default function CheckoutStep1({ onNext, updateData }: any) {
       subtotal,
       total,
     });
+
+    trackAddShippingInfo(cart, freteFinal?.name || (modoEntrega === "retirar" ? "Retirada" : "Entrega"));
 
     onNext();
   };

@@ -2,6 +2,7 @@ import { Product as ProductType } from '@/types/Product';
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { trackAddToCart, trackRemoveFromCart } from '@/lib/analytics';
 
 type Product = ProductType;
 
@@ -111,6 +112,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
         }
         return [...prevItems, { ...product, quantity: 1 }];
       });
+      trackAddToCart(product);
       return true;
     } catch (err) {
       console.error('Erro ao adicionar produto no carrinho:', err);
@@ -122,6 +124,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const removeFromCart = async (productId: number) => {
     const token = localStorage.getItem('token');
     if (!token) return;
+    const removedItem = items.find((item) => item.id === productId);
 
     try {
       const response = await fetch(`${API}/cartItem/${productId}`, {
@@ -133,6 +136,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
       if (!response.ok) throw new Error('Erro ao remover produto');
 
       setItems(prevItems => prevItems.filter(item => item.id !== productId));
+      if (removedItem) trackRemoveFromCart(removedItem, removedItem.quantity);
     } catch (err) {
       console.error('Erro ao remover produto do carrinho:', err);
       toast.error(err instanceof Error ? err.message : 'Erro ao remover produto');
@@ -146,6 +150,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   }
 
   try {
+    const currentItem = items.find((item) => item.id === productId);
     const token = localStorage.getItem('token');
     const response = await fetch(`${API}/cartItem/${productId}`, {
       method: 'PUT',
@@ -162,6 +167,11 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     setItems(prevItems =>
       prevItems.map(item => item.id === productId ? { ...item, quantity } : item)
     );
+    if (currentItem && quantity > currentItem.quantity) {
+      trackAddToCart(currentItem, quantity - currentItem.quantity);
+    } else if (currentItem && quantity < currentItem.quantity) {
+      trackRemoveFromCart(currentItem, currentItem.quantity - quantity);
+    }
   } catch (err) {
     console.error('Erro ao atualizar quantidade no backend:', err);
     toast.error(err instanceof Error ? err.message : 'Erro ao atualizar quantidade');
