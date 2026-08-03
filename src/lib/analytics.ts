@@ -19,7 +19,7 @@ declare global {
 }
 
 const CONSENT_STORAGE_KEY = "lu_analytics_consent_v1";
-const DEFAULT_MEASUREMENT_ID = "G-TP5L2DMT5S";
+const DEFAULT_MEASUREMENT_ID = "G-TP5LZDMT5S";
 const MEASUREMENT_ID = import.meta.env.VITE_GA_MEASUREMENT_ID || DEFAULT_MEASUREMENT_ID;
 
 let consentDefaultsApplied = false;
