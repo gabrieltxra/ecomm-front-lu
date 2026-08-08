@@ -121,6 +121,32 @@ const Home: React.FC = () => {
         </div>
       </section>
 
+      <section className="py-10 md:py-14">
+        <div className="container mx-auto px-4">
+          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-3xl font-bold">Produtos em destaque</h2>
+              <p className="mt-2 text-lg text-slate-600 dark:text-slate-300">
+                Alguns produtos para você conhecer primeiro.
+              </p>
+            </div>
+            <Link to="/produtos" className="text-lg font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-300">
+              Ver todos os produtos
+            </Link>
+          </div>
+
+          {loading && featuredProducts.length === 0 ? (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {[...Array(4)].map((_, index) => (
+                <div key={index} className="h-[360px] animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" />
+              ))}
+            </div>
+          ) : (
+            <ProductGrid products={featuredProducts} />
+          )}
+        </div>
+      </section>
+
       {categories.length > 0 && (
         <section id="categorias" className="border-y border-slate-200 bg-slate-50 py-10 dark:border-slate-800 dark:bg-slate-900/60">
           <div className="container mx-auto px-4">
@@ -178,32 +204,6 @@ const Home: React.FC = () => {
           </div>
         </section>
       )}
-
-      <section className="py-10 md:py-14">
-        <div className="container mx-auto px-4">
-          <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-            <div>
-              <h2 className="text-3xl font-bold">Produtos em destaque</h2>
-              <p className="mt-2 text-lg text-slate-600 dark:text-slate-300">
-                Alguns produtos para você conhecer primeiro.
-              </p>
-            </div>
-            <Link to="/produtos" className="text-lg font-semibold text-rose-600 hover:text-rose-700 dark:text-rose-300">
-              Ver todos os produtos
-            </Link>
-          </div>
-
-          {loading && featuredProducts.length === 0 ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {[...Array(4)].map((_, index) => (
-                <div key={index} className="h-[360px] animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" />
-              ))}
-            </div>
-          ) : (
-            <ProductGrid products={featuredProducts} />
-          )}
-        </div>
-      </section>
 
       <section className="border-t border-slate-200 bg-rose-50 py-10 dark:border-slate-800 dark:bg-slate-900">
         <div className="container mx-auto flex flex-col gap-5 px-4 md:flex-row md:items-center md:justify-between">
