@@ -39,7 +39,7 @@ function getPickupStatusMeta(status?: string | null) {
       label: "Pronto para retirada",
       message: "Seu pedido está pronto para retirada em nossa loja.",
       className:
-        "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-500/20 dark:bg-emerald-500/10 dark:text-emerald-200",
+        "border-emerald-200 bg-emerald-50 text-emerald-800",
     };
   }
 
@@ -48,7 +48,7 @@ function getPickupStatusMeta(status?: string | null) {
       label: "Retirado",
       message: "Este pedido já foi retirado.",
       className:
-        "border-slate-200 bg-slate-50 text-slate-800 dark:border-white/10 dark:bg-white/5 dark:text-slate-200",
+        "border-[#473d35]/10 bg-[#eadfd4] text-[#4d443e]",
     };
   }
 
@@ -56,7 +56,7 @@ function getPickupStatusMeta(status?: string | null) {
     label: "Aguardando retirada",
     message: "Entraremos em contato quando seu pedido estiver disponível para retirada.",
     className:
-      "border-amber-200 bg-amber-50 text-amber-900 dark:border-amber-500/20 dark:bg-amber-500/10 dark:text-amber-100",
+      "border-amber-200 bg-amber-50 text-amber-900",
   };
 }
 
@@ -127,27 +127,27 @@ const OrderDetails: React.FC = () => {
       return {
         label: "Pago",
         className:
-          "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-200 dark:ring-emerald-500/20",
+          "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200",
       };
     }
     if (key.includes("pending") || key.includes("pendente")) {
       return {
         label: "Pendente",
         className:
-          "bg-amber-50 text-amber-800 ring-1 ring-amber-200 dark:bg-amber-500/10 dark:text-amber-200 dark:ring-amber-500/20",
+          "bg-amber-50 text-amber-800 ring-1 ring-amber-200",
       };
     }
     if (key.includes("cancelled") || key.includes("cancelado")) {
       return {
         label: "Cancelado",
         className:
-          "bg-rose-50 text-rose-700 ring-1 ring-rose-200 dark:bg-rose-500/10 dark:text-rose-200 dark:ring-rose-500/20",
+          "bg-[#f7e1df] text-[#8f4541] ring-1 ring-[#b45f5a]/20",
       };
     }
     return {
       label: (order as any)?.status || order?.payment_status || "Status",
       className:
-        "bg-slate-50 text-slate-700 ring-1 ring-slate-200 dark:bg-white/5 dark:text-slate-200 dark:ring-white/10",
+        "bg-[#eadfd4] text-[#5e554e] ring-1 ring-[#473d35]/10",
     };
   }, [order]);
 
@@ -201,10 +201,10 @@ const OrderDetails: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen pt-24 flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center bg-[#f8f4ed] pt-20">
         <div className="text-center">
-          <div className="mx-auto mb-3 h-10 w-10 rounded-full border-2 border-rose-200 border-t-rose-500 animate-spin" />
-          <p className="text-sm text-slate-600 dark:text-slate-300">
+          <div className="mx-auto mb-3 h-10 w-10 animate-spin rounded-full border-2 border-[#e5c7c2] border-t-[#b45f5a]" />
+          <p className="text-sm text-[#746860]">
             Carregando pedido...
           </p>
         </div>
@@ -214,14 +214,14 @@ const OrderDetails: React.FC = () => {
 
   if (!order) {
     return (
-      <div className="min-h-screen pt-24 flex items-center justify-center px-4">
-        <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-white/10 dark:bg-slate-900">
-          <p className="text-slate-700 dark:text-slate-200">
+      <div className="flex min-h-screen items-center justify-center bg-[#f8f4ed] px-4 pt-20">
+        <div className="w-full max-w-md rounded-[1.5rem] border border-[#473d35]/10 bg-[#fffaf3] p-6 shadow-[0_20px_60px_rgba(61,45,36,0.1)]">
+          <p className="text-[#5e554e]">
             Pedido não encontrado.
           </p>
           <button
             onClick={() => navigate(-1)}
-            className="mt-4 inline-flex w-full items-center justify-center rounded-xl bg-rose-500 px-4 py-2.5 text-white hover:bg-rose-600 transition"
+            className="mt-4 inline-flex w-full items-center justify-center rounded-full bg-[#302b27] px-4 py-3 font-semibold text-white transition hover:bg-[#b45f5a]"
           >
             Voltar
           </button>
@@ -237,23 +237,23 @@ const OrderDetails: React.FC = () => {
   )}`;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-white to-rose-50 dark:from-slate-950 dark:to-slate-900 pt-20 pb-16">
-      <div className="container mx-auto px-4 max-w-4xl">
+    <div className="min-h-screen bg-[#f8f4ed] pb-16 pt-20 text-[#302b27]">
+      <div className="mx-auto max-w-6xl px-5 pt-8 sm:px-8 lg:px-12 lg:pt-10">
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center gap-2 text-sm mb-6 text-rose-600 hover:text-rose-700 dark:text-rose-300 dark:hover:text-rose-200"
+          className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-[#a64f4a] transition hover:text-[#873c38]"
         >
           <ArrowLeft className="w-4 h-4" /> Voltar
         </button>
 
         {/* Header Card */}
-        <div className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/5">
+        <div className="rounded-[1.5rem] border border-[#473d35]/10 bg-[#fffaf3] shadow-[0_18px_55px_rgba(61,45,36,0.07)]">
           <div className="p-6 md:p-8">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div>
                 <div className="flex flex-wrap items-center gap-3">
-                  <h1 className="text-2xl md:text-3xl font-semibold text-slate-900 dark:text-white">
-                    Pedido <span className="text-rose-500">#{order.id}</span>
+                  <h1 className="font-elegant text-3xl font-semibold leading-tight tracking-[-0.025em] text-[#302b27] md:text-4xl">
+                    Pedido <span className="break-all text-[#a64f4a]">#{order.id}</span>
                   </h1>
 
                   <span
@@ -263,7 +263,7 @@ const OrderDetails: React.FC = () => {
                   </span>
                 </div>
 
-                <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
+                <p className="mt-3 text-sm text-[#746860]">
                   Revise os detalhes do pedido, itens e documentos.
                 </p>
               </div>
@@ -274,9 +274,7 @@ const OrderDetails: React.FC = () => {
                     href={nfePdfUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm
-                               bg-rose-50 text-rose-700 ring-1 ring-rose-200 hover:bg-rose-100 transition
-                               dark:bg-white/5 dark:text-rose-200 dark:ring-white/10"
+                    className="inline-flex items-center justify-center gap-2 rounded-full bg-[#eadfd4] px-4 py-2.5 text-sm font-semibold text-[#8f4541] ring-1 ring-[#b45f5a]/15 transition hover:bg-[#dfcec1]"
                   >
                     <FileText className="w-4 h-4" />
                     Baixar NF-e
@@ -287,44 +285,44 @@ const OrderDetails: React.FC = () => {
 
             {/* Meta info */}
             <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3">
-              <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/5">
-                <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
+              <div className="rounded-xl border border-[#473d35]/10 bg-[#f8f4ed] p-4">
+                <div className="flex items-center gap-2 text-[#4d443e]">
                   <Calendar className="w-4 h-4" />
                   <span className="text-sm font-medium">Data</span>
                 </div>
-                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                <p className="mt-1 text-sm text-[#746860]">
                   {formatDateTimeBr(order.created_at)}
                 </p>
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/5">
-                <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
+              <div className="rounded-xl border border-[#473d35]/10 bg-[#f8f4ed] p-4">
+                <div className="flex items-center gap-2 text-[#4d443e]">
                   <CreditCard className="w-4 h-4" />
                   <span className="text-sm font-medium">Pagamento</span>
                 </div>
-                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                <p className="mt-1 text-sm text-[#746860]">
                   {order.payment_method}{" "}
-                  <span className="text-slate-400 dark:text-slate-400">
+                  <span className="text-[#9a8d84]">
                     ({order.payment_status})
                   </span>
                 </p>
               </div>
 
-              <div className="rounded-xl border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/5">
-                <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
+              <div className="rounded-xl border border-[#473d35]/10 bg-[#f8f4ed] p-4">
+                <div className="flex items-center gap-2 text-[#4d443e]">
                   <Truck className="w-4 h-4" />
                   <span className="text-sm font-medium">Entrega</span>
                 </div>
-                <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                <p className="mt-1 text-sm text-[#746860]">
                   {order.shipping_method || "—"}
                 </p>
               </div>
             </div>
 
             {/* Endereço / Retirada */}
-            <div className="mt-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:border-white/10 dark:bg-white/5">
+            <div className="mt-4 rounded-2xl border border-[#473d35]/10 bg-[#f8f4ed] p-5">
               <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2 text-slate-700 dark:text-slate-200">
+                <div className="flex items-center gap-2 text-[#4d443e]">
                   <MapPin className="w-4 h-4" />
                   <span className="text-sm font-medium">
                     {isPickup ? "Endereço para retirada" : "Endereço de entrega"}
@@ -332,17 +330,17 @@ const OrderDetails: React.FC = () => {
                 </div>
 
                 {isPickup ? (
-                  <span className="text-xs rounded-full px-2.5 py-1 bg-slate-100 text-slate-700 dark:bg-white/10 dark:text-slate-200">
+                  <span className="rounded-full bg-[#eadfd4] px-2.5 py-1 text-xs text-[#5e554e]">
                     Retirada
                   </span>
                 ) : (
-                  <span className="text-xs rounded-full px-2.5 py-1 bg-rose-50 text-rose-700 ring-1 ring-rose-200 dark:bg-white/5 dark:text-rose-200 dark:ring-white/10">
+                  <span className="rounded-full bg-[#ead2c9] px-2.5 py-1 text-xs text-[#8f4541] ring-1 ring-[#b45f5a]/15">
                     Entrega
                   </span>
                 )}
               </div>
 
-              <div className="mt-3 text-sm text-slate-700 dark:text-slate-200 space-y-1">
+              <div className="mt-3 space-y-1 text-sm text-[#4d443e]">
                 <p className="font-medium">
                   {address.street || "—"}
                   {address.number ? `, ${address.number}` : ""}
@@ -351,7 +349,7 @@ const OrderDetails: React.FC = () => {
                     : ""}
                 </p>
 
-                <p className="text-slate-600 dark:text-slate-300">
+                <p className="text-[#746860]">
                   {address.cep ? `CEP: ${address.cep}` : "CEP: —"}
                   {" • "}
                   {address.phone
@@ -369,14 +367,14 @@ const OrderDetails: React.FC = () => {
                 )}
 
                 {!isPickup && trackingCode && (
-                  <div className="mt-3 rounded-xl border border-rose-100 bg-rose-50 px-3 py-3 text-rose-900 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-100">
+                  <div className="mt-3 rounded-xl border border-[#b45f5a]/15 bg-[#ead2c9]/55 px-3 py-3 text-[#743c38]">
                     <p className="text-xs font-semibold uppercase tracking-wide">Codigo de rastreio</p>
                     <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                       <span className="break-all font-semibold">{trackingCode}</span>
                       <button
                         type="button"
                         onClick={copyTrackingCode}
-                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-3 py-2 text-sm font-medium text-rose-700 ring-1 ring-rose-200 transition hover:bg-rose-100 dark:bg-white/10 dark:text-rose-100 dark:ring-white/10 dark:hover:bg-white/15"
+                        className="inline-flex items-center justify-center gap-2 rounded-full bg-[#fffaf3] px-3 py-2 text-sm font-semibold text-[#8f4541] ring-1 ring-[#b45f5a]/15 transition hover:bg-white"
                       >
                         <Copy className="h-4 w-4" />
                         Copiar
@@ -390,7 +388,7 @@ const OrderDetails: React.FC = () => {
                     href={googleMapsLink}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center gap-2 text-sm text-rose-600 hover:text-rose-700 dark:text-rose-300 dark:hover:text-rose-200"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#a64f4a] transition hover:text-[#873c38]"
                   >
                     <MapPin className="w-4 h-4" />
                     Abrir no Google Maps
@@ -403,18 +401,18 @@ const OrderDetails: React.FC = () => {
 
         {/* Itens + Total */}
         <div className="mt-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/5">
+          <div className="rounded-[1.5rem] border border-[#473d35]/10 bg-[#fffaf3] shadow-[0_18px_55px_rgba(61,45,36,0.07)] lg:col-span-2">
             <div className="p-6">
               <div className="flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-white flex items-center gap-2">
-                  <Package className="w-5 h-5 text-rose-500" />
+                <h2 className="flex items-center gap-2 font-elegant text-xl font-semibold text-[#302b27]">
+                  <Package className="h-5 w-5 text-[#b45f5a]" />
                   Itens do pedido
                 </h2>
 
                 {canRequestReturn && (
                   <button
                     onClick={() => navigate(`/order/${order.id}/support`)}
-                    className="inline-flex items-center gap-2 text-sm text-rose-600 hover:text-rose-700 dark:text-rose-300 dark:hover:text-rose-200"
+                    className="inline-flex items-center gap-2 text-sm font-semibold text-[#a64f4a] transition hover:text-[#873c38]"
                     title="Abrir solicitação de devolução/troca"
                   >
                     <RotateCcw className="w-4 h-4" />
@@ -423,18 +421,18 @@ const OrderDetails: React.FC = () => {
                 )}
               </div>
 
-              <div className="mt-4 divide-y divide-slate-200 dark:divide-white/10 rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden">
+              <div className="mt-4 overflow-hidden rounded-xl border border-[#473d35]/10 divide-y divide-[#473d35]/10">
                 {order.items?.map((it: any) => {
                   const img = getItemImage(it);
 
                   return (
                     <div
                       key={it.id ?? `${it.product_id}-${it.price}`}
-                      className="flex items-start justify-between gap-3 p-4 bg-white dark:bg-transparent"
+                      className="flex items-start justify-between gap-3 bg-[#f8f4ed]/70 p-4"
                     >
                       {/* left */}
                       <div className="flex items-start gap-3 min-w-0">
-                        <div className="h-14 w-14 rounded-xl overflow-hidden border bg-slate-50 flex items-center justify-center shrink-0 dark:bg-white/5 dark:border-white/10">
+                        <div className="flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-[#473d35]/10 bg-[#eadfd4]">
                           {img ? (
                             <CachedImage
                               src={getOptimizedImageUrl(img, { width: 112, height: 112, quality: 66 })}
@@ -447,15 +445,15 @@ const OrderDetails: React.FC = () => {
                               height={112}
                             />
                           ) : (
-                            <ImageIcon className="h-5 w-5 text-slate-400" />
+                            <ImageIcon className="h-5 w-5 text-[#9a8d84]" />
                           )}
                         </div>
 
                         <div className="min-w-0">
-                          <p className="font-medium text-slate-900 dark:text-white truncate">
+                          <p className="truncate font-medium text-[#302b27]">
                             {it.product_name}
                           </p>
-                          <p className="text-sm text-slate-600 dark:text-slate-300">
+                          <p className="text-sm text-[#746860]">
                             Quantidade:{" "}
                             <span className="font-medium">{it.quantity}</span>
                           </p>
@@ -464,10 +462,10 @@ const OrderDetails: React.FC = () => {
 
                       {/* right */}
                       <div className="text-right shrink-0">
-                        <p className="text-sm text-slate-600 dark:text-slate-300">
+                        <p className="font-sans text-sm tabular-nums text-[#746860]">
                           R$ {formatMoney(it.price)}
                         </p>
-                        <p className="font-semibold text-slate-900 dark:text-white">
+                        <p className="font-sans font-bold tabular-nums text-[#302b27]">
                           R$ {formatMoney(it.price * it.quantity)}
                         </p>
                       </div>
@@ -476,7 +474,7 @@ const OrderDetails: React.FC = () => {
                 })}
 
                 {(order.items?.length ?? 0) === 0 && (
-                  <div className="p-4 text-sm text-slate-600 dark:text-slate-300">
+                  <div className="p-4 text-sm text-[#746860]">
                     Nenhum item encontrado.
                   </div>
                 )}
@@ -484,28 +482,28 @@ const OrderDetails: React.FC = () => {
             </div>
           </div>
 
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-white/10 dark:bg-white/5">
+          <div className="rounded-[1.5rem] border border-[#473d35]/10 bg-[#efe5dc] shadow-[0_18px_55px_rgba(61,45,36,0.07)]">
             <div className="p-6">
-              <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+              <h3 className="font-elegant text-xl font-semibold text-[#302b27]">
                 Resumo
               </h3>
 
               <div className="mt-4 space-y-2 text-sm">
-                <div className="flex justify-between text-slate-600 dark:text-slate-300">
+                <div className="flex justify-between text-[#746860]">
                   <span>Subtotal</span>
                   <span>R$ {formatMoney(order.total ?? 0)}</span>
                 </div>
 
-                <div className="flex justify-between text-slate-600 dark:text-slate-300">
+                <div className="flex justify-between text-[#746860]">
                   <span>Frete</span>
                   <span>R$ {formatMoney(order.shipping_cost ?? 0)}</span>
                 </div>
 
-                <div className="pt-3 mt-3 border-t border-slate-200 dark:border-white/10 flex justify-between">
-                  <span className="font-semibold text-slate-900 dark:text-white">
+                <div className="mt-3 flex justify-between border-t border-[#473d35]/15 pt-3">
+                  <span className="font-semibold text-[#302b27]">
                     Total
                   </span>
-                  <span className="font-semibold text-slate-900 dark:text-white">
+                  <span className="font-sans font-bold tabular-nums text-[#302b27]">
                     R$ {formatMoney(totalFinal)}
                   </span>
                 </div>
@@ -514,8 +512,7 @@ const OrderDetails: React.FC = () => {
               <div className="mt-5 space-y-2">
                 <button
                   onClick={() => navigate(`/order/${order.id}/support`)}
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm
-                             bg-rose-500 text-white hover:bg-rose-600 transition"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-[#b45f5a] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#9f4e49]"
                 >
                   <RotateCcw className="w-4 h-4" />
                   Abrir ticket de devolução/troca
@@ -523,16 +520,14 @@ const OrderDetails: React.FC = () => {
 
                 <button
                   onClick={() => navigate(-1)}
-                  className="w-full inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm
-                             bg-slate-100 text-slate-900 hover:bg-slate-200 transition
-                             dark:bg-white/10 dark:text-white dark:hover:bg-white/15"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-[#473d35]/15 bg-[#fffaf3] px-4 py-3 text-sm font-semibold text-[#302b27] transition hover:bg-white"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   Voltar para pedidos
                 </button>
               </div>
 
-              <p className="mt-4 text-xs text-slate-500 dark:text-slate-400">
+              <p className="mt-4 text-xs leading-5 text-[#7b6f66]">
                 Dica: se o pedido estiver pago, você pode abrir uma solicitação
                 de devolução/troca.
               </p>
