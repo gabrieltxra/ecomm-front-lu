@@ -26,7 +26,7 @@ const Login: React.FC = () => {
       localStorage.setItem("token", token);
       login(user, token);
       await loadCartFromServer();
-      navigate("/");
+      navigate("/ecommerce");
     } catch (err: any) {
       setErro(err?.message || "Erro ao fazer login.");
     }

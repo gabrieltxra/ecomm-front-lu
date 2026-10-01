@@ -95,7 +95,7 @@ useEffect(() => {
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-4">Produto não encontrado</h1>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/ecommerce')}
             className="bg-atelie-gradient text-white px-6 py-2 rounded-lg"
           >
             Voltar à Home

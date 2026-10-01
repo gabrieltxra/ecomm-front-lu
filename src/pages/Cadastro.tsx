@@ -213,7 +213,7 @@ const Cadastro: React.FC = () => {
       login(user, token);
 
       toast.success("Conta criada com sucesso!");
-      navigate("/");
+      navigate("/ecommerce");
     } catch (err: any) {
       const { status, error, details } = extractApiError(err);
 

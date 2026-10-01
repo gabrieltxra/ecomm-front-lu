@@ -47,7 +47,7 @@ const Cart: React.FC = () => {
               Você ainda não adicionou nenhum produto ao seu carrinho.
             </p>
             <Link
-              to="/"
+              to="/ecommerce"
               className="inline-block bg-atelie-gradient text-white px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
             >
               Continuar Comprando

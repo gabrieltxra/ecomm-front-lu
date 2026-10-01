@@ -271,7 +271,7 @@ export default function CheckoutStatusPage({ variant }: Props) {
 
             {paid ? (
               <div className="flex gap-4">
-                <Link to="/" className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 rounded-md text-center">Voltar à loja</Link>
+                <Link to="/ecommerce" className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-2 rounded-md text-center">Voltar à loja</Link>
                 <Link to={`/order/${order.id}`} className="flex-1 bg-rose-500 hover:bg-rose-600 text-white font-semibold py-2 rounded-md text-center">Ver pedido</Link>
               </div>
              ) : failed || expired ? (

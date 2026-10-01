@@ -14,7 +14,7 @@ const Header: React.FC = () => {
   const { user, isLoggedIn, isLoading: isAuthLoading } = useAuth();
 
   const navigation = [
-    { name: 'Home', href: '/' },
+    { name: 'Home', href: '/ecommerce' },
     { name: 'Produtos', href: '/produtos' },
     // { name: 'Cortinas', href: '/cortinas' },
     // { name: 'Persianas', href: '/persianas' },
@@ -50,7 +50,7 @@ const Header: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to="/ecommerce" className="flex items-center space-x-2">
             <div className="w-10 h-10 rounded-full bg-atelie-gradient flex items-center justify-center">
               <span className="text-white font-script text-lg font-bold">L</span>
             </div>

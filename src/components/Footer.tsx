@@ -1,5 +1,6 @@
 import React from 'react';
 import { Instagram, Phone, Heart } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -30,8 +31,8 @@ const Footer: React.FC = () => {
           <div className="text-center">
             <h3 className="text-lg font-semibold mb-4 text-rose-500 dark:text-rose-400">Links Rápidos</h3>
             <ul className="space-y-3 text-slate-600 dark:text-slate-300">
-              <li><a href="/" className="hover:text-rose-500 dark:hover:text-rose-400 transition-colors font-medium">Home</a></li>
-              <li><a href="/produtos" className="hover:text-rose-500 dark:hover:text-rose-400 transition-colors font-medium">Produtos</a></li>
+              <li><Link to="/ecommerce" className="hover:text-rose-500 dark:hover:text-rose-400 transition-colors font-medium">Home</Link></li>
+              <li><Link to="/produtos" className="hover:text-rose-500 dark:hover:text-rose-400 transition-colors font-medium">Produtos</Link></li>
               {/* <li><a href="/cortinas" className="hover:text-rose-500 dark:hover:text-rose-400 transition-colors font-medium">Cortinas</a></li>
               <li><a href="/persianas" className="hover:text-rose-500 dark:hover:text-rose-400 transition-colors font-medium">Persianas</a></li>
               <li><a href="/sob-medida" className="hover:text-rose-500 dark:hover:text-rose-400 transition-colors font-medium">Sob Medida</a></li> */}
@@ -90,4 +91,4 @@ const Footer: React.FC = () => {
   );
 };
 
-export default Footer; 
+export default Footer;
