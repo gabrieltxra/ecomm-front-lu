@@ -130,8 +130,8 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
           {product.description}
         </p>
 
-        <div className="mt-auto flex items-center justify-between gap-2">
-          <span className={`font-sans font-bold tabular-nums tracking-[-0.02em] text-[#9f4e49] ${compact ? 'text-xl' : 'text-2xl'}`}>
+        <div className="mt-auto flex flex-wrap items-center justify-between gap-3">
+          <span className={`whitespace-nowrap font-sans font-bold tabular-nums tracking-[-0.02em] text-[#9f4e49] ${compact ? 'text-xl' : 'text-2xl'}`}>
             {formatPrice(product.price)}
           </span>
 
@@ -139,7 +139,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
             type="button"
             onClick={handleAddToCart}
             disabled={!isAvailable || isAddingToCart}
-            className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
+            className={`ml-auto inline-flex min-h-10 shrink-0 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
               isAvailable
                 ? 'bg-[#302b27] text-white hover:-translate-y-0.5 hover:bg-[#b45f5a] disabled:cursor-wait disabled:opacity-85'
                 : 'cursor-not-allowed bg-[#ddd2c8] text-[#8a7d74] shadow-none'

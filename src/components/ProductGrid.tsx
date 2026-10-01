@@ -27,7 +27,10 @@ const ProductGrid: React.FC<ProductGridProps> = React.memo(({
 
   return (
     <>
-      <div ref={gridRef} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div
+        ref={gridRef}
+        className="grid gap-6 [grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr))]"
+      >
         {products.map((product, index) => (
           <div key={product.id} data-product-image-index={index} className="h-full">
             <ProductCard
