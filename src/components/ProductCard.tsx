@@ -34,7 +34,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
   const navigate = useNavigate();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const isAvailable = Number(product.stock) > 0;
-  const imageHeightClass = compact ? 'h-44 sm:h-48' : 'h-56 sm:h-60 md:h-64';
+  const imageHeightClass = compact ? 'h-52 sm:h-56' : 'h-64 sm:h-72 md:h-80';
   const productImage = product.image_urls?.[0];
   const optimizedImage = getOptimizedImageUrl(productImage, {
     width: compact ? 480 : 640,
@@ -84,13 +84,13 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 
   return (
     <article
-      className="group product-card flex h-full flex-col overflow-hidden rounded-lg border border-slate-100 bg-card shadow-sm transition-colors duration-150 md:hover:border-rose-100 md:hover:shadow-md"
+      className="group product-card flex h-full flex-col overflow-hidden rounded-[1.35rem] border border-[#473d35]/10 bg-[#fffaf3] shadow-[0_10px_30px_rgba(64,48,39,0.06)] transition duration-300 md:hover:-translate-y-1 md:hover:border-[#b45f5a]/25 md:hover:shadow-[0_18px_38px_rgba(64,48,39,0.12)]"
       onPointerEnter={prefetchProduct}
       onFocusCapture={prefetchProduct}
       onTouchStart={prefetchProduct}
     >
       <Link to={`/product/${product.id}`} className="block">
-        <div className={`relative shrink-0 overflow-hidden bg-slate-100 dark:bg-slate-800 ${imageHeightClass}`}>
+        <div className={`relative shrink-0 overflow-hidden bg-[#eadfd4] ${imageHeightClass}`}>
           {productImage ? (
             <CachedImage
               src={optimizedImage}
@@ -103,35 +103,35 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
               decoding="async"
               width={compact ? 480 : 640}
               height={compact ? 360 : 480}
-              className="h-full w-full object-cover"
+              className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.035]"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400">
+            <div className="flex h-full w-full items-center justify-center bg-[#eadfd4] text-[#8a7d74]">
               Sem imagem
             </div>
           )}
 
           <div className="absolute left-3 top-3">
-            <span className="rounded-full bg-atelie-gradient px-2 py-1 text-xs font-medium text-white">
+            <span className="rounded-full bg-[#fffaf3]/90 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-[#8f4541] shadow-sm backdrop-blur-sm">
               {product.category}
             </span>
           </div>
         </div>
       </Link>
 
-      <div className={`flex flex-1 flex-col ${compact ? 'p-3' : 'p-4'}`}>
+      <div className={`flex flex-1 flex-col ${compact ? 'p-4' : 'p-5'}`}>
         <Link to={`/product/${product.id}`} className="block">
-          <h3 className={`mb-2 line-clamp-2 font-elegant font-semibold text-foreground transition-colors group-hover:text-rose-600 ${compact ? 'text-base' : 'text-lg'}`}>
+          <h3 className={`mb-2 line-clamp-2 font-elegant font-semibold leading-snug text-[#302b27] transition-colors group-hover:text-[#9f4e49] ${compact ? 'text-lg' : 'text-xl'}`}>
             {product.name}
           </h3>
         </Link>
 
-        <p className={`mb-3 text-sm text-muted-foreground ${compact ? 'line-clamp-1' : 'line-clamp-2'}`}>
+        <p className={`mb-4 text-sm leading-6 text-[#7b6f66] ${compact ? 'line-clamp-1' : 'line-clamp-2'}`}>
           {product.description}
         </p>
 
         <div className="mt-auto flex items-center justify-between gap-2">
-          <span className={`font-bold text-rose-500 dark:text-rose-400 ${compact ? 'text-xl' : 'text-2xl'}`}>
+          <span className={`font-elegant font-semibold text-[#9f4e49] ${compact ? 'text-xl' : 'text-2xl'}`}>
             {formatPrice(product.price)}
           </span>
 
@@ -139,10 +139,10 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
             type="button"
             onClick={handleAddToCart}
             disabled={!isAvailable || isAddingToCart}
-            className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold shadow-sm transition-colors ${
+            className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all ${
               isAvailable
-                ? 'bg-rose-500 text-white hover:bg-rose-600 disabled:cursor-wait disabled:opacity-85 dark:bg-rose-400 dark:hover:bg-rose-500'
-                : 'cursor-not-allowed bg-gray-300 text-gray-500 shadow-none dark:bg-gray-700 dark:text-gray-400'
+                ? 'bg-[#302b27] text-white hover:-translate-y-0.5 hover:bg-[#b45f5a] disabled:cursor-wait disabled:opacity-85'
+                : 'cursor-not-allowed bg-[#ddd2c8] text-[#8a7d74] shadow-none'
             }`}
             aria-label={isAvailable ? `Adicionar ${product.name} ao carrinho` : `${product.name} indisponível`}
             aria-busy={isAddingToCart}

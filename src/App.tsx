@@ -82,7 +82,7 @@ const SiteShell = () => {
           href="https://wa.me/5519991893513"
           target="_blank"
           rel="noopener noreferrer"
-          className="fixed z-50 bottom-6 right-6 bg-rose-400 hover:bg-rose-500 text-white rounded-full shadow-lg dark:shadow-dark p-4 flex items-center justify-center transition-all border-4 border-white dark:border-slate-800 backdrop-blur-sm"
+          className="fixed bottom-6 right-6 z-50 flex items-center justify-center rounded-full border-4 border-[#fffaf3] bg-[#b45f5a] p-4 text-white shadow-lg backdrop-blur-sm transition-all hover:-translate-y-1 hover:bg-[#9f4e49] dark:shadow-dark"
           aria-label="Fale conosco no WhatsApp"
         >
           <MessageCircle className="h-7 w-7 text-white drop-shadow" />

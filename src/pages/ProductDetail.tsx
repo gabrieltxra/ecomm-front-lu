@@ -23,6 +23,7 @@ import { preloadImage } from '@/lib/imagePreloadCache';
 import AddToCartDialog from '@/components/AddToCartDialog';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { trackViewItem } from '@/lib/analytics';
+import Head from '@/components/ui/Head';
 
 const ProductDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -96,7 +97,7 @@ useEffect(() => {
           <h1 className="text-2xl font-bold mb-4">Produto não encontrado</h1>
           <button
             onClick={() => navigate('/ecommerce')}
-            className="bg-atelie-gradient text-white px-6 py-2 rounded-lg"
+            className="rounded-full bg-[#27231f] px-6 py-2 text-white transition hover:bg-[#b45f5a]"
           >
             Voltar à Home
           </button>
@@ -152,7 +153,7 @@ useEffect(() => {
     const url = new URL(`/product/${product.id}`, window.location.origin).toString();
     const shareData = {
       title: product.name,
-      text: `Confira ${product.name} na Lu Cortinas.`,
+      text: `Confira ${product.name} no Ateliê Lu.`,
       url,
     };
 
@@ -184,8 +185,9 @@ useEffect(() => {
   };
 
   return (
-    <div className="min-h-screen pt-16">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-[#f8f4ed] pt-20 text-[#27231f]">
+      <Head title={`${product.name} | Ateliê Lu`} />
+      <div className="mx-auto max-w-[1380px] px-5 py-10 sm:px-8 lg:px-12">
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
@@ -202,7 +204,7 @@ useEffect(() => {
             <button
               type="button"
               onClick={() => setIsImageDialogOpen(true)}
-              className="group relative block aspect-square w-full cursor-zoom-in overflow-hidden rounded-lg bg-gray-100 text-left"
+              className="group relative block aspect-square w-full cursor-zoom-in overflow-hidden rounded-[1.5rem] bg-[#efe5dc] text-left"
               aria-label={`Ampliar imagem de ${product.name}`}
             >
               <CachedImage
@@ -236,8 +238,8 @@ useEffect(() => {
                   onTouchStart={() => preloadDetailImage(image)}
                   className={`aspect-square rounded-lg overflow-hidden border-2 transition-all ${
                     selectedImageIndex === index
-                      ? 'border-primary scale-105'
-                      : 'border-transparent hover:border-border'
+                      ? 'scale-105 border-[#b45f5a]'
+                      : 'border-transparent hover:border-[#473d35]/30'
                   }`}
                 >
                   <CachedImage
@@ -260,17 +262,17 @@ useEffect(() => {
           {/* Product Info */}
           <div className="space-y-6">
             {/* Category Badge */}
-            <span className="inline-block bg-atelie-gradient text-white px-3 py-1 rounded-full text-sm font-medium">
+            <span className="inline-block rounded-full bg-[#ead2c9] px-4 py-1.5 text-xs font-bold uppercase tracking-[0.16em] text-[#913f3b]">
               {product.category}
             </span>
 
             {/* Title */}
-            <h1 className="text-3xl md:text-4xl font-elegant font-bold text-foreground">
+            <h1 className="font-serif text-4xl font-normal leading-tight md:text-6xl">
               {product.name}
             </h1>
 
             {/* Price */}
-            <div className="text-4xl font-bold text-gradient">
+            <div className="text-3xl font-semibold text-[#a64f4a]">
               {formatPrice(product.price)}
             </div>
 
@@ -291,7 +293,7 @@ useEffect(() => {
                 className={`flex-1 py-3 px-6 rounded-lg font-semibold flex items-center justify-center space-x-2
                   ${!isAvailable 
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed" 
-                    : "bg-atelie-gradient text-white hover:opacity-90 disabled:cursor-wait disabled:opacity-85 transition-opacity"
+                    : "bg-[#27231f] text-white hover:bg-[#b45f5a] disabled:cursor-wait disabled:opacity-85 transition-colors"
                   }`}
               >
                 {isAddingToCart ? (
@@ -306,7 +308,7 @@ useEffect(() => {
               <button
                 type="button"
                 onClick={handleShare}
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg border border-border bg-background px-6 py-3 font-semibold text-foreground transition-colors hover:bg-accent"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-[#473d35]/20 bg-[#fffaf3] px-6 py-3 font-semibold transition-colors hover:bg-[#efe5dc]"
               >
                 <Share2 className="h-5 w-5" />
                 <span>Compartilhar</span>
@@ -315,8 +317,8 @@ useEffect(() => {
 
 
             {/* Contact Info */}
-            <div className="bg-accent/50 rounded-lg p-6 space-y-3">
-              <h3 className="font-semibold text-lg">Dúvidas sobre o produto?</h3>
+            <div className="space-y-3 rounded-[1.35rem] bg-[#efe5dc] p-6">
+              <h3 className="font-serif text-2xl">Dúvidas sobre o produto?</h3>
               <p className="text-muted-foreground">
                 Entre em contato conosco para esclarecimentos ou orçamento personalizado.
               </p>
@@ -324,7 +326,7 @@ useEffect(() => {
                 href="https://wa.me/5519991893513"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-lg bg-rose-500 px-5 text-base font-semibold text-white shadow-sm transition hover:bg-rose-600"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-[#b45f5a] px-5 text-base font-semibold text-white shadow-sm transition hover:bg-[#9f4e49]"
               >
                 Chamar no WhatsApp
                 <Phone className="h-5 w-5" />

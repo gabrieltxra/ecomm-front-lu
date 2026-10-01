@@ -286,7 +286,7 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
               {isRetirada ? (
                 <div className="min-w-0 rounded-2xl border p-4 text-sm text-gray-700 md:p-5">
                   <h3 className="mb-2 font-semibold text-gray-900">Retirada no local</h3>
-                  <div className="break-words">Lu Cortinas Ateliê — Rua Jurunas, 398, Santa Bárbara d'Oeste - SP</div>
+                  <div className="break-words">Ateliê Lu — Rua Jurunas, 398, Santa Bárbara d'Oeste - SP</div>
                   <div className="break-words">CEP: 13457-038 • Tel: (19) 99189-3513</div>
                   <div className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 shadow-sm">
                     <div className="mb-1 font-semibold uppercase tracking-wide text-amber-700">Aviso de retirada</div>

@@ -1,43 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { ShoppingCart, LogIn, Menu, X, Search } from 'lucide-react';
-import { useCart } from '../contexts/CartContext';
+import { LogIn, Menu, Search, ShoppingBag, X } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+
 import { useAuth } from '@/contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
 
 const Header: React.FC = () => {
   const { getTotalItems, isLoading: isCartLoading } = useCart();
+  const { user, isLoggedIn, isLoading: isAuthLoading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, isLoggedIn, isLoading: isAuthLoading } = useAuth();
 
   const navigation = [
-    { name: 'Home', href: '/ecommerce' },
+    { name: 'Loja', href: '/ecommerce' },
     { name: 'Produtos', href: '/produtos' },
-    // { name: 'Cortinas', href: '/cortinas' },
-    // { name: 'Persianas', href: '/persianas' },
-    // { name: 'Sob Medida', href: '/sob-medida' }
+    { name: 'O ateliê', href: '/' },
   ];
-
-  const isActive = (href: string) => location.pathname === href;
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     setSearchTerm(location.pathname === '/produtos' ? params.get('search') || '' : '');
+    setIsMenuOpen(false);
+    setIsSearchOpen(false);
   }, [location.pathname, location.search]);
 
   const submitSearch = () => {
     const value = searchTerm.trim();
     navigate(value ? `/produtos?search=${encodeURIComponent(value)}` : '/produtos');
-    setIsMenuOpen(false);
-    setIsSearchOpen(false);
-  };
-
-  const handleSearchSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    submitSearch();
   };
 
   const totalItems = getTotalItems();
@@ -46,130 +38,114 @@ const Header: React.FC = () => {
     : `Carrinho de compras com ${totalItems} ${totalItems === 1 ? 'item' : 'itens'}`;
 
   return (
-    <header className="fixed top-0 w-full bg-background/95 backdrop-blur-sm border-b border-border z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link to="/ecommerce" className="flex items-center space-x-2">
-            <div className="w-10 h-10 rounded-full bg-atelie-gradient flex items-center justify-center">
-              <span className="text-white font-script text-lg font-bold">L</span>
-            </div>
-            <div className="hidden sm:block">
-              <span className="text-gradient font-elegant text-xl font-semibold">Ateliê</span>
-              <span className="text-gradient font-script text-xl ml-1">Lu</span>
-              <span className="text-gradient font-elegant text-lg block text-xs">Cortinas</span>
-            </div>
-        </Link>
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-[#473d35]/10 bg-[#f8f4ed]/95 text-[#302b27] backdrop-blur-xl">
+      <div className="mx-auto max-w-[1380px] px-4 sm:px-8 lg:px-12">
+        <div className="flex h-20 items-center justify-between gap-5">
+          <Link to="/ecommerce" className="group flex shrink-0 items-center gap-3" aria-label="Ateliê Lu — loja">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#b45f5a] font-script text-xl font-bold text-white shadow-[0_8px_24px_rgba(109,56,51,0.18)] transition-transform group-hover:-rotate-6">
+              L
+            </span>
+            <span className="hidden leading-none sm:block">
+              <span className="block font-elegant text-lg font-semibold tracking-[0.03em]">Ateliê Lu</span>
+              <span className="mt-1 block text-[9px] font-semibold uppercase tracking-[0.32em] text-[#8a7770]">Ateliê</span>
+            </span>
+          </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8" role="navigation" aria-label="Menu principal">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={`rounded-lg px-3 py-2 text-sm font-semibold transition-all duration-150 hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 ${
-                  isActive(item.href)
-                    ? 'bg-accent text-accent-foreground ring-1 ring-primary/20 shadow-sm'
-                    : 'text-muted-foreground'
-                }`}
-                aria-current={isActive(item.href) ? 'page' : undefined}
-              >
-                {item.name}
-              </Link>
-            ))}
+          <nav className="hidden items-center gap-6 lg:flex" aria-label="Menu principal">
+            {navigation.map((item) => {
+              const active = location.pathname === item.href;
+              return (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={`border-b py-2 text-sm font-semibold transition-colors ${
+                    active
+                      ? 'border-[#b45f5a] text-[#9f4e49]'
+                      : 'border-transparent text-[#6f645c] hover:text-[#9f4e49]'
+                  }`}
+                  aria-current={active ? 'page' : undefined}
+                >
+                  {item.name}
+                </Link>
+              );
+            })}
           </nav>
 
           <form
-            onSubmit={handleSearchSubmit}
-            className="hidden min-w-0 flex-1 max-w-sm items-center rounded-full border border-border bg-background px-3 py-2 md:flex"
+            onSubmit={(event) => {
+              event.preventDefault();
+              submitSearch();
+            }}
+            className="hidden min-w-0 max-w-xs flex-1 items-center rounded-full border border-[#514841]/15 bg-[#fffaf3]/75 px-4 py-2.5 md:flex"
             role="search"
           >
-            <button
-              type="submit"
-              className="rounded-full p-1 text-muted-foreground transition hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              aria-label="Enviar busca"
-            >
-              <Search className="h-4 w-4" />
-            </button>
+            <Search className="h-4 w-4 shrink-0 text-[#9f4e49]" />
             <input
               type="search"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  event.preventDefault();
-                  submitSearch();
-                }
-              }}
-              placeholder="Buscar produtos"
-              className="min-w-0 flex-1 bg-transparent px-2 text-sm outline-none placeholder:text-muted-foreground"
+              placeholder="Buscar na coleção"
+              className="min-w-0 flex-1 bg-transparent px-3 text-sm text-[#403832] outline-none placeholder:text-[#9a8d84]"
               aria-label="Buscar produtos"
             />
           </form>
 
-          {/* Actions */}
-          <div className="flex items-center space-x-3 sm:space-x-4">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
             <button
               type="button"
               onClick={() => setIsSearchOpen((open) => !open)}
-              className="rounded-lg p-2 text-muted-foreground transition-all duration-150 hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 md:hidden"
+              className="grid h-10 w-10 place-items-center rounded-full text-[#5e554e] transition hover:bg-[#ead9cd] hover:text-[#9f4e49] md:hidden"
               aria-label="Buscar produtos"
             >
               <Search className="h-5 w-5" />
             </button>
 
-            {/* Cart */}
-            <Link 
-              to="/cart" 
-              className="relative rounded-lg p-2 text-muted-foreground transition-all duration-150 hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+            <Link
+              to="/cart"
+              className="relative grid h-10 w-10 place-items-center rounded-full text-[#5e554e] transition hover:bg-[#ead9cd] hover:text-[#9f4e49]"
               aria-label={cartLabel}
               aria-busy={isCartLoading}
             >
-              <ShoppingCart className="h-5 w-5" />
+              <ShoppingBag className="h-5 w-5" />
               {!isCartLoading && totalItems > 0 && (
-                <span className="absolute -top-1 -right-1 bg-rose-500 dark:bg-rose-400 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium animate-pulse">
+                <span className="absolute -right-0.5 -top-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-[#b45f5a] px-1 text-[10px] font-bold text-white">
                   {totalItems}
                 </span>
               )}
             </Link>
+
             {isAuthLoading ? (
-              <div
-                className="h-8 w-8 animate-pulse rounded-full bg-muted"
-                role="status"
-                aria-label="Carregando conta"
-              />
+              <div className="h-9 w-9 animate-pulse rounded-full bg-[#ead9cd]" aria-label="Carregando conta" />
             ) : isLoggedIn && user ? (
               <Link
                 to="/perfil"
-                className="w-8 h-8 rounded-full overflow-hidden border-2 border-primary hover:scale-105 transition-transform"
+                className="h-9 w-9 overflow-hidden rounded-full border-2 border-[#b45f5a] transition hover:scale-105"
                 aria-label={`Abrir perfil de ${user.name}`}
               >
-             {user.avatarUrl ? (
-              <img
-                src={user.avatarUrl}
-                alt="Avatar"
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center bg-rose-400 text-white text-xl font-bold uppercase">
-                {user.name[0]
-                }
-              </div>
-            )}
+                {user.avatarUrl ? (
+                  <img src={user.avatarUrl} alt="Avatar" className="h-full w-full object-cover" />
+                ) : (
+                  <span className="grid h-full w-full place-items-center bg-[#b45f5a] text-sm font-bold uppercase text-white">
+                    {user.name[0]}
+                  </span>
+                )}
               </Link>
             ) : (
-              <Link to="/login" aria-label="Entrar na conta" className="rounded-lg p-2 text-muted-foreground transition-all duration-150 hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2">
+              <Link
+                to="/login"
+                className="grid h-10 w-10 place-items-center rounded-full text-[#5e554e] transition hover:bg-[#ead9cd] hover:text-[#9f4e49]"
+                aria-label="Entrar na conta"
+              >
                 <LogIn className="h-5 w-5" />
               </Link>
             )}
-            {/* Mobile Menu Button */}
+
             <button
               type="button"
-              className="rounded-lg p-2 text-muted-foreground transition-all duration-150 hover:-translate-y-0.5 hover:bg-accent hover:text-accent-foreground hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 md:hidden"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="grid h-10 w-10 place-items-center rounded-full text-[#5e554e] transition hover:bg-[#ead9cd] lg:hidden"
+              onClick={() => setIsMenuOpen((open) => !open)}
               aria-label={isMenuOpen ? 'Fechar menu principal' : 'Abrir menu principal'}
               aria-expanded={isMenuOpen}
-              aria-controls="mobile-navigation"
             >
               {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -178,55 +154,37 @@ const Header: React.FC = () => {
 
         {isSearchOpen && (
           <form
-            onSubmit={handleSearchSubmit}
-            className="mb-3 flex items-center rounded-full border border-border bg-background px-3 py-2 shadow-sm md:hidden"
-            role="search"
+            onSubmit={(event) => {
+              event.preventDefault();
+              submitSearch();
+            }}
+            className="mb-4 flex items-center rounded-full border border-[#514841]/15 bg-[#fffaf3] px-4 py-3 md:hidden"
           >
-            <button
-              type="submit"
-              className="rounded-full p-1 text-muted-foreground transition hover:bg-accent hover:text-accent-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-              aria-label="Enviar busca"
-            >
-              <Search className="h-4 w-4" />
-            </button>
+            <Search className="h-4 w-4 text-[#9f4e49]" />
             <input
               type="search"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  event.preventDefault();
-                  submitSearch();
-                }
-              }}
-              placeholder="Buscar produtos"
-              className="min-w-0 flex-1 bg-transparent px-2 text-sm outline-none placeholder:text-muted-foreground"
+              placeholder="Buscar na coleção"
+              className="min-w-0 flex-1 bg-transparent px-3 text-sm outline-none"
               aria-label="Buscar produtos"
               autoFocus
             />
           </form>
         )}
 
-        {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div id="mobile-navigation" className="md:hidden py-4 border-t border-border animate-fade-in">
-            <nav className="flex flex-col space-y-4">
-              {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`rounded-lg px-3 py-2 text-sm font-semibold transition-all duration-150 hover:bg-accent hover:text-accent-foreground ${
-                    isActive(item.href)
-                      ? 'bg-accent text-accent-foreground ring-1 ring-primary/20'
-                      : 'text-muted-foreground'
-                  }`}
-                  onClick={() => setIsMenuOpen(false)}
-                >
-                  {item.name}
-                </Link>
-              ))}
-            </nav>
-          </div>
+          <nav className="grid gap-1 border-t border-[#473d35]/10 py-4 lg:hidden" aria-label="Menu mobile">
+            {navigation.map((item) => (
+              <Link
+                key={item.name}
+                to={item.href}
+                className="rounded-xl px-4 py-3 text-sm font-semibold text-[#5e554e] transition hover:bg-[#ead9cd] hover:text-[#9f4e49]"
+              >
+                {item.name}
+              </Link>
+            ))}
+          </nav>
         )}
       </div>
     </header>

@@ -38,17 +38,17 @@ const Cart: React.FC = () => {
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen pt-16">
+      <div className="min-h-screen bg-[#f8f4ed] pt-20 text-[#27231f]">
         <div className="container mx-auto px-4 py-16">
           <div className="text-center max-w-md mx-auto">
-            <ShoppingBag className="h-24 w-24 mx-auto text-muted-foreground mb-6" />
-            <h1 className="text-3xl font-elegant font-bold mb-4">Carrinho Vazio</h1>
-            <p className="text-muted-foreground mb-8">
+            <ShoppingBag className="mx-auto mb-6 h-20 w-20 text-[#b45f5a]" strokeWidth={1.3} />
+            <h1 className="mb-4 font-serif text-4xl font-normal">Seu carrinho está vazio</h1>
+            <p className="mb-8 text-[#6f655d]">
               Você ainda não adicionou nenhum produto ao seu carrinho.
             </p>
             <Link
               to="/ecommerce"
-              className="inline-block bg-atelie-gradient text-white px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity"
+              className="inline-block rounded-full bg-[#27231f] px-8 py-3 font-semibold text-white transition hover:bg-[#b45f5a]"
             >
               Continuar Comprando
             </Link>
@@ -59,10 +59,11 @@ const Cart: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen pt-16">
-      <div className="container mx-auto px-4 py-8">
+    <div className="min-h-screen bg-[#f8f4ed] pt-20 text-[#27231f]">
+      <div className="mx-auto max-w-[1380px] px-5 py-12 sm:px-8 lg:px-12">
         <div className="mb-8">
-          <h1 className="text-3xl font-elegant font-bold text-gradient mb-2">
+          <p className="mb-3 text-[0.7rem] font-bold uppercase tracking-[0.28em] text-[#a64f4a]">Sua seleção</p>
+          <h1 className="mb-2 font-serif text-4xl font-normal md:text-5xl">
             Meu Carrinho
           </h1>
           <p className="text-muted-foreground">
@@ -74,7 +75,7 @@ const Cart: React.FC = () => {
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => (
-              <div key={item.id} className="bg-card rounded-lg p-4 sm:p-6 border border-border">
+              <div key={item.id} className="rounded-[1.35rem] border border-[#473d35]/10 bg-[#fffaf3] p-4 sm:p-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                   {/* Product Image */}
                   <div className="flex min-w-0 flex-1 items-center gap-4">
@@ -83,7 +84,7 @@ const Cart: React.FC = () => {
                         src={getOptimizedImageUrl(item.image_urls?.[0], { width: 160, height: 160, quality: 68 })}
                         fallbackSrc={item.image_urls?.[0]}
                         alt={item.name}
-                        className="h-20 w-20 object-cover rounded-lg"
+                        className="h-20 w-20 rounded-xl object-cover"
                         loading="lazy"
                         decoding="async"
                         width={160}
@@ -97,7 +98,7 @@ const Cart: React.FC = () => {
                       <p className="text-muted-foreground text-sm mb-2">
                         {item.category}
                       </p>
-                      <div className="text-lg font-bold text-gradient">
+                      <div className="text-lg font-bold text-[#a64f4a]">
                         {formatPrice(item.price)}
                       </div>
                     </div>
@@ -105,7 +106,7 @@ const Cart: React.FC = () => {
 
                   <div className="flex items-center justify-between gap-4 sm:justify-end">
                     {/* Quantity Controls */}
-                    <div className="flex items-center gap-3 rounded-lg border border-border px-2 py-1">
+                    <div className="flex items-center gap-3 rounded-full border border-[#473d35]/15 px-2 py-1">
                       <button
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         className="flex h-9 w-9 items-center justify-center rounded-md hover:bg-accent transition-colors"
@@ -149,8 +150,8 @@ const Cart: React.FC = () => {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="bg-card rounded-lg p-6 border border-border sticky top-24">
-              <h2 className="text-xl font-semibold mb-6">Resumo do Pedido</h2>
+            <div className="sticky top-24 rounded-[1.35rem] border border-[#473d35]/10 bg-[#efe5dc] p-6">
+              <h2 className="mb-6 font-serif text-2xl">Resumo do pedido</h2>
               
               <div className="space-y-4 mb-6">
                 {items.map((item) => (
@@ -164,7 +165,7 @@ const Cart: React.FC = () => {
               <div className="border-t border-border pt-4 mb-6">
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span className="text-gradient">{formatPrice(getTotalPrice())}</span>
+                  <span className="text-[#a64f4a]">{formatPrice(getTotalPrice())}</span>
                 </div>
               </div>
 
@@ -172,14 +173,14 @@ const Cart: React.FC = () => {
                 <Link
                   to="/checkout"
                   onClick={() => trackBeginCheckout(items)}
-                  className="w-full bg-atelie-gradient text-white py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity text-center block"
+                  className="block w-full rounded-full bg-[#27231f] py-3 text-center font-semibold text-white transition hover:bg-[#b45f5a]"
                 >
                   Finalizar Compra
                 </Link>
                 
                 <Link
                   to="/produtos"
-                  className="block w-full text-center border border-border py-3 rounded-lg hover:bg-accent transition-colors"
+                  className="block w-full rounded-full border border-[#473d35]/20 py-3 text-center transition-colors hover:bg-[#fffaf3]"
                 >
                   Continuar Comprando
                 </Link>
