@@ -127,6 +127,9 @@ const galleryProjects = [
 
 const Landing = () => {
   const [projectFilter, setProjectFilter] = useState('todos');
+  const filteredProjects = projectFilter === 'todos'
+    ? galleryProjects
+    : galleryProjects.filter((project) => project.tags.includes(projectFilter));
 
   useEffect(() => {
     const elements = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
@@ -309,36 +312,36 @@ const Landing = () => {
             </a>
           </div>
 
-          <div className="mb-9 flex flex-wrap gap-2" role="group" aria-label="Filtrar projetos">
-            {projectFilters.map((filter) => {
-              const active = projectFilter === filter.value;
-              return (
-                <button
-                  key={filter.value}
-                  type="button"
-                  onClick={() => setProjectFilter(filter.value)}
-                  className={`rounded-full border px-5 py-2.5 text-sm font-semibold transition ${
-                    active
-                      ? 'border-[#302b27] bg-[#302b27] text-white shadow-sm'
-                      : 'border-[#473d35]/15 bg-[#fffaf3]/70 text-[#655b54] hover:border-[#b45f5a]/40 hover:text-[#9f4e49]'
-                  }`}
-                  aria-pressed={active}
-                >
-                  {filter.label}
-                </button>
-              );
-            })}
+          <div className="-mx-5 mb-9 overflow-x-auto px-5 pb-2 sm:mx-0 sm:overflow-visible sm:px-0 sm:pb-0">
+            <div className="flex w-max gap-2 sm:w-auto sm:flex-wrap" role="tablist" aria-label="Filtrar projetos">
+              {projectFilters.map((filter) => {
+                const active = projectFilter === filter.value;
+                return (
+                  <button
+                    key={filter.value}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    aria-controls="project-gallery"
+                    onClick={() => setProjectFilter(filter.value)}
+                    className={`touch-manipulation whitespace-nowrap rounded-full border px-5 py-2.5 text-sm font-semibold transition ${
+                      active
+                        ? 'border-[#302b27] bg-[#302b27] text-white shadow-sm'
+                        : 'border-[#473d35]/15 bg-[#fffaf3]/70 text-[#655b54] hover:border-[#b45f5a]/40 hover:text-[#9f4e49]'
+                    }`}
+                  >
+                    {filter.label}
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {galleryProjects.map((project, index) => {
-              const visible = projectFilter === 'todos' || project.tags.includes(projectFilter);
-              return (
+          <div id="project-gallery" className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3" role="tabpanel" aria-live="polite">
+            {filteredProjects.map((project) => (
                 <figure
                   key={project.src}
-                  data-reveal="image"
-                  className={`group relative overflow-hidden rounded-[1.35rem] bg-[#d9cec4] shadow-[0_12px_35px_rgba(60,44,35,0.08)] ${visible ? '' : 'hidden'}`}
-                  style={{ transitionDelay: `${(index % 3) * 70}ms` }}
+                  className="group relative overflow-hidden rounded-[1.35rem] bg-[#d9cec4] shadow-[0_12px_35px_rgba(60,44,35,0.08)]"
                 >
                   <img
                     src={project.src}
@@ -355,8 +358,7 @@ const Landing = () => {
                     <h3 className="mt-2 font-elegant text-2xl">{project.title}</h3>
                   </figcaption>
                 </figure>
-              );
-            })}
+            ))}
           </div>
         </div>
       </section>
