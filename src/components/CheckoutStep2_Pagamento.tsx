@@ -213,7 +213,7 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
         </DialogContent>
       </Dialog>
 
-      <div className="min-h-screen w-full overflow-x-hidden px-3 pb-28 pt-24 sm:px-4 lg:px-6">
+      <div className="min-h-screen w-full overflow-x-hidden px-3 pb-28 pt-28 sm:px-4 lg:px-6">
         <div className="mx-auto mb-5 flex w-full max-w-2xl items-center justify-center sm:mb-6">
           <div className="flex items-center w-full">
             <div className="w-8 h-8 bg-rose-200 text-gray-500 rounded-full flex items-center justify-center">1</div>
@@ -311,7 +311,7 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
               )}
             </div>
 
-            <div className="min-w-0 space-y-4 lg:sticky lg:top-24">
+            <div className="min-w-0 space-y-4 lg:sticky lg:top-28">
               <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-700 md:p-5">
                 <h3 className="mb-4 font-semibold text-gray-900">Resumo financeiro</h3>
 

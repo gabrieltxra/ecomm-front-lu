@@ -215,7 +215,7 @@ const Products: React.FC = () => {
               {showFilters && <X className="w-5 h-5" />}
             </button>
 
-            <div className={`sticky top-24 rounded-[1.35rem] border border-[#473d35]/10 bg-[#fffaf3] p-6 shadow-[0_10px_30px_rgba(64,48,39,0.05)] lg:block ${showFilters ? 'block' : 'hidden'}`}>
+            <div className={`sticky top-28 rounded-[1.35rem] border border-[#473d35]/10 bg-[#fffaf3] p-6 shadow-[0_10px_30px_rgba(64,48,39,0.05)] lg:block ${showFilters ? 'block' : 'hidden'}`}>
               <div className="flex items-center justify-between mb-6">
                 <h3 className="font-elegant text-xl font-semibold text-[#302b27]">Filtros</h3>
                 <button onClick={clearFilters} className="text-sm font-semibold text-[#a64f4a] hover:text-[#8f4541]">Limpar</button>

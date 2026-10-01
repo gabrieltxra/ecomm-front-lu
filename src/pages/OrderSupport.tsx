@@ -65,8 +65,8 @@ export default function OrderSupport() {
   }
 
   return (
-    <div className="min-h-screen bg-rose-50/40 pt-20 pb-16">
-      <div className="container mx-auto max-w-2xl px-4">
+    <div className="min-h-screen bg-rose-50/40 pb-16 pt-20">
+      <div className="container mx-auto max-w-2xl px-4 pt-10 sm:pt-12">
         <button
           onClick={() => navigate(-1)}
           className="mb-6 inline-flex min-h-11 items-center gap-2 text-sm text-rose-600 transition hover:text-rose-700"

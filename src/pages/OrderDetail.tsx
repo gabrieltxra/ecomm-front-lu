@@ -238,7 +238,7 @@ const OrderDetails: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#f8f4ed] pb-16 pt-20 text-[#302b27]">
-      <div className="mx-auto max-w-6xl px-5 pt-8 sm:px-8 lg:px-12 lg:pt-10">
+      <div className="mx-auto max-w-6xl px-5 pt-10 sm:px-8 sm:pt-12 lg:px-12">
         <button
           onClick={() => navigate(-1)}
           className="mb-6 inline-flex items-center gap-2 text-sm font-semibold text-[#a64f4a] transition hover:text-[#873c38]"

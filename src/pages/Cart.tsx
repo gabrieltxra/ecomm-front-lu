@@ -150,7 +150,7 @@ const Cart: React.FC = () => {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 rounded-[1.35rem] border border-[#473d35]/10 bg-[#efe5dc] p-6">
+            <div className="sticky top-28 rounded-[1.35rem] border border-[#473d35]/10 bg-[#efe5dc] p-6">
               <h2 className="mb-6 font-serif text-2xl">Resumo do pedido</h2>
               
               <div className="space-y-4 mb-6">
