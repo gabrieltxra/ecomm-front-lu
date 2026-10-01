@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 const whatsappUrl =
   'https://wa.me/5519991893513?text=Olá!%20Gostaria%20de%20conhecer%20as%20opções%20do%20Ateliê%20Lu.';
@@ -37,7 +37,97 @@ const benefits = [
   },
 ];
 
+const projectFilters = [
+  { value: 'todos', label: 'Todos' },
+  { value: 'cortinas', label: 'Cortinas' },
+  { value: 'persianas', label: 'Persianas' },
+  { value: 'quartos', label: 'Quartos' },
+  { value: 'salas', label: 'Salas' },
+];
+
+const galleryProjects = [
+  {
+    src: '/landing/instagram/quarto-voil.jpg',
+    alt: 'Quarto contemporâneo com cortina de voil branca do teto ao piso',
+    title: 'Leveza no quarto',
+    detail: 'Voil wave',
+    tags: ['cortinas', 'quartos'],
+  },
+  {
+    src: '/landing/instagram/quarto-linho.jpg',
+    alt: 'Quarto com cortina de linho bege cobrindo toda a parede',
+    title: 'Textura e aconchego',
+    detail: 'Linho wave',
+    tags: ['cortinas', 'quartos'],
+  },
+  {
+    src: '/landing/instagram/quarto-classico.jpg',
+    alt: 'Quarto claro com persiana romana bege',
+    title: 'Luz na medida',
+    detail: 'Persiana romana',
+    tags: ['persianas', 'quartos'],
+  },
+  {
+    src: '/landing/instagram/cortina-canto.jpg',
+    alt: 'Sala de televisão com cortina wave em tom neutro',
+    title: 'Conforto visual',
+    detail: 'Cortina wave',
+    tags: ['cortinas', 'salas'],
+  },
+  {
+    src: '/landing/instagram/cortina-porta.jpg',
+    alt: 'Sala de pé-direito alto com cortina branca do teto ao piso',
+    title: 'Amplitude e movimento',
+    detail: 'Voil pé-direito alto',
+    tags: ['cortinas', 'salas'],
+  },
+  {
+    src: '/landing/instagram/projeto-fevereiro-09.jpg',
+    alt: 'Quarto infantil com cortina branca e iluminação embutida',
+    title: 'Delicadeza iluminada',
+    detail: 'Voil com iluminação',
+    tags: ['cortinas', 'quartos'],
+  },
+  {
+    src: '/landing/instagram/projeto-fevereiro-08.jpg',
+    alt: 'Janela alta com cortina branca e caimento leve',
+    title: 'Caimento impecável',
+    detail: 'Voil sob medida',
+    tags: ['cortinas', 'quartos'],
+  },
+  {
+    src: '/landing/instagram/projeto-janeiro-31.jpg',
+    alt: 'Sala clara com cortina branca, sofá e mesa de centro',
+    title: 'Sala leve e acolhedora',
+    detail: 'Cortina wave',
+    tags: ['cortinas', 'salas'],
+  },
+  {
+    src: '/landing/instagram/projeto-janeiro-14.jpg',
+    alt: 'Sala aconchegante com cortina branca e iluminação quente',
+    title: 'Aconchego ao entardecer',
+    detail: 'Voil com forro',
+    tags: ['cortinas', 'salas'],
+  },
+  {
+    src: '/landing/instagram/projeto-janeiro-19.jpg',
+    alt: 'Ambiente de pé-direito alto com cortina cinza longa',
+    title: 'Elegância vertical',
+    detail: 'Cortina pé-direito alto',
+    tags: ['cortinas', 'salas'],
+  },
+  {
+    src: '/landing/instagram/projeto-janeiro-15.jpg',
+    alt: 'Quarto clássico em branco e vinho com cortina clara',
+    title: 'Composição clássica',
+    detail: 'Cortina com forro',
+    tags: ['cortinas', 'quartos'],
+  },
+];
+
 const Landing = () => {
+  const [projectFilter, setProjectFilter] = useState('todos');
+
   useEffect(() => {
     const elements = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
 
@@ -219,48 +309,54 @@ const Landing = () => {
             </a>
           </div>
 
-          <div className="grid gap-5 md:grid-cols-[1.08fr_0.92fr_1fr]">
-            {[
-              {
-                src: '/landing/cortina-iluminada.jpg',
-                alt: 'Quarto com cortina bege do teto ao piso e iluminação embutida',
-                title: 'Caimento e luz',
-                detail: 'Cortina sob medida',
-              },
-              {
-                src: '/landing/cortina-sala.jpg',
-                alt: 'Sala acolhedora com cortina longa em tom neutro',
-                title: 'Conforto visual',
-                detail: 'Tecido encorpado',
-              },
-              {
-                src: '/landing/persiana-quarto.jpg',
-                alt: 'Quarto claro com persiana romana em tom neutro',
-                title: 'Praticidade elegante',
-                detail: 'Persiana romana',
-              },
-            ].map((project, index) => (
-              <figure
-                key={project.src}
-                data-reveal="image"
-                className={`group relative overflow-hidden bg-[#d9cec4] ${index === 1 ? 'md:mt-16' : ''} ${index === 2 ? 'md:mt-7' : ''}`}
-                style={{ transitionDelay: `${index * 90}ms` }}
-              >
-                <img
-                  src={project.src}
-                  alt={project.alt}
-                  width={640}
-                  height={640}
-                  loading="lazy"
-                  className="aspect-[4/5] h-full w-full object-cover transition duration-700 group-hover:scale-[1.035]"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#241d18]/75 via-transparent to-transparent" />
-                <figcaption className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-7">
-                  <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-white/70">{project.detail}</span>
-                  <h3 className="mt-2 font-elegant text-2xl">{project.title}</h3>
-                </figcaption>
-              </figure>
-            ))}
+          <div className="mb-9 flex flex-wrap gap-2" role="group" aria-label="Filtrar projetos">
+            {projectFilters.map((filter) => {
+              const active = projectFilter === filter.value;
+              return (
+                <button
+                  key={filter.value}
+                  type="button"
+                  onClick={() => setProjectFilter(filter.value)}
+                  className={`rounded-full border px-5 py-2.5 text-sm font-semibold transition ${
+                    active
+                      ? 'border-[#302b27] bg-[#302b27] text-white shadow-sm'
+                      : 'border-[#473d35]/15 bg-[#fffaf3]/70 text-[#655b54] hover:border-[#b45f5a]/40 hover:text-[#9f4e49]'
+                  }`}
+                  aria-pressed={active}
+                >
+                  {filter.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {galleryProjects.map((project, index) => {
+              const visible = projectFilter === 'todos' || project.tags.includes(projectFilter);
+              return (
+                <figure
+                  key={project.src}
+                  data-reveal="image"
+                  className={`group relative overflow-hidden rounded-[1.35rem] bg-[#d9cec4] shadow-[0_12px_35px_rgba(60,44,35,0.08)] ${visible ? '' : 'hidden'}`}
+                  style={{ transitionDelay: `${(index % 3) * 70}ms` }}
+                >
+                  <img
+                    src={project.src}
+                    alt={project.alt}
+                    width={1080}
+                    height={1080}
+                    loading="lazy"
+                    decoding="async"
+                    className="aspect-[4/5] h-full w-full object-cover transition duration-700 group-hover:scale-[1.035]"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#241d18]/80 via-[#241d18]/5 to-transparent" />
+                  <figcaption className="absolute inset-x-0 bottom-0 p-6 text-white sm:p-7">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-white/70">{project.detail}</span>
+                    <h3 className="mt-2 font-elegant text-2xl">{project.title}</h3>
+                  </figcaption>
+                </figure>
+              );
+            })}
           </div>
         </div>
       </section>
