@@ -2,9 +2,12 @@ import {
   ArrowRight,
   ArrowUpRight,
   Check,
+  Clock3,
   HeartHandshake,
   Instagram,
+  MapPin,
   MessageCircle,
+  Phone,
   Ruler,
   Sparkles,
   Store,
@@ -15,6 +18,12 @@ import { useEffect, useState } from 'react';
 
 const whatsappUrl =
   'https://wa.me/5519991893513?text=Olá!%20Gostaria%20de%20conhecer%20as%20opções%20do%20Ateliê%20Lu.';
+
+const businessHours = [
+  ['Segunda a sexta', '08:00–18:00'],
+  ['Sábado', '08:00–12:00'],
+  ['Domingo', 'Fechado'],
+];
 
 const benefits = [
   {
@@ -450,18 +459,61 @@ const Landing = () => {
       </section>
     </main>
 
-    <footer className="bg-[#27231f] px-5 py-10 text-[#d7cdc4] sm:px-8">
-      <div className="mx-auto flex max-w-[1380px] flex-col gap-7 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <span className="grid h-9 w-9 shrink-0 aspect-square place-items-center rounded-full bg-[#b45f5a] font-script text-lg font-bold text-white">L</span>
-          <span className="font-elegant text-lg text-[#fffaf3]">Ateliê Lu Cortinas</span>
+    <footer className="bg-[#27231f] px-5 py-12 text-[#d7cdc4] sm:px-8 sm:py-14">
+      <div className="mx-auto max-w-[1380px]">
+        <div className="grid gap-10 border-b border-white/10 pb-10 md:grid-cols-[0.85fr_1.15fr_1fr] md:gap-12">
+          <div>
+            <div className="flex items-center gap-3">
+              <span className="grid h-10 w-10 shrink-0 aspect-square place-items-center rounded-full bg-[#b45f5a] font-script text-xl font-bold text-white">L</span>
+              <span className="font-elegant text-xl text-[#fffaf3]">Ateliê Lu Cortinas</span>
+            </div>
+            <p className="mt-5 max-w-xs text-sm leading-6 text-[#a99c92]">
+              Cortinas e persianas escolhidas com cuidado para transformar cada ambiente.
+            </p>
+          </div>
+
+          <div>
+            <h2 className="flex items-center gap-2.5 text-xs font-bold uppercase tracking-[0.22em] text-[#d99790]">
+              <MapPin className="h-4 w-4" aria-hidden="true" />
+              Onde estamos
+            </h2>
+            <a
+              href="https://www.google.com/maps/search/?api=1&query=R.%20Jurunas%2C%20398%20-%20S%C3%A3o%20Francisco%2C%20Santa%20B%C3%A1rbara%20d%27Oeste%20-%20SP%2C%2013457-038"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 block max-w-md text-sm leading-6 transition hover:text-white"
+            >
+              R. Jurunas, 398 — São Francisco<br />
+              Santa Bárbara d'Oeste — SP, 13457-038
+            </a>
+            <a href="tel:+5519991893513" className="mt-4 inline-flex items-center gap-2 text-sm transition hover:text-white">
+              <Phone className="h-4 w-4 text-[#d99790]" aria-hidden="true" />
+              (19) 99189-3513
+            </a>
+          </div>
+
+          <div>
+            <h2 className="flex items-center gap-2.5 text-xs font-bold uppercase tracking-[0.22em] text-[#d99790]">
+              <Clock3 className="h-4 w-4" aria-hidden="true" />
+              Horário de funcionamento
+            </h2>
+            <dl className="mt-4 max-w-xs space-y-2 text-sm">
+              {businessHours.map(([days, hours]) => (
+                <div key={days} className="flex items-center justify-between gap-5">
+                  <dt className="text-[#a99c92]">{days}</dt>
+                  <dd className={hours === 'Fechado' ? 'text-[#d99790]' : 'text-[#f4ede6]'}>{hours}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
         </div>
-        <div className="flex flex-wrap items-center gap-x-7 gap-y-3 text-sm">
+
+        <div className="flex flex-col gap-4 pt-7 sm:flex-row sm:items-center sm:justify-between">
           <a href="https://www.instagram.com/lucortinas_atelie" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 transition hover:text-white">
             <Instagram className="h-4 w-4" /> @lucortinas_atelie
           </a>
+          <p className="text-xs text-[#9f9187]">© {new Date().getFullYear()} Ateliê Lu</p>
         </div>
-        <p className="text-xs text-[#9f9187]">© {new Date().getFullYear()} Ateliê Lu</p>
       </div>
     </footer>
   </div>
