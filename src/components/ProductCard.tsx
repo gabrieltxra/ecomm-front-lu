@@ -131,7 +131,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
         </p>
 
         <div className="mt-auto flex items-center justify-between gap-2">
-          <span className={`font-elegant font-semibold text-[#9f4e49] ${compact ? 'text-xl' : 'text-2xl'}`}>
+          <span className={`font-sans font-bold tabular-nums tracking-[-0.02em] text-[#9f4e49] ${compact ? 'text-xl' : 'text-2xl'}`}>
             {formatPrice(product.price)}
           </span>
 

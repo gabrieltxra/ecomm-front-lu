@@ -98,7 +98,7 @@ const Cart: React.FC = () => {
                       <p className="text-muted-foreground text-sm mb-2">
                         {item.category}
                       </p>
-                      <div className="text-lg font-bold text-[#a64f4a]">
+                      <div className="font-sans text-lg font-bold tabular-nums tracking-[-0.02em] text-[#a64f4a]">
                         {formatPrice(item.price)}
                       </div>
                     </div>
@@ -165,7 +165,7 @@ const Cart: React.FC = () => {
               <div className="border-t border-border pt-4 mb-6">
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span className="text-[#a64f4a]">{formatPrice(getTotalPrice())}</span>
+                  <span className="font-sans font-bold tabular-nums tracking-[-0.02em] text-[#a64f4a]">{formatPrice(getTotalPrice())}</span>
                 </div>
               </div>
 

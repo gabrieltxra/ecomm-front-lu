@@ -71,7 +71,7 @@ const AddToCartDialog = ({ product, open, onOpenChange }: AddToCartDialogProps) 
                 {product.name}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">{product.category}</p>
-              <p className="mt-2 text-lg font-bold text-rose-500">
+              <p className="mt-2 font-sans text-lg font-bold tabular-nums tracking-[-0.02em] text-[#9f4e49]">
                 {formatPrice(product.price)}
               </p>
             </div>

@@ -272,7 +272,7 @@ useEffect(() => {
             </h1>
 
             {/* Price */}
-            <div className="text-3xl font-semibold text-[#a64f4a]">
+            <div className="font-sans text-3xl font-bold tabular-nums tracking-[-0.02em] text-[#a64f4a]">
               {formatPrice(product.price)}
             </div>
 
