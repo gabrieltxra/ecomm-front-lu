@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const whatsappUrl =
   'https://wa.me/5519991893513?text=Olá!%20Gostaria%20de%20conhecer%20as%20opções%20do%20Ateliê%20Lu.';
@@ -36,7 +37,31 @@ const benefits = [
   },
 ];
 
-const Landing = () => (
+const Landing = () => {
+  useEffect(() => {
+    const elements = Array.from(document.querySelectorAll<HTMLElement>('[data-reveal]'));
+
+    if (!('IntersectionObserver' in window)) {
+      elements.forEach((element) => element.classList.add('is-visible'));
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.14, rootMargin: '0px 0px -7% 0px' }
+    );
+
+    elements.forEach((element) => observer.observe(element));
+    return () => observer.disconnect();
+  }, []);
+
+  return (
   <div className="landing-page min-h-screen overflow-hidden bg-[#f8f4ed] text-[#2e2925] selection:bg-[#c96b65] selection:text-white">
     <Helmet>
       <title>Ateliê Lu Cortinas | Ambientes que acolhem</title>
@@ -82,7 +107,7 @@ const Landing = () => (
         <div className="pointer-events-none absolute -right-24 bottom-4 h-96 w-96 rounded-full bg-[#cf8b84]/15 blur-3xl" />
 
         <div className="mx-auto grid min-h-[calc(100vh-5rem)] max-w-[1380px] items-center gap-12 px-5 py-16 sm:px-8 lg:grid-cols-[1.04fr_0.96fr] lg:px-12 lg:py-20">
-          <div className="relative z-10 max-w-3xl">
+          <div className="relative z-10 max-w-3xl" data-reveal="left">
             <div className="mb-8 flex items-center gap-3 text-xs font-bold uppercase tracking-[0.28em] text-[#a64f4a]">
               <span className="h-px w-10 bg-[#a64f4a]" />
               Design que veste a casa
@@ -120,7 +145,7 @@ const Landing = () => (
             </div>
           </div>
 
-          <div className="relative mx-auto w-full max-w-[590px] lg:ml-auto">
+          <div className="relative mx-auto w-full max-w-[590px] lg:ml-auto" data-reveal="image">
             <div className="absolute -left-7 top-12 z-20 rounded-full border border-[#fffaf3]/60 bg-[#fffaf3]/90 px-4 py-2 text-xs font-semibold text-[#645b54] shadow-lg backdrop-blur-md sm:-left-12 sm:px-5 sm:py-3">
               Sob medida, como a sua casa
             </div>
@@ -152,11 +177,11 @@ const Landing = () => (
 
       <section id="atelie" className="border-y border-[#463b33]/10 bg-[#302b27] py-20 text-[#f8f1e8] sm:py-28">
         <div className="mx-auto grid max-w-[1380px] gap-14 px-5 sm:px-8 lg:grid-cols-[0.72fr_1.28fr] lg:px-12">
-          <div>
+          <div data-reveal="left">
             <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#d99790]">Mais que decoração</p>
             <div className="mt-8 h-px w-16 bg-[#d99790]" />
           </div>
-          <div>
+          <div data-reveal="up">
             <h2 className="max-w-4xl font-elegant text-4xl leading-[1.08] tracking-[-0.025em] sm:text-5xl lg:text-6xl">
               A casa conta quem você é. A gente ajuda a contar essa história com{' '}
               <span className="font-script italic text-[#d99790]">textura, luz e delicadeza.</span>
@@ -175,7 +200,7 @@ const Landing = () => (
 
       <section id="projetos" className="bg-[#f1e9e0] py-20 sm:py-28">
         <div className="mx-auto max-w-[1380px] px-5 sm:px-8 lg:px-12">
-          <div className="mb-12 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div className="mb-12 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between" data-reveal="up">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#a64f4a]">Feitos pelo Ateliê Lu</p>
               <h2 className="mt-4 max-w-2xl font-elegant text-4xl leading-tight tracking-[-0.025em] sm:text-5xl">
@@ -217,7 +242,9 @@ const Landing = () => (
             ].map((project, index) => (
               <figure
                 key={project.src}
+                data-reveal="image"
                 className={`group relative overflow-hidden bg-[#d9cec4] ${index === 1 ? 'md:mt-16' : ''} ${index === 2 ? 'md:mt-7' : ''}`}
+                style={{ transitionDelay: `${index * 90}ms` }}
               >
                 <img
                   src={project.src}
@@ -240,7 +267,7 @@ const Landing = () => (
 
       <section id="diferenciais" className="bg-[#f8f4ed] py-20 sm:py-28">
         <div className="mx-auto max-w-[1380px] px-5 sm:px-8 lg:px-12">
-          <div className="mb-14 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div className="mb-14 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between" data-reveal="up">
             <div>
               <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#a64f4a]">Nosso jeito de fazer</p>
               <h2 className="mt-4 max-w-2xl font-elegant text-4xl leading-tight tracking-[-0.025em] sm:text-5xl">Detalhes que mudam tudo.</h2>
@@ -252,7 +279,9 @@ const Landing = () => (
             {benefits.map(({ icon: Icon, number, title, description }, index) => (
               <article
                 key={title}
+                data-reveal="up"
                 className={`group relative py-9 md:px-8 md:py-12 lg:px-10 ${index > 0 ? 'border-t border-[#463b33]/15 md:border-l md:border-t-0' : ''}`}
+                style={{ transitionDelay: `${index * 80}ms` }}
               >
                 <div className="flex items-center justify-between">
                   <span className="grid h-12 w-12 place-items-center rounded-full bg-[#ead9cd] text-[#a64f4a] transition group-hover:-rotate-6 group-hover:bg-[#b45f5a] group-hover:text-white">
@@ -270,7 +299,7 @@ const Landing = () => (
 
       <section id="processo" className="bg-[#eadfd4] py-20 sm:py-28">
         <div className="mx-auto grid max-w-[1380px] gap-14 px-5 sm:px-8 lg:grid-cols-[0.9fr_1.1fr] lg:px-12">
-          <div>
+          <div data-reveal="left">
             <p className="text-xs font-bold uppercase tracking-[0.28em] text-[#a64f4a]">Como funciona</p>
             <h2 className="mt-5 max-w-xl font-elegant text-4xl leading-tight tracking-[-0.025em] sm:text-5xl">
               Da ideia à janela, sem complicação.
@@ -286,7 +315,7 @@ const Landing = () => (
             </Link>
           </div>
 
-          <ol className="space-y-3">
+          <ol className="space-y-3" data-reveal="right">
             {[
               ['Conte o que você imagina', 'Envie referências, medidas ou apenas a sua ideia pelo WhatsApp.'],
               ['Escolha com orientação', 'Ajudamos a combinar modelo, tecido, cor e acabamento.'],
@@ -306,7 +335,7 @@ const Landing = () => (
       </section>
 
       <section className="bg-[#b45f5a] px-5 py-20 text-white sm:px-8 sm:py-24">
-        <div className="mx-auto max-w-5xl text-center">
+        <div className="mx-auto max-w-5xl text-center" data-reveal="up">
           <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#f2cec8]">Seu ambiente começa aqui</p>
           <h2 className="mt-6 font-elegant text-4xl leading-tight tracking-[-0.025em] sm:text-6xl">Vamos encontrar a cortina certa para a sua história?</h2>
           <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
@@ -338,6 +367,7 @@ const Landing = () => (
       </div>
     </footer>
   </div>
-);
+  );
+};
 
 export default Landing;

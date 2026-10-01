@@ -344,3 +344,42 @@
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+/* Entradas sutis da landing conforme o conteúdo aparece no scroll. */
+.landing-page [data-reveal] {
+  --reveal-x: 0px;
+  --reveal-y: 26px;
+  opacity: 0;
+  transform: translate3d(var(--reveal-x), var(--reveal-y), 0);
+  transition:
+    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.landing-page [data-reveal='left'] {
+  --reveal-x: -28px;
+  --reveal-y: 0px;
+}
+
+.landing-page [data-reveal='right'] {
+  --reveal-x: 28px;
+  --reveal-y: 0px;
+}
+
+.landing-page [data-reveal='image'] {
+  --reveal-y: 18px;
+  transform: translate3d(0, var(--reveal-y), 0) scale(0.975);
+}
+
+.landing-page [data-reveal].is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing-page [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
