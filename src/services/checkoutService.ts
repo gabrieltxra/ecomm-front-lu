@@ -41,8 +41,6 @@ export interface OrderStatusResponse {
   payment_method: string;
   mp_payment_method_id?: string | null;
   payment_status: "pending" | "paid" | "failed" | "succeeded" | "expired";
-  stripe_session_id?: string;
-  stripe_payment_intent?: string;
   address: {
     cep: string;
     street: string;

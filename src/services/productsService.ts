@@ -56,10 +56,10 @@ const EMPTY_FILTERS_CONFIG: FiltersConfig = {
 };
 
 const isAbortError = (error: unknown) => error instanceof DOMException && error.name === 'AbortError';
-const PRODUCTS_CACHE_TTL_MS = 5 * 60_000;
-const PRODUCT_DETAIL_CACHE_TTL_MS = 10 * 60_000;
+const PRODUCTS_CACHE_TTL_MS = 15_000;
+const PRODUCT_DETAIL_CACHE_TTL_MS = 15_000;
 const FILTERS_CACHE_TTL_MS = 15 * 60_000;
-const SESSION_CACHE_PREFIX = 'lu-ecom-cache:';
+const SESSION_CACHE_PREFIX = 'lu-ecom-cache:v2:';
 
 type ClientCacheEntry<T> = {
   expiresAt: number;

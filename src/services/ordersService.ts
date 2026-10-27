@@ -40,8 +40,6 @@ export interface Order {
   payment_method: string;
   mp_payment_method_id?: string | null;
   payment_status: 'pending' | 'succeeded' | 'failed' | 'expired' | 'review';
-  stripe_session_id?: string;
-  stripe_payment_intent?: string;
 
   nfe_pdf_url?: string | null;
 
@@ -189,8 +187,6 @@ function normalizeOrder(raw: any): Order {
     payment_method: normalizedPaymentMethod,
     mp_payment_method_id: raw.mp_payment_method_id ? String(raw.mp_payment_method_id) : null,
     payment_status: paymentStatusMap[raw.payment_status] || raw.payment_status,
-    stripe_session_id: raw.stripe_session_id,
-    stripe_payment_intent: raw.stripe_payment_intent,
     address: {
       cep: String(raw.address?.cep ?? ''),
       street: String(raw.address?.street ?? ''),
