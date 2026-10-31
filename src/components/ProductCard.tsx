@@ -34,6 +34,8 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
   const navigate = useNavigate();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const isAvailable = Number(product.stock) > 0;
+  const requiresVariantChoice = (product.variant_count ?? product.variants?.length ?? 0) > 1;
+  const hasPriceRange = Number(product.price_max ?? product.price) > Number(product.price_min ?? product.price);
   const imageHeightClass = compact ? 'h-52 sm:h-56' : 'h-64 sm:h-72 md:h-80';
   const productImage = product.image_urls?.[0];
   const optimizedImage = getOptimizedImageUrl(productImage, {
@@ -59,6 +61,11 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 
     if (isAddingToCart) return;
 
+    if (requiresVariantChoice) {
+      navigate(`/product/${product.id}`);
+      return;
+    }
+
     if (!isAvailable) {
       toast.error('Produto indisponível no momento.');
       return;
@@ -75,12 +82,14 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
     setIsAddingToCart(true);
 
     try {
-      const added = await addToCart(product);
-      if (added) onAddedToCart?.(product);
+      const onlyVariant = product.variants?.length === 1 ? product.variants[0] : null;
+      const cartProduct = onlyVariant ? { ...product, ...onlyVariant, variants: product.variants } : product;
+      const added = await addToCart(cartProduct);
+      if (added) onAddedToCart?.(cartProduct);
     } finally {
       setIsAddingToCart(false);
     }
-  }, [addToCart, isAddingToCart, isAvailable, navigate, onAddedToCart, product]);
+  }, [addToCart, isAddingToCart, isAvailable, navigate, onAddedToCart, product, requiresVariantChoice]);
 
   return (
     <article
@@ -132,7 +141,8 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
 
         <div className="mt-auto flex flex-wrap items-center justify-between gap-3">
           <span className={`whitespace-nowrap font-sans font-bold tabular-nums tracking-[-0.02em] text-[#9f4e49] ${compact ? 'text-xl' : 'text-2xl'}`}>
-            {formatPrice(product.price)}
+            {hasPriceRange && <span className="mr-1 text-xs font-semibold uppercase tracking-wide">A partir de</span>}
+            {formatPrice(product.price_min ?? product.price)}
           </span>
 
           <button
@@ -144,7 +154,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
                 ? 'bg-[#302b27] text-white hover:-translate-y-0.5 hover:bg-[#b45f5a] disabled:cursor-wait disabled:opacity-85'
                 : 'cursor-not-allowed bg-[#ddd2c8] text-[#8a7d74] shadow-none'
             }`}
-            aria-label={isAvailable ? `Adicionar ${product.name} ao carrinho` : `${product.name} indisponível`}
+            aria-label={isAvailable ? (requiresVariantChoice ? `Escolher opção de ${product.name}` : `Adicionar ${product.name} ao carrinho`) : `${product.name} indisponível`}
             aria-busy={isAddingToCart}
           >
             {isAddingToCart ? (
@@ -152,7 +162,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
             ) : (
               <ShoppingCart className="h-4 w-4" />
             )}
-            {isAddingToCart ? 'Adicionando...' : isAvailable ? 'Comprar' : 'Indisponível'}
+            {isAddingToCart ? 'Adicionando...' : isAvailable ? (requiresVariantChoice ? 'Escolher opção' : 'Comprar') : 'Indisponível'}
           </button>
         </div>
       </div>

@@ -15,8 +15,8 @@ const API = import.meta.env.VITE_REACT_APP_API_URL || 'http://localhost:3000/api
 interface CartContextType {
   items: CartItem[];
   addToCart: (product: Product) => Promise<boolean>;
-  removeFromCart: (productId: number) => Promise<void>;
-  updateQuantity: (productId: number, quantity: number) => Promise<void>;
+  removeFromCart: (productId: string) => Promise<void>;
+  updateQuantity: (productId: string, quantity: number) => Promise<void>;
   getTotalItems: () => number;
   getTotalPrice: () => number;
   clearCart: () => void;
@@ -121,7 +121,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   };
 
-  const removeFromCart = async (productId: number) => {
+  const removeFromCart = async (productId: string) => {
     const token = localStorage.getItem('token');
     if (!token) return;
     const removedItem = items.find((item) => item.id === productId);
@@ -143,7 +143,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
     }
   };
 
- const updateQuantity = async (productId: number, quantity: number) => {
+ const updateQuantity = async (productId: string, quantity: number) => {
   if (quantity <= 0) {
     removeFromCart(productId);
     return;

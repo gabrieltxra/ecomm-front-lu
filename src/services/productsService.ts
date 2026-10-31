@@ -166,9 +166,19 @@ export function getCachedProducts(filters: FilterState, page: number = 1, limit:
 export function primeProductCache(product?: Product | null) {
   if (!product?.id) return;
 
-  const cacheKey = String(product.id);
-  setClientCache(productByIdCache, cacheKey, product, PRODUCT_DETAIL_CACHE_TTL_MS);
-  setSessionCache(`product:${cacheKey}`, product, PRODUCT_DETAIL_CACHE_TTL_MS);
+  const cacheEntries = product.variants?.length
+    ? product.variants.map((variant) => ({
+        ...product,
+        id: variant.id,
+        selected_variant_id: variant.id,
+      }))
+    : [product];
+
+  cacheEntries.forEach((entry) => {
+    const cacheKey = String(entry.id);
+    setClientCache(productByIdCache, cacheKey, entry, PRODUCT_DETAIL_CACHE_TTL_MS);
+    setSessionCache(`product:${cacheKey}`, entry, PRODUCT_DETAIL_CACHE_TTL_MS);
+  });
 }
 
 export function getCachedProductById(id: string | number) {
@@ -229,6 +239,12 @@ export const getProducts = async (
     const products: Product[] = data.products.map((product: Product) => ({
       ...product,
       price: Number(product.price),
+      stock: Number(product.stock),
+      variants: product.variants?.map((variant) => ({
+        ...variant,
+        price: Number(variant.price),
+        stock: Number(variant.stock),
+      })),
     }));
 
     const result = {
@@ -259,7 +275,17 @@ export const getProductById = async (id: string | number): Promise<Product | nul
     const response = await fetch(`${API_BASE_URL}/product/${id}`);
     if (!response.ok) throw new Error('Produto nao encontrado');
 
-    const product = await response.json();
+    const rawProduct = await response.json();
+    const product: Product = {
+      ...rawProduct,
+      price: Number(rawProduct.price),
+      stock: Number(rawProduct.stock),
+      variants: rawProduct.variants?.map((variant: Product) => ({
+        ...variant,
+        price: Number(variant.price),
+        stock: Number(variant.stock),
+      })),
+    };
     primeProductCache(product);
 
     return product;

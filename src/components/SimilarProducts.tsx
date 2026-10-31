@@ -37,7 +37,9 @@ const SimilarProducts: React.FC<SimilarProductsProps> = ({
         );
 
         let nextProducts = (sameCategoryResponse?.products || []).filter(
-          (product) => String(product.id) !== String(currentProduct.id)
+          (product) =>
+            String(product.id) !== String(currentProduct.id)
+            && product.variant_group_id !== currentProduct.variant_group_id
         );
 
         if (nextProducts.length < maxProducts) {
@@ -56,6 +58,7 @@ const SimilarProducts: React.FC<SimilarProductsProps> = ({
           const fallbackProducts = (fallbackResponse?.products || []).filter(
             (product) =>
               String(product.id) !== String(currentProduct.id) &&
+              product.variant_group_id !== currentProduct.variant_group_id &&
               !nextProducts.some((item) => String(item.id) === String(product.id))
           );
 
@@ -78,7 +81,7 @@ const SimilarProducts: React.FC<SimilarProductsProps> = ({
     return () => {
       active = false;
     };
-  }, [currentProduct.category, currentProduct.id, maxProducts]);
+  }, [currentProduct.category, currentProduct.id, currentProduct.variant_group_id, maxProducts]);
 
   if (!loading && products.length === 0) return null;
 
