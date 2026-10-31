@@ -33,7 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
   const { addToCart } = useCart();
   const navigate = useNavigate();
   const [isAddingToCart, setIsAddingToCart] = useState(false);
-  const isAvailable = Number(product.stock) > 0;
+  const isAvailable = product.status === 'active' && Number(product.stock) > 0;
   const requiresVariantChoice = (product.variant_count ?? product.variants?.length ?? 0) > 1;
   const hasPriceRange = Number(product.price_max ?? product.price) > Number(product.price_min ?? product.price);
   const imageHeightClass = compact ? 'h-52 sm:h-56' : 'h-64 sm:h-72 md:h-80';
