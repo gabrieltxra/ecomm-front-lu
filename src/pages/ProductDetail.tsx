@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
+  Check,
   ChevronLeft,
   ChevronRight,
   Loader2,
@@ -118,6 +119,8 @@ useEffect(() => {
   }
   
   const isAvailable = selectedProduct?.status === 'active' && Number(selectedProduct?.stock ?? 0) > 0;
+  const displayName = selectedProduct?.name ?? product.name;
+  const displayDescription = selectedProduct?.description ?? product.description;
   const selectedImages = selectedProduct?.image_urls?.length
     ? selectedProduct.image_urls
     : product.image_urls ?? [];
@@ -166,8 +169,8 @@ useEffect(() => {
   const handleShare = async () => {
     const url = new URL(`/product/${selectedProduct?.id ?? product.id}`, window.location.origin).toString();
     const shareData = {
-      title: product.name,
-      text: `Confira ${product.name} no Ateliê Lu.`,
+      title: displayName,
+      text: `Confira ${displayName} no Ateliê Lu.`,
       url,
     };
 
@@ -200,7 +203,7 @@ useEffect(() => {
 
   return (
     <div className="min-h-screen bg-[#f8f4ed] pt-20 text-[#27231f]">
-      <Head title={`${product.name} | Ateliê Lu`} />
+      <Head title={`${displayName} | Ateliê Lu`} />
       <div className="mx-auto max-w-[1380px] px-5 py-10 sm:px-8 lg:px-12">
         {/* Back Button */}
         <button
@@ -219,7 +222,7 @@ useEffect(() => {
               type="button"
               onClick={() => setIsImageDialogOpen(true)}
               className="group relative block aspect-square w-full cursor-zoom-in overflow-hidden rounded-[1.5rem] bg-[#efe5dc] text-left"
-              aria-label={`Ampliar imagem de ${product.name}`}
+              aria-label={`Ampliar imagem de ${displayName}`}
             >
               <CachedImage
                 key={selectedImage}
@@ -227,7 +230,7 @@ useEffect(() => {
                 srcSet={getProductImageSrcSet(selectedImage, [480, 720, 960, 1280])}
                 sizes="(max-width: 1023px) calc(100vw - 2rem), 50vw"
                 fallbackSrc={selectedImage}
-                alt={product.name}
+                alt={displayName}
                 loading="eager"
                 fetchPriority="high"
                 decoding="async"
@@ -261,7 +264,7 @@ useEffect(() => {
                     srcSet={getProductImageSrcSet(image, [120, 180, 240])}
                     sizes="(max-width: 1023px) calc((100vw - 4rem) / 3), 160px"
                     fallbackSrc={image}
-                    alt={`${product.name} ${index + 1}`}
+                    alt={`${displayName} ${index + 1}`}
                     loading="lazy"
                     decoding="async"
                     width={240}
@@ -282,7 +285,7 @@ useEffect(() => {
 
             {/* Title */}
             <h1 className="font-serif text-4xl font-normal leading-tight md:text-6xl">
-              {product.name}
+              {displayName}
             </h1>
 
             {/* Price */}
@@ -293,33 +296,69 @@ useEffect(() => {
             {/* Description */}
             <div className="prose prose-gray max-w-none">
               <p className="text-muted-foreground leading-relaxed">
-                {product.description}
+                {displayDescription}
               </p>
             </div>
 
             {(product.variants?.length ?? 0) > 1 && (
-              <div className="space-y-3 rounded-[1.35rem] border border-[#473d35]/10 bg-[#fffaf3] p-5">
-                <div className="flex items-center justify-between gap-3">
-                  <h2 className="font-semibold text-[#302b27]">Escolha a cor ou estampa</h2>
-                  <span className="text-sm text-[#7b6f66]">{selectedVariant?.variant_label}</span>
+              <div className="space-y-4 rounded-[1.5rem] border border-[#473d35]/10 bg-[#fffaf3] p-5 shadow-[0_12px_32px_rgba(64,48,39,0.06)]">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                  <div>
+                    <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#9f4e49]">Cor ou estampa</p>
+                    <h2 className="mt-1 font-serif text-2xl text-[#302b27]">Escolha sua opção</h2>
+                  </div>
+                  <span className="text-sm text-[#7b6f66]">
+                    {product.variants.length} opç{product.variants.length !== 1 ? 'ões' : 'ão'}
+                  </span>
                 </div>
-                <div className="flex flex-wrap gap-2" role="list" aria-label="Variações disponíveis">
-                  {product.variants?.map((variant) => {
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" role="list" aria-label="Variações disponíveis">
+                  {product.variants.map((variant) => {
                     const selected = String(variant.id) === String(selectedVariant?.id);
                     const available = variant.status === 'active' && Number(variant.stock) > 0;
+                    const variantImage = variant.image_urls?.[0] || product.image_urls?.[0] || '';
                     return (
                       <button
                         key={variant.id}
                         type="button"
                         onClick={() => navigate(`/product/${variant.id}`, { replace: true })}
-                        className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                        onPointerEnter={() => variantImage && preloadDetailImage(variantImage)}
+                        onFocus={() => variantImage && preloadDetailImage(variantImage)}
+                        className={`group/variant relative flex min-w-0 items-center gap-3 rounded-2xl border p-2.5 text-left transition duration-300 ${
                           selected
-                            ? 'border-[#b45f5a] bg-[#b45f5a] text-white'
-                            : 'border-[#473d35]/20 bg-white text-[#5e554e] hover:border-[#b45f5a]/60'
-                        } ${available ? '' : 'opacity-60'}`}
+                            ? 'border-[#b45f5a] bg-[#f5e2db] shadow-[0_8px_22px_rgba(180,95,90,0.14)]'
+                            : 'border-[#473d35]/15 bg-[#fffdf9] hover:border-[#b45f5a]/55 hover:bg-[#f9eee7]'
+                        }`}
                         aria-pressed={selected}
+                        aria-label={`${variant.variant_label || 'Padrão'}, ${formatPrice(variant.price)}, ${available ? 'disponível' : 'esgotada'}`}
                       >
-                        {variant.variant_label || 'Padrão'}{available ? '' : ' — esgotado'}
+                        <span className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl bg-[#eadfd4]">
+                          {variantImage && (
+                            <CachedImage
+                              src={getOptimizedImageUrl(variantImage, { width: 160, quality: 70 })}
+                              srcSet={getProductImageSrcSet(variantImage, [96, 128, 160])}
+                              sizes="64px"
+                              fallbackSrc={variantImage}
+                              alt=""
+                              loading="lazy"
+                              decoding="async"
+                              width={160}
+                              height={160}
+                              className="h-full w-full object-cover transition duration-300 group-hover/variant:scale-105"
+                            />
+                          )}
+                          {selected && (
+                            <span className="absolute right-1 top-1 flex h-5 w-5 items-center justify-center rounded-full bg-[#b45f5a] text-white shadow-sm">
+                              <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                            </span>
+                          )}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate font-semibold text-[#302b27]">{variant.variant_label || 'Padrão'}</span>
+                          <span className="mt-1 block text-sm font-bold tabular-nums text-[#9f4e49]">{formatPrice(variant.price)}</span>
+                          <span className={`mt-0.5 block text-xs font-medium ${available ? 'text-[#606c38]' : 'text-[#9f4e49]'}`}>
+                            {available ? `${variant.stock} em estoque` : 'Esgotada'}
+                          </span>
+                        </span>
                       </button>
                     );
                   })}
@@ -381,7 +420,7 @@ useEffect(() => {
       </div>
       
       {/* Produtos Similares */}
-      {product && <SimilarProducts currentProduct={product} />}
+      {product && <SimilarProducts currentProduct={selectedProduct ?? product} />}
       <AddToCartDialog
         product={selectedProduct ?? product}
         open={isCartDialogOpen}
@@ -397,7 +436,7 @@ useEffect(() => {
           }}
         >
           <DialogTitle className="sr-only">
-            Imagem ampliada de {product.name}
+            Imagem ampliada de {displayName}
           </DialogTitle>
           <div className="relative flex h-full min-h-0 items-center justify-center overflow-hidden rounded-lg">
             <CachedImage
@@ -406,7 +445,7 @@ useEffect(() => {
               srcSet={getProductImageSrcSet(selectedImage, [720, 960, 1280, 1600])}
               sizes="calc(100vw - 1rem)"
               fallbackSrc={selectedImage}
-              alt={product.name}
+              alt={displayName}
               loading="eager"
               decoding="async"
               width={1600}

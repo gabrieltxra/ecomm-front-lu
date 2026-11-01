@@ -59,7 +59,7 @@ const isAbortError = (error: unknown) => error instanceof DOMException && error.
 const PRODUCTS_CACHE_TTL_MS = 15_000;
 const PRODUCT_DETAIL_CACHE_TTL_MS = 15_000;
 const FILTERS_CACHE_TTL_MS = 15 * 60_000;
-const SESSION_CACHE_PREFIX = 'lu-ecom-cache:v2:';
+const SESSION_CACHE_PREFIX = 'lu-ecom-cache:v3:';
 
 type ClientCacheEntry<T> = {
   expiresAt: number;
@@ -164,15 +164,13 @@ export function getCachedProducts(filters: FilterState, page: number = 1, limit:
 }
 
 export function primeProductCache(product?: Product | null) {
-  if (!product?.id) return;
+  if (!product?.id || !product.variants?.length) return;
 
-  const cacheEntries = product.variants?.length
-    ? product.variants.map((variant) => ({
-        ...product,
-        id: variant.id,
-        selected_variant_id: variant.id,
-      }))
-    : [product];
+  const cacheEntries = product.variants.map((variant) => ({
+    ...product,
+    id: variant.id,
+    selected_variant_id: variant.id,
+  }));
 
   cacheEntries.forEach((entry) => {
     const cacheKey = String(entry.id);

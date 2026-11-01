@@ -125,6 +125,14 @@ const ProductCard: React.FC<ProductCardProps> = React.memo(({
               {product.category}
             </span>
           </div>
+
+          {product.variant_label && (
+            <div className="absolute bottom-3 left-3">
+              <span className="rounded-full bg-[#302b27]/90 px-3 py-1.5 text-xs font-semibold text-white shadow-sm backdrop-blur-sm">
+                {product.variant_label}
+              </span>
+            </div>
+          )}
         </div>
       </Link>
 
