@@ -181,7 +181,7 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
       <Dialog open={stockErrorOpen} onOpenChange={setStockErrorOpen}>
         <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Estoque atualizado</DialogTitle>
+            <DialogTitle>Disponibilidade atualizada</DialogTitle>
             <DialogDescription>
               Alguns itens do seu pedido nao estao mais disponiveis na quantidade solicitada.
             </DialogDescription>
@@ -193,7 +193,7 @@ export default function CheckoutStep2({ onBack, updateData, data }: any) {
                 <div key={item.id} className="rounded-lg border border-rose-100 bg-rose-50 p-3 text-sm text-gray-700">
                   <div className="font-medium text-gray-900">{item.name}</div>
                   <div>Solicitado: {item.requested}</div>
-                  <div>Disponivel: {item.stock}</div>
+                  <div>A quantidade solicitada não está mais disponível.</div>
                 </div>
               ))
             ) : (

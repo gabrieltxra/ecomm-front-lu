@@ -356,7 +356,7 @@ useEffect(() => {
                           <span className="block truncate font-semibold text-[#302b27]">{variant.variant_label || 'Padrão'}</span>
                           <span className="mt-1 block text-sm font-bold tabular-nums text-[#9f4e49]">{formatPrice(variant.price)}</span>
                           <span className={`mt-0.5 block text-xs font-medium ${available ? 'text-[#606c38]' : 'text-[#9f4e49]'}`}>
-                            {available ? `${variant.stock} em estoque` : 'Esgotada'}
+                            {available ? 'Disponível' : 'Esgotada'}
                           </span>
                         </span>
                       </button>
