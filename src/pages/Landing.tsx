@@ -15,6 +15,9 @@ import {
 import { Helmet } from 'react-helmet-async';
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
+import { ECOMMERCE_ENABLED } from '@/lib/features';
+
+const instagramUrl = 'https://www.instagram.com/lucortinas_atelie';
 
 const whatsappUrl =
   'https://wa.me/5519991893513?text=Olá!%20Gostaria%20de%20conhecer%20as%20opções%20do%20Ateliê%20Lu.';
@@ -192,14 +195,27 @@ const Landing = () => {
           <a href="#processo" className="transition-colors hover:text-[#a64f4a]">Como funciona</a>
         </nav>
 
-        <Link
-          to="/ecommerce"
-          className="group inline-flex items-center gap-2 rounded-full bg-[#322c28] px-4 py-2.5 text-sm font-semibold text-[#fffaf3] transition hover:bg-[#a64f4a] sm:px-5"
-        >
-          <span className="hidden sm:inline">Visitar a loja</span>
-          <span className="sm:hidden">Loja</span>
-          <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-        </Link>
+        {ECOMMERCE_ENABLED ? (
+          <Link
+            to="/ecommerce"
+            className="group inline-flex items-center gap-2 rounded-full bg-[#322c28] px-4 py-2.5 text-sm font-semibold text-[#fffaf3] transition hover:bg-[#a64f4a] sm:px-5"
+          >
+            <span className="hidden sm:inline">Visitar a loja</span>
+            <span className="sm:hidden">Loja</span>
+            <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+          </Link>
+        ) : (
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group inline-flex items-center gap-2 rounded-full bg-[#322c28] px-4 py-2.5 text-sm font-semibold text-[#fffaf3] transition hover:bg-[#a64f4a] sm:px-5"
+          >
+            <MessageCircle className="h-4 w-4" />
+            <span className="hidden sm:inline">Fale com a gente</span>
+            <span className="sm:hidden">Contato</span>
+          </a>
+        )}
       </div>
     </header>
 
@@ -228,13 +244,23 @@ const Landing = () => {
             </div>
 
             <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-              <Link
-                to="/ecommerce"
-                className="group inline-flex min-h-14 items-center justify-center gap-3 rounded-full bg-[#b45f5a] px-7 text-sm font-bold text-white shadow-[0_14px_34px_rgba(117,58,53,0.22)] transition hover:-translate-y-0.5 hover:bg-[#9f4e49]"
-              >
-                Conhecer a coleção
-                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Link>
+              {ECOMMERCE_ENABLED ? (
+                <Link
+                  to="/ecommerce"
+                  className="group inline-flex min-h-14 items-center justify-center gap-3 rounded-full bg-[#b45f5a] px-7 text-sm font-bold text-white shadow-[0_14px_34px_rgba(117,58,53,0.22)] transition hover:-translate-y-0.5 hover:bg-[#9f4e49]"
+                >
+                  Conhecer a coleção
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Link>
+              ) : (
+                <a
+                  href="#projetos"
+                  className="group inline-flex min-h-14 items-center justify-center gap-3 rounded-full bg-[#b45f5a] px-7 text-sm font-bold text-white shadow-[0_14px_34px_rgba(117,58,53,0.22)] transition hover:-translate-y-0.5 hover:bg-[#9f4e49]"
+                >
+                  Ver projetos
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </a>
+              )}
               <a
                 href={whatsappUrl}
                 target="_blank"
@@ -412,14 +438,25 @@ const Landing = () => {
               Da ideia à janela, sem complicação.
             </h2>
             <p className="mt-6 max-w-lg leading-7 text-[#6c6058]">
-              Você pode começar pela nossa loja ou conversar diretamente com a gente. Seguimos no seu ritmo.
+              {ECOMMERCE_ENABLED
+                ? 'Você pode começar pela nossa loja ou conversar diretamente com a gente. Seguimos no seu ritmo.'
+                : 'Tudo começa com uma conversa. Conte o que você imagina e seguimos no seu ritmo.'}
             </p>
-            <Link to="/ecommerce" className="group mt-9 inline-flex items-center gap-3 font-bold text-[#9f4e49]">
-              Explorar produtos
-              <span className="grid h-9 w-9 place-items-center rounded-full border border-[#9f4e49]/30 transition group-hover:translate-x-1 group-hover:bg-[#9f4e49] group-hover:text-white">
-                <ArrowRight className="h-4 w-4" />
-              </span>
-            </Link>
+            {ECOMMERCE_ENABLED ? (
+              <Link to="/ecommerce" className="group mt-9 inline-flex items-center gap-3 font-bold text-[#9f4e49]">
+                Explorar produtos
+                <span className="grid h-9 w-9 place-items-center rounded-full border border-[#9f4e49]/30 transition group-hover:translate-x-1 group-hover:bg-[#9f4e49] group-hover:text-white">
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              </Link>
+            ) : (
+              <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="group mt-9 inline-flex items-center gap-3 font-bold text-[#9f4e49]">
+                Pedir um orçamento
+                <span className="grid h-9 w-9 place-items-center rounded-full border border-[#9f4e49]/30 transition group-hover:translate-x-1 group-hover:bg-[#9f4e49] group-hover:text-white">
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              </a>
+            )}
           </div>
 
           <ol className="space-y-3" data-reveal="right">
@@ -446,10 +483,17 @@ const Landing = () => {
           <p className="text-xs font-bold uppercase tracking-[0.3em] text-[#f2cec8]">Seu ambiente começa aqui</p>
           <h2 className="mt-6 font-elegant text-4xl leading-tight tracking-[-0.025em] sm:text-6xl">Vamos encontrar a cortina certa para a sua história?</h2>
           <div className="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
-            <Link to="/ecommerce" className="inline-flex min-h-14 items-center justify-center gap-3 rounded-full bg-[#fffaf3] px-7 text-sm font-bold text-[#8f4541] transition hover:-translate-y-0.5 hover:bg-white">
-              <Store className="h-4 w-4" />
-              Ir para a loja
-            </Link>
+            {ECOMMERCE_ENABLED ? (
+              <Link to="/ecommerce" className="inline-flex min-h-14 items-center justify-center gap-3 rounded-full bg-[#fffaf3] px-7 text-sm font-bold text-[#8f4541] transition hover:-translate-y-0.5 hover:bg-white">
+                <Store className="h-4 w-4" />
+                Ir para a loja
+              </Link>
+            ) : (
+              <a href={instagramUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-14 items-center justify-center gap-3 rounded-full bg-[#fffaf3] px-7 text-sm font-bold text-[#8f4541] transition hover:-translate-y-0.5 hover:bg-white">
+                <Instagram className="h-4 w-4" />
+                Ver no Instagram
+              </a>
+            )}
             <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-14 items-center justify-center gap-3 rounded-full border border-white/35 px-7 text-sm font-bold transition hover:-translate-y-0.5 hover:bg-white/10">
               <MessageCircle className="h-4 w-4" />
               Conversar no WhatsApp

@@ -1,20 +1,4 @@
 User-agent: *
 Allow: /
 
-# Sitemap
-Sitemap: https://lucortinas.com/sitemap.xml
-
-# Crawl-delay
-Crawl-delay: 1
-
-# Disallow admin areas (if any)
-Disallow: /admin/
-Disallow: /api/
-Disallow: /_next/
-Disallow: /static/
-
-# Allow important pages
-Allow: /produtos/
-Allow: /cortinas/
-Allow: /persianas/
-Allow: /sob-medida/
+Sitemap: https://lucortinas.com.br/sitemap.xml

@@ -44,7 +44,7 @@ export default function AnalyticsConsent() {
         <div>
           <h2 id="analytics-consent-title" className="font-semibold">Sua privacidade importa</h2>
           <p className="mt-1 text-sm leading-relaxed text-slate-600">
-            Usamos cookies analíticos opcionais para entender a navegação e melhorar a loja. Dados de login e pagamento não são enviados ao Analytics.
+            Usamos cookies analíticos opcionais para entender a navegação e melhorar o site. Dados pessoais não são enviados ao Analytics.
           </p>
           {choice && (
             <p className="mt-1 text-xs text-slate-500">

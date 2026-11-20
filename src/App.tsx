@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { HelmetProvider, Helmet } from "react-helmet-async";
 import { lazy, Suspense } from "react";
 import { CartProvider } from "./contexts/CartContext";
@@ -16,6 +16,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { MessageCircle } from "lucide-react";
 import AnalyticsConsent from "./components/AnalyticsConsent";
 import AnalyticsRouteTracker from "./components/AnalyticsRouteTracker";
+import { ECOMMERCE_ENABLED, SITE_URL } from "./lib/features";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,23 @@ const PageFallback = () => (
   <div className="flex min-h-[60vh] items-center justify-center" role="status">
     <div className="h-10 w-10 animate-spin rounded-full border-4 border-rose-200 border-t-rose-500" />
     <span className="sr-only">Carregando página</span>
+  </div>
+);
+
+// Loja desligada: só a landing. Qualquer outra URL (vitrine, produto, login,
+// carrinho, pedidos) volta para o início sem chamar a API.
+const LandingOnlyShell = () => (
+  <div className="min-h-screen bg-background relative flex flex-col">
+    <ScrollToTop />
+    <main className="flex-1">
+      <Suspense fallback={<PageFallback />}>
+        <Routes>
+          <Route path="/" element={<Landing />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
+    </main>
+    <AnalyticsConsent />
   </div>
 );
 
@@ -99,12 +117,10 @@ const App = () => (
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <ThemeProvider>
-            <CartProvider>
-              <AuthProvider>
-              <Toaster />
-              <Sonner />
-              {/* SEO Meta Tags */}
-              <Helmet>
+            <Toaster />
+            <Sonner />
+            {/* SEO Meta Tags */}
+            <Helmet>
                 <title>Ateliê Lu Cortinas - Cortinas e Persianas Sob Medida</title>
                 <meta name="description" content="Transforme seu lar com elegância e personalidade. Cortinas e persianas sob medida há mais de 10 anos. Qualidade premium, atendimento exclusivo e entrega para todo Brasil." />
                 <meta name="keywords" content="cortinas, persianas, sob medida, decoração, ateliê, lu cortinas, cortinas personalizadas, persianas personalizadas" />
@@ -115,7 +131,8 @@ const App = () => (
                 <meta property="og:title" content="Ateliê Lu Cortinas - Cortinas e Persianas Sob Medida" />
                 <meta property="og:description" content="Transforme seu lar com elegância e personalidade. Cortinas e persianas sob medida há mais de 10 anos." />
                 <meta property="og:type" content="website" />
-                <meta property="og:url" content="https://atelielucortinas.com" />
+                <meta property="og:url" content={`${SITE_URL}/`} />
+                <link rel="canonical" href={`${SITE_URL}/`} />
                 
                 {/* Twitter Card */}
                 <meta name="twitter:card" content="summary_large_image" />
@@ -129,9 +146,15 @@ const App = () => (
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
               </Helmet>
-              <SiteShell />
-            </AuthProvider>
-          </CartProvider>
+            {ECOMMERCE_ENABLED ? (
+              <CartProvider>
+                <AuthProvider>
+                  <SiteShell />
+                </AuthProvider>
+              </CartProvider>
+            ) : (
+              <LandingOnlyShell />
+            )}
         </ThemeProvider>
       </TooltipProvider>
     </QueryClientProvider>
